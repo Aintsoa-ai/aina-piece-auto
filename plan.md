@@ -18,17 +18,17 @@
 - [x] Faire en sorte que le Dashboard global puisse être filtré : "Statistiques Boutique Centre" vs "Statistiques Boutique Nord" (Réalisé via le module de rapport et d'export).
 - [x] Implémenter un Mode Simulateur pour que l'Administrateur teste l'interface de chaque boutique en un clic.
 
-## Phase 4 : Déploiement Production (Go-Live) - (Prochaine Étape)
+## Phase 4 : Déploiement Production (Go-Live) - (Terminée)
 - [x] Validation de l'intégrité du moteur de rendu PDF (Design exécutif, vectoriel, couleurs inline) sur tous les appareils.
 - [x] Correction de la visibilité des textes et couleurs dans le PDF (remplacement des classes CSS par des styles inline pour compatibilité `html2canvas`).
-- [ ] Compiler le code (`npm run build`).
-- [ ] Héberger l'application sur un serveur de production web (ex: Vercel, Netlify ou Render).
+- [x] Compiler le code (`npm run build`).
+- [x] Héberger l'application sur un serveur de production web (Vercel).
 - [x] Activer les politiques de sécurité finales (Row Level Security - RLS) sur Supabase pour garantir qu'aucune donnée ne fuite sans token d'authentification valide.
 - [ ] Effectuer une session de formation en conditions réelles avec le personnel Aina Pièce Auto.
 
 ## Phase 5 : Produit Multi-Client (Template SaaS)
 - [x] Génération de `schema_initial.sql` : script SQL complet pour créer une base Supabase vierge en 1 clic pour un nouveau client.
 - [x] Guide de déploiement `client_deploy.md` : procédure complète (~15 min) pour livrer l'ERP à un nouveau client.
-- [ ] Pousser le code source sur un repository GitHub privé (une seule branche = tous les clients).
+- [x] Pousser le code source sur un repository GitHub privé (une seule branche = tous les clients).
 - [ ] Créer une page de démonstration publique (avec fausses données) pour les prospects.
 - [ ] Définir une grille tarifaire : Forfait installation + Abonnement mensuel maintenance.

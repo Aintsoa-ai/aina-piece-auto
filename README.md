@@ -49,6 +49,14 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - **Sécurité Invisible (RLS) :** Cloisonnement physique des données de ventes, caisse et dépenses directement au niveau de la base de données. Il est impossible pour une boutique d'accéder aux données financières d'une autre boutique, même par piratage direct de l'API.
 - **Simulateur de Boutique :** Un mode "Simuler Accès" permettant au patron de se glisser dans la peau d'un caissier spécifique pour vérifier son interface instantanément.
 
+### 9. Déploiement Production (Cloud)
+- **Hébergement :** Application déployée en continu sur **Vercel** (`aina-piece-auto.vercel.app`).
+- **Synchronisation GitHub :** Chaque mise à jour du code (`git push`) déclenche automatiquement une nouvelle version de production.
+- **Gestion des Clés :** Variables d'environnement masquées côté serveur.
+
+### 10. Nettoyage de Base (Hard Reset)
+- **Déploiement Initial :** Avant le lancement, exécution d'un script `reset_db.ts` côté serveur utilisant la clé de service (`SERVICE_ROLE_KEY`) pour supprimer en cascade toutes les boutiques (effaçant instantanément ventes, stock, achats) afin de démarrer sur une base 100% vierge.
+
 ## Compatibilité Matérielle
 - **Ordinateur (Desktop) :** Interface complète avec menu latéral fixe.
 - **Téléphone (Mobile) :** Interface "Responsive" avec menu hamburger et cartes. Aucune fonctionnalité n'est altérée. (Ex: Le blocage du mode caissier et l'export des rapports fonctionnent parfaitement sur Mobile).

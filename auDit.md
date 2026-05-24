@@ -89,3 +89,24 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Vérification TypeScript :** Compilation `tsc --noEmit` → Exit code 0 — zéro erreur.
 - **Impact Mobile :** Aucun. Le téléchargement du PDF via navigateur mobile (Chrome/Firefox) fonctionne identiquement. Le rendu A4 est complet et lisible.
 - **Impact Desktop :** Toutes les couleurs (Vert Sarcelle #0F755E, Gris Charbon #333, Orange #FBB03B, Vert Lime #95C11E) s'affichent correctement dans le PDF final.
+
+## Audit #14 - Déploiement en Production (Vercel & GitHub)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Rendre l'application publiquement accessible.
+- **Action :** Poussée du code sur GitHub et intégration continue avec Vercel (`aina-piece-auto.vercel.app`).
+- **Configuration :** Injection des variables d'environnement (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) directement dans Vercel pour masquer les clés au public.
+- **Résultat :** Accessibilité instantanée sur Mobile et Desktop avec synchronisation automatique à chaque modification de code.
+
+## Audit #15 - Radar Temps Réel & Bug Matrice
+**Statut : Résolu & Déployé ✅**
+- **Problème identifié :** La boutique sur mobile ne clignotait pas en vert, et la matrice affichait les mauvaises permissions.
+- **Analyse #1 (Radar) :** Le code de récupération du statut triait les utilisateurs par `last_login` descendant. En PostgreSQL, les valeurs `NULL` sont placées en premier par défaut. Ainsi, un utilisateur n'ayant jamais été connecté écrasait le statut d'un utilisateur récemment connecté dans la même boutique.
+- **Analyse #2 (Matrice) :** Une erreur dans la requête de récupération des profils (`column email does not exist`) déclenchait le chargement des profils de démonstration (Rakoto/Randria), ce qui faussait l'affichage de la matrice.
+- **Résolution :** Ajout de la clause `.not('last_login', 'is', null)` pour le radar, et correction de la requête SQL dans `Settings.tsx` pour enlever `email`.
+- **Vérification :** Le système de permissions croisées est intact sur Mobile et Desktop.
+
+## Audit #16 - Nettoyage Intégral et Démarrage Propre
+**Statut : Validé ✅**
+- **Objectif :** Effacer toutes les données de test pour préparer le lancement officiel.
+- **Action :** Création d'un script Node/TypeScript (`reset_db.ts`) exécuté avec la clé Supabase `SERVICE_ROLE_KEY`.
+- **Résultat :** Suppression en cascade de toutes les boutiques, ce qui a automatiquement effacé les ventes, achats, stock et dépenses associés. Seul l'administrateur a été conservé. L'application est prête pour la saisie des données réelles.
