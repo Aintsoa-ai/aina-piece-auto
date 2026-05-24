@@ -45,30 +45,7 @@ export const Users: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Exact mock list matching reference screenshot 1
-  const demoUsers: UserAccount[] = [
-    {
-      id: 'u1',
-      nom: 'Administrateur',
-      identifiant: 'admin',
-      role: 'Administrateur',
-      statut: true
-    },
-    {
-      id: 'u2',
-      nom: 'Jean Employé',
-      identifiant: 'employe',
-      role: 'Employé',
-      statut: true
-    },
-    {
-      id: 'u3',
-      nom: 'Marie Caisse',
-      identifiant: 'caissier',
-      role: 'Caissier',
-      statut: true
-    }
-  ];
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -103,12 +80,7 @@ export const Users: React.FC = () => {
           };
         });
 
-        // Smart merge: keep all 3 visual mock users and append database profiles safely
-        const uniqueDemoUsers = demoUsers.filter(
-          demo => !parsedUsers.some(dbUser => dbUser.nom.toLowerCase() === demo.nom.toLowerCase())
-        );
-
-        setUsers([...uniqueDemoUsers, ...parsedUsers]);
+        setUsers(parsedUsers);
         
       } else {
         setUsers([]);

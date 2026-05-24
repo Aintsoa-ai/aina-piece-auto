@@ -57,7 +57,7 @@ export const Sales: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [vendeurName, setVendeurName] = useState<string>('Marie Caisse');
+  const [vendeurName, setVendeurName] = useState<string>('');
   const [selectedBoutique, setSelectedBoutique] = useState<string>('Centre');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -346,7 +346,7 @@ export const Sales: React.FC = () => {
   const handleOpenModal = () => {
     setCart([]);
     setSearchQuery('');
-    setVendeurName(profile?.full_name || 'Marie Caisse');
+    setVendeurName(profile?.full_name || 'Vendeur Inconnu');
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsModalOpen(true);
@@ -709,15 +709,12 @@ export const Sales: React.FC = () => {
                   {/* Vendeur Config */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Vendeur / Caissier</label>
-                    <select 
-                      style={s.selectInput}
+                    <input 
+                      type="text"
+                      style={{...s.inputField, backgroundColor: 'rgba(255,255,255,0.02)', color: 'rgba(255,255,255,0.5)', cursor: 'not-allowed'}}
                       value={vendeurName}
-                      onChange={(e) => setVendeurName(e.target.value)}
-                    >
-                      <option value="Marie Caisse">Marie Caisse (Caissière)</option>
-                      <option value="Jean Employé">Jean Employé (Commercial)</option>
-                      <option value="Administrateur Aina">Administrateur Aina</option>
-                    </select>
+                      disabled
+                    />
                   </div>
 
                   {/* Boutique Config */}
