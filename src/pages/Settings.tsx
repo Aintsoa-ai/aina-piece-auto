@@ -384,6 +384,7 @@ export const Settings: React.FC = () => {
             .from('profiles')
             .select('last_login')
             .eq('boutique_id', boutique.id)
+            .not('last_login', 'is', null)
             .order('last_login', { ascending: false })
             .limit(1);
 
