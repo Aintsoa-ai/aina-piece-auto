@@ -199,7 +199,7 @@ export const Settings: React.FC = () => {
     fetchBoutiques();
     const fetchProfiles = async () => {
       try {
-        const { data, error } = await supabase.from('profiles').select('id, full_name, email, role_id, boutique_id, created_at');
+        const { data, error } = await supabase.from('profiles').select('id, full_name, role_id, boutique_id, created_at');
         if (data && data.length > 0) {
           setProfiles(data);
           
