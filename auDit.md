@@ -110,3 +110,11 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Objectif :** Effacer toutes les données de test pour préparer le lancement officiel.
 - **Action :** Création d'un script Node/TypeScript (`reset_db.ts`) exécuté avec la clé Supabase `SERVICE_ROLE_KEY`.
 - **Résultat :** Suppression en cascade de toutes les boutiques, ce qui a automatiquement effacé les ventes, achats, stock et dépenses associés. Seul l'administrateur a été conservé. L'application est prête pour la saisie des données réelles.
+
+## Audit #17 - Nettoyage Définitif des Données de Test (Hardcoded)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Éradiquer les "fantômes" de l'environnement de développement.
+- **Problème identifié :** Les noms de démonstration (ex: "Jean Employé", "Marie Caisse") continuaient d'apparaître sur la page Utilisateurs et comme vendeur par défaut dans le module Ventes, même après une remise à zéro de la base.
+- **Analyse :** Une fonction de "smart merge" dans le code forçait l'affichage de ces profils en secours (`isDemoData` fallback).
+- **Résolution :** Suppression complète des constantes `demoUsers` dans `Users.tsx`. Dans `Sales.tsx`, remplacement du sélecteur de vendeur (qui contenait des `<option>` en dur) par un champ texte désactivé qui récupère dynamiquement et de façon sécurisée le nom du compte actuellement connecté (`profile?.full_name`).
+- **Impact Sécurité & UI :** Les employés ne peuvent plus tricher en sélectionnant le nom d'un collègue lors d'une vente. L'interface affiche la stricte réalité.
