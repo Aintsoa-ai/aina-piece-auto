@@ -137,3 +137,9 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Problème identifié :** La colonne "Marge" du tableau des ventes était coupée lors de l'export PDF.
 - **Analyse :** Le conteneur HTML forçait une largeur rigide de `210mm` avec des marges internes de `40px`, ce qui débordait du cadre standard A4 capturé par `html2pdf.js`.
 - **Résolution :** Modification du code avec une largeur réactive (`width: 100%; max-width: 800px; padding: 20px;`) pour que le tableau se compacte proprement au lieu de déborder. Suppression de la fonctionnalité d'export PowerPoint, obsolète pour ce type de rapport. Le format Word a également été ajusté pour ouvrir parfaitement ce rendu web natif.
+
+## Audit #21 - Cohérence Graphique (Calendriers)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Standardiser l'expérience visuelle sur toute l'application.
+- **Problème identifié :** Le calendrier de la page "Paramètres" (Export de Rapport) affichait les dates d'activité avec une bordure rouge, alors que le calendrier du "Tableau de bord" les remplissait entièrement en rouge.
+- **Résolution :** Uniformisation du code CSS-in-JS dans `Settings.tsx` pour que les couleurs de fond (Bleu pour aujourd'hui, Rouge pour l'activité) soient strictement identiques à celles du tableau de bord.
