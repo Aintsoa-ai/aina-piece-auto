@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { initSyncListeners } from '../services/syncManager';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
@@ -21,8 +22,14 @@ import {
   Moon,
   Settings,
   FileSpreadsheet,
-  ChevronRight
+  ChevronRight,
+  Cloud,
+  CloudOff,
+  RefreshCw
 } from 'lucide-react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../services/db';
+import { syncUp } from '../services/syncManager';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -44,20 +51,57 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Heartbeat pour le statut "En ligne"
+  const pendingSalesCount = useLiveQuery(() => db.pending_ventes.count(), []) || 0;
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleManualSync = async () => {
+    if (pendingSalesCount === 0 || !navigator.onLine) return;
+    setIsSyncing(true);
+    await syncUp();
+    setIsSyncing(false);
+  };
+
+  // Heartbeat pour le statut "En ligne" et Init Sync avec Presence
   useEffect(() => {
     if (!profile?.id) return;
     
-    // Ping immédiat
+    // Initialiser le système hors-ligne
+    initSyncListeners(profile?.boutique_id || undefined);
+    
+    // Ping DB immédiat pour historique
     supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', profile.id).then();
     
-    // Ping toutes les 5 minutes
-    const interval = setInterval(() => {
-      supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', profile.id).then();
-    }, 5 * 60 * 1000);
+    // Presence Channel pour suivi en temps réel instantané (Millisecondes)
+    const room = supabase.channel('online-boutiques', {
+      config: { presence: { key: profile.id } },
+    });
+
+    room.on('presence', { event: 'sync' }, () => {
+      const state = room.presenceState();
+      window.dispatchEvent(new CustomEvent('presenceUpdate', { detail: state }));
+    });
+    room.on('presence', { event: 'join' }, ({ key, newPresences }) => {
+      window.dispatchEvent(new CustomEvent('presenceUpdate', { detail: room.presenceState() }));
+    });
+    room.on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+      window.dispatchEvent(new CustomEvent('presenceUpdate', { detail: room.presenceState() }));
+    });
+
+    room.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await room.track({
+          user_id: profile.id,
+          boutique_id: profile?.boutique_id || 'admin',
+          full_name: profile.full_name,
+          online_at: new Date().toISOString(),
+        });
+      }
+    });
     
-    return () => clearInterval(interval);
-  }, [profile?.id]);
+    return () => {
+      supabase.removeChannel(room);
+    };
+  }, [profile?.id, profile?.boutique_id, profile?.full_name]);
 
   // ─── Menu sections exactly like the reference ───────────────────────
   const menuSections = [
@@ -246,6 +290,36 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
             <span style={s.topBarTitle}>{currentName}</span>
           </div>
           <div style={s.topBarRight}>
+            
+            {/* Sync Button */}
+            <button
+              style={{
+                ...s.themeBtn,
+                backgroundColor: pendingSalesCount > 0 ? (navigator.onLine ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)') : 'transparent',
+                color: pendingSalesCount > 0 ? (navigator.onLine ? '#f59e0b' : '#ef4444') : 'rgba(255,255,255,0.4)',
+                border: pendingSalesCount > 0 ? (navigator.onLine ? '1px solid #f59e0b' : '1px solid #ef4444') : '1px solid transparent',
+                position: 'relative'
+              }}
+              onClick={handleManualSync}
+              disabled={isSyncing || pendingSalesCount === 0 || !navigator.onLine}
+              title={pendingSalesCount > 0 ? `${pendingSalesCount} ventes en attente de synchronisation` : 'Aucune donnée en attente'}
+            >
+              {isSyncing ? (
+                <RefreshCw size={16} style={{ animation: 'spin 1s linear infinite' }} />
+              ) : pendingSalesCount > 0 ? (
+                <CloudOff size={16} />
+              ) : (
+                <Cloud size={16} />
+              )}
+              {pendingSalesCount > 0 && (
+                <span style={{
+                  position: 'absolute', top: -5, right: -5, background: '#f59e0b', color: '#fff', fontSize: '10px', fontWeight: 'bold', borderRadius: '50%', padding: '2px 5px'
+                }}>
+                  {pendingSalesCount}
+                </span>
+              )}
+            </button>
+
             <button
               style={s.themeBtn}
               onClick={() => setTheme(theme === 'clair' ? 'sombre' : 'clair')}

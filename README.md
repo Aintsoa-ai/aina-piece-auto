@@ -57,6 +57,12 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 ### 10. Nettoyage de Base (Hard Reset)
 - **Déploiement Initial :** Avant le lancement, exécution d'un script `reset_db.ts` côté serveur utilisant la clé de service (`SERVICE_ROLE_KEY`) pour supprimer en cascade toutes les boutiques (effaçant instantanément ventes, stock, achats) afin de démarrer sur une base 100% vierge.
 
+### 11. Fonctionnement Hors-Ligne (PWA & IndexedDB)
+- **Base de Données Locale :** Utilisation de `Dexie.js` pour créer une base de données IndexedDB stockant un cache du catalogue et le stock disponible (syncDown).
+- **Vente Sans Connexion :** En cas de coupure WiFi, le module de Caisse sauvegarde la vente localement de manière totalement transparente.
+- **Synchronisation Automatique :** Dès le retour de la connexion Internet, un écouteur déclenche automatiquement un `syncUp`, poussant la file d'attente des ventes directement sur Supabase, mettant ainsi à jour l'interface de l'Administrateur instantanément.
+- **Statut en Temps Réel :** Le panneau d'administration affiche la pastille (Mode En Ligne / Hors-Ligne) avec le compte des ventes en attente.
+
 ## Compatibilité Matérielle
 - **Ordinateur (Desktop) :** Interface complète avec menu latéral fixe.
 - **Téléphone (Mobile) :** Interface "Responsive" avec menu hamburger et cartes. Aucune fonctionnalité n'est altérée. (Ex: Le blocage du mode caissier et l'export des rapports fonctionnent parfaitement sur Mobile). L'ergonomie prend en compte les claviers virtuels (`100dvh`, défilement actif) pour ne jamais bloquer la saisie.

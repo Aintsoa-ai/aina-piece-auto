@@ -144,6 +144,24 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
+
+    // Auto-actualisation en temps réel (notamment pour les ventes hors-ligne synchronisées)
+    const channel = supabase
+      .channel('dashboard_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ventes' }, () => {
+        setTimeout(() => fetchDashboardData(), 1500); // Délai pour details_ventes
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'achats' }, () => {
+        setTimeout(() => fetchDashboardData(), 1500);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'depenses' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Compute stats whenever selectedDate or rawData changes

@@ -157,3 +157,10 @@ Historique et suivi des audits de sÃ©curitÃ©, de performance et de stabilitÃ© de
 - **ProblÃ¨me identifiÃ© :** La crÃ©ation d'un compte caissier Ã©chouait silencieusement Ã  l'assigner Ã  une boutique si le trigger de base de donnÃ©es Ã©tait trop lent, crÃ©ant des comptes "orphelins" (boutique `null`) ou assignÃ©s Ã  la mauvaise boutique par dÃ©faut.
 - **RÃ©solution :** Modification de la fonction de crÃ©ation dans `Settings.tsx` pour utiliser un `upsert` robuste au lieu d'un simple `update`. Le compte orphelin de test a Ã©tÃ© corrigÃ© manuellement en base.
 - **Impact UI/UX :** Le radar de prÃ©sence affiche dorÃ©navant le statut en temps rÃ©el ("En ligne" / "Hors Ligne") exact pour chaque boutique distinctement.
+
+## Audit #23 - Mode Hors-Ligne & SyncUp
+**Statut : Résolu & Déployé ?**
+- **Objectif :** Finaliser l'enregistrement hors-ligne des ventes.
+- **Problème identifié :** Le payload généré localement pour Supabase utilisait 'vendeur_id' au lieu de 'caissier_id', provoquant un échec silencieux lors de la synchronisation (SyncUp) au retour réseau.
+- **Résolution :** Alignement du schéma IndexedDB (db.pending_ventes) avec les colonnes de Supabase (caissier_id, suppression des colonnes non existantes comme client_nom). Implémentation du compteur de ventes en attente directement relié à Dexie dans l'interface Administrateur.
+- **Impact UI/UX :** Lorsqu'il y a coupure WiFi, la vente est conservée dans le navigateur (IndexedDB). Au retour réseau, la pastille de synchronisation s'affiche et la base Supabase est mise à jour, répercutant l'information instantanément chez l'Administrateur.

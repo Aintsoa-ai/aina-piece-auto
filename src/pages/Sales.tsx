@@ -2,18 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Search, 
-  Plus, 
-  Printer, 
-  X, 
-  ShoppingCart, 
-  AlertCircle, 
-  CheckCircle2, 
-  User,
-  ArrowRight,
-  TrendingUp
-} from 'lucide-react';
+import { Printer, AlertCircle, Plus, Search, CheckCircle2, X, ShoppingCart, User, ArrowRight, TrendingUp } from 'lucide-react';
+import { db } from '../services/db';
+import { v4 as uuidv4 } from 'uuid';
 
 interface SaleItem {
   id: string;
@@ -402,15 +393,19 @@ export const Sales: React.FC = () => {
     setErrorMsg(null);
 
     let calculatedTotal = 0;
-    let computedBenefice = 0;
     
     cart.forEach(item => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         calculatedTotal += pVente * item.quantity;
-        computedBenefice += (pVente * item.quantity) - ((item.piece.prix_achat || 0) * item.quantity);
     });
 
+    const boutiqueIdToUse = profile?.boutique_id || selectedBoutique;
+
     try {
+      if (!navigator.onLine) {
+        throw new Error("offline");
+      }
+
       // 1. Fetch current active caisse or first caisse to attach if exists
       const { data: caisseData } = await supabase
         .from('caisse')
@@ -426,7 +421,7 @@ export const Sales: React.FC = () => {
         .insert({
           total: calculatedTotal,
           caissier_id: profile?.id || null,
-          boutique_id: profile?.boutique_id || null
+          boutique_id: boutiqueIdToUse || null
         })
         .select('*')
         .single();
@@ -464,19 +459,36 @@ export const Sales: React.FC = () => {
       }
 
       setSuccessMsg("Vente enregistrée avec succès !");
-      
-      // To refresh accurately, just trigger a full fetch
       fetchSalesAndStock();
-
       setIsModalOpen(false);
 
-    } catch (err: any) {      console.warn("Write to DB failed, simulating local success for offline safety :", err);
-      // Simulate offline success anyway
-      const fallbackVenteId = Math.random().toString(36).substring(7);
+    } catch (err: any) {
+      console.warn("Réseau indisponible, enregistrement local (IndexedDB) pour la PWA :", err);
+      
+      const offlineSaleId = uuidv4();
+      
+      await db.pending_ventes.add({
+        id: offlineSaleId,
+        boutique_id: boutiqueIdToUse || '',
+        vendeur_id: profile?.id || '',
+        client_nom: 'Client Divers',
+        client_contact: '',
+        status: 'COMPLETED',
+        total: calculatedTotal,
+        created_at: new Date().toISOString(),
+        details: cart.map(item => ({
+          piece_id: item.piece.piece_id || item.piece.id,
+          quantite: item.quantity,
+          prix_vente: item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0,
+          total: (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity
+        }))
+      });
+
+      // Mettre à jour visuellement le stock local dans l'état (simulation locale)
       const simulatedSales = cart.map((item, index) => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         return {
-          id: `${fallbackVenteId}-sim-${index}`,
+          id: `${offlineSaleId}-sim-${index}`,
           date: new Date().toLocaleString('fr-FR', {
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
@@ -493,8 +505,18 @@ export const Sales: React.FC = () => {
       });
 
       setSales([...simulatedSales, ...sales]);
-      setSuccessMsg("Vente enregistrée localement.");
-      setIsModalOpen(false);
+      
+      // Update local state pieces stock
+      setPieces(prev => prev.map(p => {
+        const inCart = cart.find(c => (c.piece.piece_id || c.piece.id) === (p.piece_id || p.id));
+        if (inCart) {
+          return { ...p, quantity_disponible: p.quantity_disponible - inCart.quantity };
+        }
+        return p;
+      }));
+
+      setSuccessMsg("Mode Hors-Ligne: Vente sécurisée localement. Synchronisation prévue au retour réseau.");
+      setTimeout(() => setIsModalOpen(false), 2000);
     } finally {
       setIsSubmitting(false);
     }

@@ -10,7 +10,8 @@ import {
   Sun, Moon, Laptop, Languages, Wifi, WifiOff, Store, Plus, CheckCircle2, AlertTriangle, RefreshCw, Database, Shield, Eye, EyeOff, Activity, Circle, LayoutDashboard, ShoppingCart, TrendingDown, Wallet, BarChart2, Boxes, Truck, Users, Building2, FileSpreadsheet, Settings as SettingsIcon, X, Printer, Download, FileText, Presentation, Save, UploadCloud, Edit2
 } from 'lucide-react';
 import * as XLSX from 'xlsx-js-style';
-
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../services/db';
 interface Boutique {
   id: string;
   name: string;
@@ -130,9 +131,9 @@ export const Settings: React.FC = () => {
     }
   });
 
-  const [simulatedOffline, setSimulatedOffline] = useState(false);
-  const [simulatedQueueCount, setSimulatedQueueCount] = useState(0);
-  const [syncingOffline, setSyncingOffline] = useState(false);
+  const pendingSalesCount = useLiveQuery(() => db.pending_ventes.count(), []) || 0;
+  const isSyncing = false; // We can handle sync state via global event or just keep it simple
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Boutique online status tracking
@@ -360,8 +361,10 @@ export const Settings: React.FC = () => {
     reader.readAsText(file);
   };
 
+  const [activePresences, setActivePresences] = useState<any[]>([]);
+
   // Fetch boutique online statuses from last activity logs
-  const fetchBoutiqueStatuses = async () => {
+  const fetchBoutiqueStatuses = async (currentPresences: any[] = activePresences) => {
     setStatusLoading(true);
     try {
       // Get all boutiques
@@ -395,14 +398,20 @@ export const Settings: React.FC = () => {
             ? (Date.now() - lastActivity.getTime()) / 60000
             : Infinity;
 
+          // Instant presence override
+          const isInstantlyOnline = currentPresences.some((p: any) => p.boutique_id === boutique.id);
+
           let status: 'online' | 'recent' | 'offline' = 'offline';
-          if (minutesAgo < 15) status = 'online';
-          else if (minutesAgo < 120) status = 'recent';
+          if (isInstantlyOnline) {
+            status = 'online';
+          } else if (minutesAgo < 120) {
+            status = 'recent';
+          }
 
           return {
             boutiqueId: boutique.id,
             boutiqueName: boutique.name,
-            lastActivity,
+            lastActivity: isInstantlyOnline ? new Date() : lastActivity,
             activeUserCount: userCount || 0,
             status
           };
@@ -423,9 +432,24 @@ export const Settings: React.FC = () => {
   useEffect(() => {
     fetchBoutiques();
     fetchBoutiqueStatuses();
-    // Auto-refresh every 60 seconds
-    const interval = setInterval(fetchBoutiqueStatuses, 60000);
-    return () => clearInterval(interval);
+    
+    // Auto-refresh every 60 seconds as a fallback
+    const interval = setInterval(() => fetchBoutiqueStatuses(), 60000);
+    
+    // Instant refresh on Presence changes
+    const handlePresenceUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const presencesObj = customEvent.detail || {};
+      const flatPresences = Object.values(presencesObj).flat();
+      setActivePresences(flatPresences);
+      fetchBoutiqueStatuses(flatPresences);
+    };
+    window.addEventListener('presenceUpdate', handlePresenceUpdate);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('presenceUpdate', handlePresenceUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -527,14 +551,6 @@ export const Settings: React.FC = () => {
     }
   };
 
-  const handleSyncOffline = () => {
-    if (simulatedQueueCount === 0) return;
-    setSyncingOffline(true);
-    setTimeout(() => {
-      setSyncingOffline(false);
-      setSimulatedQueueCount(0);
-    }, 1500);
-  };
 
   const executeExport = async (format: 'excel' | 'word' | 'pdf' | 'powerpoint' | 'print') => {
     setIsExporting(true);
@@ -1397,28 +1413,17 @@ export const Settings: React.FC = () => {
           <div style={s.offlineCard}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {simulatedOffline
+                {isOffline
                   ? <WifiOff size={16} color="#ef4444" />
                   : <Wifi size={16} color="#22c55e" />
                 }
                 <span style={{ fontSize: '13px', fontWeight: '700', color: '#ffffff' }}>
-                  {simulatedOffline ? 'Mode simulation : Hors-Ligne' : 'Mode simulation : En Ligne'}
+                  {isOffline ? 'Statut Réseau : Hors-Ligne (PWA)' : 'Statut Réseau : En Ligne'}
                 </span>
               </div>
-              <button
-                style={{
-                  ...s.smallBtn,
-                  backgroundColor: simulatedOffline ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                  color: simulatedOffline ? '#22c55e' : '#ef4444',
-                  borderColor: simulatedOffline ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)'
-                }}
-                onClick={() => { setSimulatedOffline(!simulatedOffline); if (simulatedOffline) handleSyncOffline(); }}
-              >
-                {simulatedOffline ? 'Simuler Retour Réseau' : 'Simuler Panne Réseau'}
-              </button>
             </div>
 
-            {simulatedOffline && (
+            {isOffline && (
               <div style={s.offlineWarning}>
                 <AlertTriangle size={14} />
                 <span>Connexion coupée ! Le POS continue de tourner. Les transactions s'enregistrent localement.</span>
@@ -1430,23 +1435,20 @@ export const Settings: React.FC = () => {
                 <Database size={14} />
                 <span>Ventes en attente de synchronisation :</span>
               </div>
-              <span style={{ fontSize: '18px', fontWeight: '800', color: simulatedQueueCount > 0 ? '#f59e0b' : 'rgba(255,255,255,0.35)' }}>
-                {simulatedQueueCount}
+              <span style={{ fontSize: '18px', fontWeight: '800', color: pendingSalesCount > 0 ? '#f59e0b' : 'rgba(255,255,255,0.35)' }}>
+                {pendingSalesCount}
               </span>
             </div>
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-              <button style={{ ...s.smallBtn, flex: 1, justifyContent: 'center' }} disabled={!simulatedOffline} onClick={() => setSimulatedQueueCount((p) => p + 1)}>
-                Simuler Vente Hors-Ligne
-              </button>
               <button
-                style={{ ...s.smallBtn, flex: 1, justifyContent: 'center', backgroundColor: '#0066fe', color: '#ffffff', borderColor: '#0066fe', opacity: (simulatedQueueCount === 0 || simulatedOffline || syncingOffline) ? 0.5 : 1 }}
-                disabled={simulatedQueueCount === 0 || simulatedOffline || syncingOffline}
-                onClick={handleSyncOffline}
+                style={{ ...s.smallBtn, flex: 1, justifyContent: 'center', backgroundColor: '#0066fe', color: '#ffffff', borderColor: '#0066fe', opacity: (pendingSalesCount === 0 || isOffline || isSyncing) ? 0.5 : 1 }}
+                disabled={pendingSalesCount === 0 || isOffline || isSyncing}
+                onClick={() => window.dispatchEvent(new Event('online'))}
               >
-                {syncingOffline
+                {isSyncing
                   ? <><RefreshCw size={13} /> Synchronisation...</>
-                  : <><RefreshCw size={13} /> Synchroniser {simulatedQueueCount} ventes</>
+                  : <><RefreshCw size={13} /> Forcer la Synchronisation</>
                 }
               </button>
             </div>
@@ -1497,7 +1499,7 @@ export const Settings: React.FC = () => {
                 </h3>
                 <button
                   style={s.refreshStatusBtn}
-                  onClick={fetchBoutiqueStatuses}
+                  onClick={() => fetchBoutiqueStatuses()}
                   disabled={statusLoading}
                   title="Actualiser"
                 >

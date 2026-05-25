@@ -39,8 +39,8 @@
 - [x] Standardisation du design des calendriers avec thématique sombre et indicateurs d'activité (pastilles rouges).
 - [ ] Revue complète de l'ergonomie sur mobile pour garantir que les claviers virtuels ne masquent plus aucune zone de saisie.
 
-## Phase 7 : Véritable Système Hors-Ligne (PWA & IndexedDB)
-- [ ] Créer une base de données locale (IndexedDB) pour stocker temporairement les ventes sans réseau.
-- [ ] Mettre en cache le catalogue complet et les stocks pour la recherche hors-ligne dans la Caisse.
-- [ ] Développer le système de synchronisation automatique (File d'attente) au retour de la connexion Internet.
-- [ ] Gérer les conflits de stock lors de la synchronisation (vérification backend).
+## Phase 7 : Véritable Système Hors-Ligne (PWA & IndexedDB) (Terminée)
+- [x] Créer une base de données locale (IndexedDB) pour stocker temporairement les ventes sans réseau.
+- [x] Mettre en cache le catalogue complet et les stocks pour la recherche hors-ligne dans la Caisse.
+- [x] Développer le système de synchronisation automatique (File d'attente) au retour de la connexion Internet.
+- [x] Gérer les conflits de stock lors de la synchronisation (vérification backend).

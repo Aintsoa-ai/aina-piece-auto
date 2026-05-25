@@ -40,4 +40,5 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - **Thématisation :** Permettre aux utilisateurs de choisir la couleur d'accentuation (au lieu de seulement bleu/rouge).
 
 ## 9. Fonctionnement Hors-Ligne (PWA & Offline First)
-- **Véritable Système Hors-Ligne (Déplacé vers `plan.md` Phase 7) :** Remplacer l'actuelle maquette de simulation par un véritable moteur IndexedDB. L'application mettra en cache le catalogue complet et permettra de faire des ventes sans connexion. Au retour du réseau, un ServiceWorker synchronisera automatiquement la file d'attente vers Supabase.
+- **Diff-Sync pour le Catalogue :** Actuellement, le `syncDown` supprime et remet l'intégralité du catalogue. À l'avenir, implémenter un "Delta Sync" (ou Diff-Sync) qui ne télécharge que les lignes ajoutées/modifiées depuis le dernier horodatage afin d'économiser de la bande passante sur mobile.
+- **Support des Achats & Dépenses :** Étendre l'infrastructure Offline (IndexedDB) aux autres modules comme les Achats et les Dépenses (pour le moment, seules les ventes disposent d'une file d'attente hors-ligne).
