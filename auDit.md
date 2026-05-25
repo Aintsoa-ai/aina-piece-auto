@@ -159,8 +159,15 @@ Historique et suivi des audits de sÃ©curitÃ©, de performance et de stabilitÃ© de
 - **Impact UI/UX :** Le radar de prÃ©sence affiche dorÃ©navant le statut en temps rÃ©el ("En ligne" / "Hors Ligne") exact pour chaque boutique distinctement.
 
 ## Audit #23 - Mode Hors-Ligne & SyncUp
-**Statut : Résolu & Déployé ?**
+**Statut : Rï¿½solu & Dï¿½ployï¿½ ?**
 - **Objectif :** Finaliser l'enregistrement hors-ligne des ventes.
-- **Problème identifié :** Le payload généré localement pour Supabase utilisait 'vendeur_id' au lieu de 'caissier_id', provoquant un échec silencieux lors de la synchronisation (SyncUp) au retour réseau.
-- **Résolution :** Alignement du schéma IndexedDB (db.pending_ventes) avec les colonnes de Supabase (caissier_id, suppression des colonnes non existantes comme client_nom). Implémentation du compteur de ventes en attente directement relié à Dexie dans l'interface Administrateur.
-- **Impact UI/UX :** Lorsqu'il y a coupure WiFi, la vente est conservée dans le navigateur (IndexedDB). Au retour réseau, la pastille de synchronisation s'affiche et la base Supabase est mise à jour, répercutant l'information instantanément chez l'Administrateur.
+- **Problï¿½me identifiï¿½ :** Le payload gï¿½nï¿½rï¿½ localement pour Supabase utilisait 'vendeur_id' au lieu de 'caissier_id', provoquant un ï¿½chec silencieux lors de la synchronisation (SyncUp) au retour rï¿½seau.
+- **Rï¿½solution :** Alignement du schï¿½ma IndexedDB (db.pending_ventes) avec les colonnes de Supabase (caissier_id, suppression des colonnes non existantes comme client_nom). Implï¿½mentation du compteur de ventes en attente directement reliï¿½ ï¿½ Dexie dans l'interface Administrateur.
+- **Impact UI/UX :** Lorsqu'il y a coupure WiFi, la vente est conservï¿½e dans le navigateur (IndexedDB). Au retour rï¿½seau, la pastille de synchronisation s'affiche et la base Supabase est mise ï¿½ jour, rï¿½percutant l'information instantanï¿½ment chez l'Administrateur.
+
+
+### AUDIT: 25 Mai 2026 - SystÃ¨me Hors-Ligne & Synchronisation PWA
+- **ProblÃ¨me initial :** Les ventes effectuÃ©es hors-ligne n'arrivaient pas dans la base de donnÃ©es en raison d'une erreur de syntaxe UUID (champ ID vide converti en string au lieu de null) et le Tableau de bord ne s'actualisait pas tout seul.
+- **Solution :** Refonte totale du composant `syncManager.ts` pour gÃ©rer l'export Dexie vers Supabase. Les ID manquants sont convertis en `null`. IntÃ©gration de Supabase Presence dans `Layout.tsx` et `Settings.tsx` pour que l'administrateur voit en temps rÃ©el si une boutique se dÃ©connecte (dÃ©lai infÃ©rieur Ã  2 secondes).
+- **Interface :** Ajout d'un bouton Nuage intelligent affichant un compteur dynamique du nombre de ventes coincÃ©es sur le tÃ©lÃ©phone.
+- **DÃ©ploiement :** RÃ©solution d'une erreur TS stricte empÃªchant Vercel de compiler, puis forÃ§age du dÃ©ploiement en production.

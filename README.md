@@ -70,3 +70,8 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 ### 11. Modernisation de l'Interface (UX/UI)
 - **Calendriers Personnalisés :** Remplacement des entrées natives (`<input type="date">`) par des calendriers `react-datepicker` en thème sombre (Glassmorphism). Affichage dynamique des dates d'activités passées en **rouge** et de la date du jour en **bleu**.
 - **Boîtes de Dialogue :** Remplacement total des `alert()`, `confirm()` et `prompt()` natifs du navigateur par des interfaces professionnelles (`SweetAlert2`) avec intégration parfaite du thème sombre.
+
+## Fonctionnalités Récentes (Mai 2026)
+- **Véritable Mode Hors-Ligne :** L'application fonctionne en tant que Progressive Web App (PWA). Les ventes peuvent être saisies sans internet et sont stockées localement (IndexedDB). Un indicateur visuel (Nuage) permet de suivre la synchronisation au retour du réseau.
+- **Suivi des connexions en Temps Réel :** Le PC administrateur peut voir en moins de 2 secondes si le téléphone d'une boutique s'est déconnecté du réseau, grâce au système WebSocket de Supabase (Presence).
+- **Tableau de bord réactif :** Le Dashboard s'actualise de lui-même dès que des ventes synchronisées arrivent dans la base.

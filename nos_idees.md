@@ -42,3 +42,8 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 ## 9. Fonctionnement Hors-Ligne (PWA & Offline First)
 - **Diff-Sync pour le Catalogue :** Actuellement, le `syncDown` supprime et remet l'intégralité du catalogue. À l'avenir, implémenter un "Delta Sync" (ou Diff-Sync) qui ne télécharge que les lignes ajoutées/modifiées depuis le dernier horodatage afin d'économiser de la bande passante sur mobile.
 - **Support des Achats & Dépenses :** Étendre l'infrastructure Offline (IndexedDB) aux autres modules comme les Achats et les Dépenses (pour le moment, seules les ventes disposent d'une file d'attente hors-ligne).
+
+
+### Améliorations Futures (Synchronisation)
+- **File d'attente avancée :** Afficher un historique visuel détaillé (liste) des ventes synchronisées avec leurs statuts (succès, échec) directement dans un panneau latéral en cliquant sur le nuage.
+- **Notification push :** Envoyer une alerte sonore ou une notification native à l'administrateur lorsqu'une boutique se déconnecte du réseau pendant les heures d'ouverture.
