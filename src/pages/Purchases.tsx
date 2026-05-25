@@ -63,6 +63,7 @@ export const Purchases: React.FC = () => {
   const [purchases, setPurchases] = useState<PurchaseItem[]>([]);
   const [pieces, setPieces] = useState<PieceOption[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
+  const [dbPriceHistory, setDbPriceHistory] = useState<{piece_id: string, sup_name: string, price: number}[]>([]);
   const [loading, setLoading] = useState(true);
   const isDemoData = false;
 
@@ -163,7 +164,7 @@ export const Purchases: React.FC = () => {
       // 1. Fetch Purchases
       const { data: achatsData } = await supabase
         .from('achats')
-        .select('*, details_achats(*, pieces(*))')
+        .select('*, details_achats(*, pieces(*)), fournisseurs(nom)')
         .order('created_at', { ascending: false });
 
       // 2. Fetch Pieces catalog
@@ -193,11 +194,12 @@ export const Purchases: React.FC = () => {
             const qty = detail?.quantite || 10;
             const puPrice = detail?.prix_unitaire || (a.total / qty);
             const rem = detail?.remise || null;
+            const supName = a.fournisseurs?.nom || 'Fournisseur Central';
 
             parsedPurchases.push({
               id: a.id,
               date: new Date(a.created_at).toLocaleDateString('fr-FR'),
-              fournisseur: a.fournisseurs?.nom || 'Fournisseur Central',
+              fournisseur: supName,
               piece_name: pieceName,
               piece_ref: pieceRef,
               quantity: qty,
@@ -235,6 +237,20 @@ export const Purchases: React.FC = () => {
         setPurchases(parsedPurchases);
         setPieces(parsedPieces);
         setSuppliers(parsedSuppliers);
+
+        // Build price history for comparison
+        const history: {piece_id: string, sup_name: string, price: number}[] = [];
+        if (result.achatsData) {
+          result.achatsData.forEach((a: any) => {
+            const supName = a.fournisseurs?.nom || 'Fournisseur Central';
+            a.details_achats?.forEach((d: any) => {
+               if (d.piece_id && d.prix_unitaire) {
+                 history.push({ piece_id: d.piece_id, sup_name: supName, price: d.prix_unitaire });
+               }
+            });
+          });
+        }
+        setDbPriceHistory(history);
 
       } else {
         // Fallback on timeout
@@ -277,21 +293,28 @@ export const Purchases: React.FC = () => {
       setUnitPrice('');
       return;
     }
-    // Autofill price based on dynamic supplier charts
-    const comps = comparisonMocks[pieceId] || comparisonMocks['p1'];
-    const currentSup = suppliers.find(s => s.id === selectedSupplierId)?.nom || 'Auto Parts Madagascar';
-    const foundPrice = comps.find(c => c.name === currentSup)?.current || comps[0].current;
-    setUnitPrice(foundPrice ? formatNum(foundPrice) : '');
+    const currentSup = suppliers.find(s => s.id === selectedSupplierId)?.nom;
+    const pieceHistory = dbPriceHistory.filter(h => h.piece_id === pieceId);
+    let defaultPrice = '';
+    if (pieceHistory.length > 0) {
+       const supHistory = currentSup ? pieceHistory.filter(h => h.sup_name === currentSup) : pieceHistory;
+       const histToUse = supHistory.length > 0 ? supHistory : pieceHistory;
+       defaultPrice = formatNum(histToUse[0].price);
+    }
+    setUnitPrice(defaultPrice);
   };
 
   // Triggers when supplier selection changes
   const handleSupplierChange = (supId: string) => {
     setSelectedSupplierId(supId);
     if (!supId || !selectedPieceId) return;
-    const comps = comparisonMocks[selectedPieceId] || comparisonMocks['p1'];
-    const supName = suppliers.find(s => s.id === supId)?.nom || 'Auto Parts Madagascar';
-    const foundPrice = comps.find(c => c.name === supName)?.current || comps[0].current;
-    setUnitPrice(foundPrice ? formatNum(foundPrice) : '');
+    const supName = suppliers.find(s => s.id === supId)?.nom;
+    if (supName) {
+       const pieceHistory = dbPriceHistory.filter(h => h.piece_id === selectedPieceId && h.sup_name === supName);
+       if (pieceHistory.length > 0) {
+          setUnitPrice(formatNum(pieceHistory[0].price));
+       }
+    }
   };
 
   const handleRegisterPurchase = async () => {
@@ -464,8 +487,39 @@ export const Purchases: React.FC = () => {
   const totalPurchasesCount = purchases.length;
   const totalPurchasesVal = purchases.reduce((acc, curr) => acc + curr.total, 0);
 
-  // Supplier Comparison list based on selected piece
-  const selectedComps = comparisonMocks[selectedPieceId] || comparisonMocks['p1'];
+  // Dynamic Supplier Comparison list based on real DB history
+  const getDynamicComps = () => {
+    if (!selectedPieceId) return [];
+    
+    // Group history by supplier
+    const pieceHistory = dbPriceHistory.filter(h => h.piece_id === selectedPieceId);
+    if (pieceHistory.length === 0) return [];
+
+    const statsMap: Record<string, { sum: number, count: number, current: number }> = {};
+    pieceHistory.forEach(h => {
+      if (!statsMap[h.sup_name]) {
+         statsMap[h.sup_name] = { sum: 0, count: 0, current: h.price }; // first encountered is most recent
+      }
+      statsMap[h.sup_name].sum += h.price;
+      statsMap[h.sup_name].count += 1;
+    });
+
+    const results = Object.keys(statsMap).map(sup => ({
+      name: sup,
+      current: statsMap[sup].current,
+      moy: statsMap[sup].sum / statsMap[sup].count
+    }));
+
+    // Sort by current price to find best
+    results.sort((a, b) => a.current - b.current);
+    
+    return results.map((r, idx) => ({
+      ...r,
+      isBest: idx === 0
+    })).slice(0, 3); // top 3
+  };
+
+  const selectedComps = getDynamicComps();
 
   const getCalculatedTotal = () => {
     const qty = parseNum(quantity) || 0;
@@ -608,7 +662,7 @@ export const Purchases: React.FC = () => {
               <div style={s.comparisonPanel}>
                 <div style={s.comparisonTitle}>
                   <TrendingDown size={13} style={{ color: 'rgba(255,255,255,0.45)' }} />
-                  <span>COMPARAISON FOURNISSEURS</span>
+                  <span>COMPARAISON FOURNISSEURS {selectedComps.length === 0 && "(Aucun historique pour l'instant)"}</span>
                 </div>
                 
                 <div style={s.comparisonList}>
