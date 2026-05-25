@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { showAlert, showConfirm, showPrompt } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { createClient } from '@supabase/supabase-js';
 import { useSettings } from '../context/SettingsContext';
