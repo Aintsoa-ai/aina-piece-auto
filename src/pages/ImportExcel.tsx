@@ -178,18 +178,31 @@ export const ImportExcel: React.FC = () => {
          }
       }
 
-      // 2. Process rows in chunks of 20 for massive speedup
-      const chunkSize = 20;
-      for (let i = 0; i < parsedData.length; i += chunkSize) {
-        const chunk = parsedData.slice(i, i + chunkSize);
+      // 1.5 Deduplicate rows by reference to safely allow parallel processing
+      const refMap = new Map<string, ExcelRow>();
+      for (const row of parsedData) {
+         if (!row.reference || !row.designation) {
+            ignoredCount++;
+            continue;
+         }
+         const ref = row.reference;
+         if (refMap.has(ref)) {
+            const existing = refMap.get(ref)!;
+            existing.quantite_achetee = (existing.quantite_achetee || 0) + (row.quantite_achetee || 0);
+            existing.quantite_disponible = (existing.quantite_disponible || 0) + (row.quantite_disponible || 0);
+         } else {
+            refMap.set(ref, { ...row });
+         }
+      }
+      const uniqueParsedData = Array.from(refMap.values());
 
-        for (const row of chunk) {
+      // 2. Process rows in chunks of 50 for massive speedup
+      const chunkSize = 50;
+      for (let i = 0; i < uniqueParsedData.length; i += chunkSize) {
+        const chunk = uniqueParsedData.slice(i, i + chunkSize);
+
+        await Promise.all(chunk.map(async (row) => {
           try {
-            if (!row.reference || !row.designation) { 
-              ignoredCount++; 
-              continue; 
-            }
-
             const { data: existingPiece } = await supabase.from('pieces').select('id').eq('reference', row.reference).maybeSingle();
             let pieceId = existingPiece?.id;
 
@@ -268,9 +281,9 @@ export const ImportExcel: React.FC = () => {
              console.error("Row import error", e);
              throw e;
           }
-        }
+        }));
         
-        setProgress(Math.round((Math.min(i + chunkSize, parsedData.length) / parsedData.length) * 100));
+        setProgress(Math.round((Math.min(i + chunkSize, uniqueParsedData.length) / uniqueParsedData.length) * 100));
       }
 
       await supabase.from('import_logs').insert({ fichier_name: fileName || 'excel_upload', statut: 'SUCCESS', details: { inserted: insertedCount, updated: updatedCount, ignored: ignoredCount } });
