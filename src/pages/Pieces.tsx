@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { showConfirm, showAlert } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -440,7 +441,8 @@ export const Pieces: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Voulez-vous vraiment supprimer cette pièce du catalogue ?")) return;
+    const confirmed = await showConfirm("Voulez-vous vraiment supprimer cette pièce du catalogue ?", true);
+    if (!confirmed) return;
     try {
       if (isDemoData) {
         setPieces(pieces.filter(p => p.id !== id));
@@ -451,7 +453,7 @@ export const Pieces: React.FC = () => {
       if (error) throw error;
       fetchData();
     } catch (err: any) {
-      alert("Erreur lors de la suppression : " + err.message);
+      showAlert("Erreur lors de la suppression : " + err.message, 'error');
     }
   };
 

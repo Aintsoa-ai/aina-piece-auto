@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { showConfirm, showAlert } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { Truck, Plus, Edit, Trash2, X, Search, Phone, MapPin } from 'lucide-react';
@@ -104,7 +105,8 @@ export const Fournisseurs: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Voulez-vous vraiment supprimer ce fournisseur ?')) return;
+    const confirmed = await showConfirm("Voulez-vous vraiment supprimer ce fournisseur ?", true);
+    if (!confirmed) return;
     try {
       const { error } = await supabase
         .from('fournisseurs')
@@ -113,7 +115,7 @@ export const Fournisseurs: React.FC = () => {
       if (error) throw error;
       fetchSuppliers();
     } catch (err: any) {
-      alert(err.message || 'Erreur lors de la suppression.');
+      showAlert(err.message || 'Erreur lors de la suppression.', 'error');
     }
   };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { showConfirm } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -172,7 +173,8 @@ export const Boutiques: React.FC = () => {
   };
 
   const handleDeleteBoutique = async (boutiqueId: string) => {
-    if (!confirm("Voulez-vous vraiment supprimer cette boutique ?")) return;
+    const confirmed = await showConfirm("Voulez-vous vraiment supprimer cette boutique ?", true);
+    if (!confirmed) return;
 
     try {
       if (isDemoData) {

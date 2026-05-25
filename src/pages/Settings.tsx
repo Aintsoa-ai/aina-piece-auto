@@ -314,20 +314,20 @@ export const Settings: React.FC = () => {
           if (!response.ok) throw new Error("Erreur serveur API email");
 
           if (!isAuto) {
-            alert(`✅ Point de sauvegarde généré ET envoyé automatiquement avec succès à ${backupEmail} !\n\nImportant : Si c'est la TOUTE PREMIÈRE FOIS, veuillez consulter votre boîte de réception (ou dossier Spam) pour valider l'adresse email auprès du service d'envoi.`);
+            showAlert(`✅ Point de sauvegarde généré ET envoyé automatiquement avec succès à ${backupEmail} !\n\nImportant : Si c'est la TOUTE PREMIÈRE FOIS, veuillez consulter votre boîte de réception (ou dossier Spam) pour valider l'adresse email auprès du service d'envoi.`, 'success');
           }
         } catch (mailErr) {
           console.error("Erreur lors de l'envoi silencieux :", mailErr);
           if (!isAuto) {
-            alert("La sauvegarde a été téléchargée sur l'ordinateur, mais l'envoi automatique par email a échoué. Vérifiez votre connexion internet.");
+            showAlert("La sauvegarde a été téléchargée sur l'ordinateur, mais l'envoi automatique par email a échoué. Vérifiez votre connexion internet.", "warning");
           }
         }
       } else {
-        if (!isAuto) alert("Point de sauvegarde téléchargé avec succès sur l'ordinateur ! (Aucun email de sécurité défini)");
+        if (!isAuto) showAlert("Point de sauvegarde téléchargé avec succès sur l'ordinateur ! (Aucun email de sécurité défini)", "success");
       }
     } catch (err: any) {
       console.error(err);
-      if (!isAuto) alert("Erreur de sauvegarde: " + err.message);
+      if (!isAuto) showAlert("Erreur de sauvegarde: " + err.message, "error");
     } finally {
       setIsBackingUp(false);
     }
@@ -344,12 +344,13 @@ export const Settings: React.FC = () => {
         const data = JSON.parse(event.target?.result as string);
         if (!data.timestamp || !data.pieces) throw new Error("Fichier invalide.");
 
-        if (window.confirm(`⚠️ RESTAURATION DU POINT DE SAUVEGARDE ⚠️\n\nVoulez-vous restaurer l'état du système du ${new Date(data.timestamp).toLocaleString('fr-FR')} ?\n\nCela écrasera la base de données actuelle pour y injecter les anciennes valeurs.`)) {
-           alert("Point de sauvegarde chargé ! L'application va traiter les données...");
+        const confirmed = await showConfirm(`⚠️ RESTAURATION DU POINT DE SAUVEGARDE ⚠️\n\nVoulez-vous restaurer l'état du système du ${new Date(data.timestamp).toLocaleString('fr-FR')} ?\n\nCela écrasera la base de données actuelle pour y injecter les anciennes valeurs.`, true);
+        if (confirmed) {
+           showAlert("Point de sauvegarde chargé ! L'application va traiter les données...", "info");
            window.location.reload();
         }
       } catch (err: any) {
-        alert("Erreur d'importation : " + err.message);
+        showAlert("Erreur d'importation : " + err.message, "error");
       } finally {
         setIsRestoring(false);
         e.target.value = '';
@@ -494,9 +495,9 @@ export const Settings: React.FC = () => {
   const handleSaveBoutiqueInfo = (boutiqueId: string) => {
     try {
       localStorage.setItem('boutiqueInfos', JSON.stringify(boutiqueInfos));
-      alert("Informations de la boutique sauvegardées localement avec succès !");
+      showAlert("Informations de la boutique sauvegardées localement avec succès !", "success");
     } catch (e) {
-      alert("Erreur lors de la sauvegarde.");
+      showAlert("Erreur lors de la sauvegarde.", "error");
     }
   };
 
@@ -514,7 +515,7 @@ export const Settings: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 1024 * 1024) { // 1MB max
-        alert("L'image est trop volumineuse (Max 1MB).");
+        showAlert("L'image est trop volumineuse (Max 1MB).", "warning");
         return;
       }
       const reader = new FileReader();
@@ -1101,7 +1102,7 @@ export const Settings: React.FC = () => {
               printWin.focus();
               printWin.print();
             } else {
-              alert("Veuillez autoriser les fenêtres contextuelles (pop-ups) pour imprimer en PDF.");
+              showAlert("Veuillez autoriser les fenêtres contextuelles (pop-ups) pour imprimer en PDF.", "warning");
             }
           }
         } else if (format === 'print') {
@@ -1113,21 +1114,22 @@ export const Settings: React.FC = () => {
             printWin.focus();
             printWin.print();
           } else {
-            alert("Veuillez autoriser les fenêtres contextuelles (pop-ups) pour imprimer.");
+            showAlert("Veuillez autoriser les fenêtres contextuelles (pop-ups) pour imprimer.", "warning");
           }
         }
       }
 
       setReportModalOpen(false);
     } catch (err: any) {
-      alert("Erreur lors de l'export: " + err.message);
+      showAlert("Erreur lors de l'export: " + err.message, "error");
     } finally {
       setIsExporting(false);
     }
   };
 
   const executePurge = async () => {
-    if (!window.confirm(`⚠️ ATTENTION ⚠️\n\nVous êtes sur le point d'EFFACER DÉFINITIVEMENT toutes les transactions (Ventes, Achats, Dépenses) du ${purgeStart} au ${purgeEnd}.\n\nCette action est totalement IRRÉVERSIBLE et permet de libérer de l'espace dans la base de données.\nÊtes-vous absolument certain(e) de vouloir continuer ?`)) {
+    const confirmed = await showConfirm(`⚠️ ATTENTION ⚠️\n\nVous êtes sur le point d'EFFACER DÉFINITIVEMENT toutes les transactions (Ventes, Achats, Dépenses) du ${purgeStart} au ${purgeEnd}.\n\nCette action est totalement IRRÉVERSIBLE et permet de libérer de l'espace dans la base de données.\nÊtes-vous absolument certain(e) de vouloir continuer ?`, true);
+    if (!confirmed) {
       return;
     }
     
@@ -1151,11 +1153,11 @@ export const Settings: React.FC = () => {
 
       await supabase.from('depenses').delete().gte('created_at', purgeStart).lte('created_at', endDateFilter);
 
-      alert(`✅ Purge effectuée avec succès.\nLes données de la période ${purgeStart} au ${purgeEnd} ont été effacées.`);
+      showAlert(`✅ Purge effectuée avec succès.\nLes données de la période ${purgeStart} au ${purgeEnd} ont été effacées.`, 'success');
       setPurgeModalOpen(false);
       window.location.reload();
     } catch (err: any) {
-      alert("❌ Erreur lors de la purge: " + err.message);
+      showAlert("❌ Erreur lors de la purge: " + err.message, "error");
     } finally {
       setIsPurging(false);
     }
@@ -2031,8 +2033,8 @@ export const Settings: React.FC = () => {
                         {!acc.isDb ? (
                           <>
                             <button 
-                              onClick={() => {
-                                const newPwd = prompt("Modifier le texte du mot de passe (ATTENTION: Ceci modifie uniquement l'affichage local, pas le vrai mot de passe dans la base de données) :", acc.password);
+                              onClick={async () => {
+                                const newPwd = await showPrompt("Modifier le texte du mot de passe (ATTENTION: Ceci modifie uniquement l'affichage local, pas le vrai mot de passe dans la base de données) :", acc.password);
                                 if (newPwd) {
                                   const updated = [...createdAccounts];
                                   const localIdx = updated.findIndex(u => u.email === acc.email);

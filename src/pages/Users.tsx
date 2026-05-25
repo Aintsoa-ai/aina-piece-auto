@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { showConfirm } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../context/AuthContext';
@@ -130,7 +131,8 @@ export const Users: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
+    const confirmed = await showConfirm("Voulez-vous vraiment supprimer cet utilisateur ?", true);
+    if (!confirmed) return;
 
     try {
       if (isDemoData) {
