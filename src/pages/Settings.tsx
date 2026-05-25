@@ -158,6 +158,16 @@ export const Settings: React.FC = () => {
   const [purgeModalOpen, setPurgeModalOpen] = useState(false);
   const [purgeStart, setPurgeStart] = useState(initialTodayStr);
   const [purgeEnd, setPurgeEnd] = useState(initialTodayStr);
+
+  const [hardResetModalOpen, setHardResetModalOpen] = useState(false);
+  const [resetOptions, setResetOptions] = useState({ 
+    boutiques: false, 
+    fournisseurs: false, 
+    catalogue: false, 
+    transactions: false,
+    numerotation: false
+  });
+  const [isHardResetting, setIsHardResetting] = useState(false);
   const [isPurging, setIsPurging] = useState(false);
   const [activeDates, setActiveDates] = useState<Set<string>>(new Set());
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -1168,6 +1178,40 @@ export const Settings: React.FC = () => {
     }
   };
 
+  const executeHardReset = async () => {
+    const confirmed = await showConfirm(`⚠️ DANGER EXTRÊME ⚠️\n\nVous êtes sur le point de RÉINITIALISER DÉFINITIVEMENT les éléments sélectionnés.\nCette action est totalement IRRÉVERSIBLE. Êtes-vous ABSOLUMENT certain(e) de vouloir continuer ?`, true);
+    if (!confirmed) return;
+    setIsHardResetting(true);
+    try {
+      if (resetOptions.transactions) {
+        await supabase.from('details_ventes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('ventes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('details_achats').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('achats').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('depenses').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('mouvements_stock').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('import_logs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      }
+      if (resetOptions.catalogue) {
+        await supabase.from('stock').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('pieces').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      }
+      if (resetOptions.fournisseurs) {
+        await supabase.from('fournisseurs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      }
+      if (resetOptions.boutiques) {
+        await supabase.from('boutiques').delete().neq('name', 'AINA PIECE BEHORIRIKA');
+      }
+      showAlert("Réinitialisation effectuée avec succès.");
+      setHardResetModalOpen(false);
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (e: any) {
+      alert("Erreur lors de la réinitialisation: " + e.message);
+    } finally {
+      setIsHardResetting(false);
+    }
+  };
+
   const executePurge = async () => {
     const confirmed = await showConfirm(`⚠️ ATTENTION ⚠️\n\nVous êtes sur le point d'EFFACER DÉFINITIVEMENT toutes les transactions (Ventes, Achats, Dépenses) du ${purgeStart} au ${purgeEnd}.\n\nCette action est totalement IRRÉVERSIBLE et permet de libérer de l'espace dans la base de données.\nÊtes-vous absolument certain(e) de vouloir continuer ?`, true);
     if (!confirmed) {
@@ -1333,6 +1377,28 @@ export const Settings: React.FC = () => {
                   Libre : {dbStats.loading ? '...' : (dbStats.totalMB - dbStats.usedMB).toFixed(1)} Mo
                 </span>
               </div>
+              <button
+                onClick={() => setHardResetModalOpen(true)}
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  color: '#ef4444',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  marginLeft: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  textTransform: 'uppercase'
+                }}
+              >
+                <RefreshCw size={12} />
+                Réinitialiser
+              </button>
             </div>
             <button
               onClick={() => {
@@ -2310,6 +2376,73 @@ export const Settings: React.FC = () => {
                 disabled={isPurging}
               >
                 {isPurging ? 'Purge en cours...' : 'Effacer les données'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL DE RÉINITIALISATION D'USINE ───────────────── */}
+      {hardResetModalOpen && (
+        <div style={s.modalOverlay}>
+          <div style={{...s.modalCard, maxWidth: '450px'}}>
+            <div style={s.modalHeader}>
+              <h3 style={{...s.modalTitle, color: '#ef4444'}}>
+                <AlertTriangle size={18} style={{ marginRight: '8px' }} />
+                Réinitialisation Globale (Factory Reset)
+              </h3>
+              <button style={s.modalCloseBtn} onClick={() => setHardResetModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={s.modalBody}>
+              <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: '20px' }}>
+                <p style={{ fontSize: '13px', color: '#fca5a5', margin: 0, lineHeight: 1.5 }}>
+                  <strong>Attention !</strong> Cette action permet de vider rapidement certaines tables de votre base de données (pour recommencer à zéro). C'est IRRÉVERSIBLE.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
+                  <input type="checkbox" checked={resetOptions.transactions} onChange={(e) => setResetOptions({...resetOptions, transactions: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
+                  <span>Ventes, Achats, Dépenses et Mouvements (Historique)</span>
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
+                  <input type="checkbox" checked={resetOptions.catalogue} onChange={(e) => setResetOptions({...resetOptions, catalogue: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
+                  <span>Catalogue des Pièces & Stock</span>
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
+                  <input type="checkbox" checked={resetOptions.fournisseurs} onChange={(e) => setResetOptions({...resetOptions, fournisseurs: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
+                  <span>Liste des Fournisseurs</span>
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
+                  <input type="checkbox" checked={resetOptions.numerotation} onChange={(e) => setResetOptions({...resetOptions, numerotation: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
+                  <span>Numérotation des factures et tickets à zéro</span>
+                </label>
+                
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
+                  <input type="checkbox" checked={resetOptions.boutiques} onChange={(e) => setResetOptions({...resetOptions, boutiques: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
+                  <span>Supprimer les autres Boutiques (Conserver 'AINA PIECE BEHORIRIKA')</span>
+                </label>
+
+              </div>
+            </div>
+
+            <div style={{ ...s.modalFooter, justifyContent: 'space-between' }}>
+              <button style={s.btnAnnuler} onClick={() => setHardResetModalOpen(false)}>
+                Annuler
+              </button>
+              <button 
+                style={{ ...s.btnValider, backgroundColor: '#dc2626', borderColor: '#dc2626' }} 
+                onClick={executeHardReset}
+                disabled={isHardResetting || (!resetOptions.transactions && !resetOptions.catalogue && !resetOptions.fournisseurs && !resetOptions.numerotation && !resetOptions.boutiques)}
+              >
+                {isHardResetting ? 'Réinitialisation...' : 'Confirmer la suppression'}
               </button>
             </div>
           </div>
