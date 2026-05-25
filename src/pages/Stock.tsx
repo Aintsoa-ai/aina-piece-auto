@@ -617,8 +617,9 @@ export const Stock: React.FC = () => {
             onChange={(e) => setSelectedBoutique(e.target.value)}
           >
             <option value="all">Toutes les boutiques</option>
-            <option value="b1">Boutique Centre</option>
-            <option value="b2">Boutique Nord</option>
+            {boutiques.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
           </select>
 
           {/* Status selection dropdown */}
@@ -850,8 +851,9 @@ export const Stock: React.FC = () => {
                       required
                     >
                       <option value="">-- Boutique départ --</option>
-                      <option value="b1">Boutique Centre</option>
-                      <option value="b2">Boutique Nord</option>
+                      {boutiques.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -864,8 +866,9 @@ export const Stock: React.FC = () => {
                       required
                     >
                       <option value="">-- Boutique arrivée --</option>
-                      <option value="b1">Boutique Centre</option>
-                      <option value="b2">Boutique Nord</option>
+                      {boutiques.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
                     </select>
                   </div>
 

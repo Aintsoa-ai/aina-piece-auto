@@ -725,8 +725,9 @@ export const Sales: React.FC = () => {
                       value={selectedBoutique}
                       onChange={(e) => setSelectedBoutique(e.target.value)}
                     >
-                      <option value="Centre">Boutique Centre (Analakely)</option>
-                      <option value="Nord">Boutique Nord (Ivato)</option>
+                      {dbBoutiques.map(b => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
                     </select>
                   </div>
 
