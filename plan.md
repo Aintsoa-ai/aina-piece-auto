@@ -44,3 +44,8 @@
 - [x] Mettre en cache le catalogue complet et les stocks pour la recherche hors-ligne dans la Caisse.
 - [x] Développer le système de synchronisation automatique (File d'attente) au retour de la connexion Internet.
 - [x] Gérer les conflits de stock lors de la synchronisation (vérification backend).
+
+
+## Mise à jour Phase 7 : Fonctionnalités Intelligentes
+- [x] Comparateur dynamique de fournisseurs : Calcul instantané du meilleur prix d'achat basé sur l'historique réel de la base de données au lieu de données simulées.
+- [x] Résolution de la défaillance de rafraîchissement d'état (stale closure) sur l'indicateur de connexion des boutiques.

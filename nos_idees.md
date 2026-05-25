@@ -47,3 +47,7 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 ### Améliorations Futures (Synchronisation)
 - **File d'attente avancée :** Afficher un historique visuel détaillé (liste) des ventes synchronisées avec leurs statuts (succès, échec) directement dans un panneau latéral en cliquant sur le nuage.
 - **Notification push :** Envoyer une alerte sonore ou une notification native à l'administrateur lorsqu'une boutique se déconnecte du réseau pendant les heures d'ouverture.
+
+### Améliorations Futures (Achats & IA)
+- **Graphique d'évolution des prix :** Afficher une petite courbe (sparkline) montrant l'inflation ou la baisse du prix d'une pièce chez un fournisseur sélectionné au fil des mois.
+- **Alerte de marge :** Bloquer ou alerter le vendeur si le prix de vente saisi est inférieur au prix d'achat moyen calculé dynamiquement.

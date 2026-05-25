@@ -171,3 +171,7 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Solution :** Refonte totale du composant `syncManager.ts` pour gérer l'export Dexie vers Supabase. Les ID manquants sont convertis en `null`. Intégration de Supabase Presence dans `Layout.tsx` et `Settings.tsx` pour que l'administrateur voit en temps réel si une boutique se déconnecte (délai inférieur à 2 secondes).
 - **Interface :** Ajout d'un bouton Nuage intelligent affichant un compteur dynamique du nombre de ventes coincées sur le téléphone.
 - **Déploiement :** Résolution d'une erreur TS stricte empêchant Vercel de compiler, puis forçage du déploiement en production.
+
+### AUDIT: 25 Mai 2026 (Soirée) - Fiabilisation Temps Réel & Algorithme d'Achats
+- **Problème de présence (Stale Closure) :** Le minuteur automatique de 60s réinitialisait la détection de présence à cause d'une faille de mémoire React (closure). Corrigé via un `useRef` pour garantir un statut "En ligne" stable.
+- **Algorithme d'achats :** Remplacement des données fictives de comparaison de fournisseurs par un algorithme d'agrégation dynamique lisant `achats` et `details_achats`. Le système identifie désormais le "MEILLEUR" fournisseur en temps réel.
