@@ -195,15 +195,43 @@ export const ImportExcel: React.FC = () => {
 
             if (existingPiece) {
               if (replaceExisting) {
-                await supabase.from('pieces').update({ designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).eq('id', pieceId);
+                let updatePayload = { designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente };
+                let { error: updErr } = await supabase.from('pieces').update(updatePayload).eq('id', pieceId);
+                if (updErr && updErr.message.includes('prix_achat')) {
+                   delete updatePayload.prix_achat;
+                   delete updatePayload.prix_vente;
+                   let { error: retryErr } = await supabase.from('pieces').update(updatePayload).eq('id', pieceId);
+                   if (retryErr) throw retryErr;
+                } else if (updErr) {
+                   throw updErr;
+                }
                 updatedCount++;
               } else if (ignoreDuplicates) { ignoredCount++; continue; }
               else if (updateExisting) {
-                await supabase.from('pieces').update({ designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined }).eq('id', pieceId);
+                let updatePayload = { designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined };
+                let { error: updErr } = await supabase.from('pieces').update(updatePayload).eq('id', pieceId);
+                if (updErr && updErr.message.includes('prix_achat')) {
+                   delete updatePayload.prix_achat;
+                   delete updatePayload.prix_vente;
+                   let { error: retryErr } = await supabase.from('pieces').update(updatePayload).eq('id', pieceId);
+                   if (retryErr) throw retryErr;
+                } else if (updErr) {
+                   throw updErr;
+                }
                 updatedCount++;
               }
             } else {
-              const { data: newPiece, error: insertError } = await supabase.from('pieces').insert({ reference: row.reference, designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).select('id').single();
+              let insertPayload = { reference: row.reference, designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente };
+              let { data: newPiece, error: insertError } = await supabase.from('pieces').insert(insertPayload).select('id').single();
+              
+              if (insertError && insertError.message.includes('prix_achat')) {
+                 delete insertPayload.prix_achat;
+                 delete insertPayload.prix_vente;
+                 let retry = await supabase.from('pieces').insert(insertPayload).select('id').single();
+                 newPiece = retry.data;
+                 insertError = retry.error;
+              }
+
               if (insertError) {
                 console.error("ERREUR D'INSERTION PIECE:", insertError);
                 throw new Error("Ligne " + row.reference + " : " + insertError.message);
