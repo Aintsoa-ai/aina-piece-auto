@@ -236,7 +236,7 @@ export const ImportExcel: React.FC = () => {
                 console.error("ERREUR D'INSERTION PIECE:", insertError);
                 throw new Error("Ligne " + row.reference + " : " + insertError.message);
               }
-              pieceId = newPiece.id;
+              pieceId = newPiece?.id;
               insertedCount++;
             }
 
