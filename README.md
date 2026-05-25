@@ -42,8 +42,8 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - **Purge de base :** Fonction pour nettoyer l'historique d'une période sans altérer le stock.
 
 ### 8. Gestion Multi-Boutique et Accès (Matrice Cloud)
-- **Radar de Présence :** Tableau de bord indiquant en temps réel quelle boutique est connectée (voyant vert clignotant, système de "Heartbeat" toutes les 5 min).
-- **Création de Caissiers Autonomes :** L'administrateur peut créer directement depuis l'application des identifiants (Email/MDP) exclusifs pour les boutiques, sans passer par Supabase.
+- **Radar de Présence :** Tableau de bord indiquant en temps réel quelle boutique est connectée (voyant vert clignotant, système de "Heartbeat" toutes les 5 min). Corrigé pour détecter précisément chaque boutique sans interférence.
+- **Création de Caissiers Autonomes :** L'administrateur peut créer des identifiants (Email/MDP) exclusifs pour les boutiques avec un système d'assignation robuste (upsert) pour éviter les profils orphelins.
 - **Mode Caissier Restreint :** Dès qu'un compte "Boutique" se connecte, l'accès aux paramètres est bloqué et les ventes sont assignées à la boutique concernée.
 - **Matrice des Autorisations (Cloud) :** Contrôle total et granulaire de l'affichage des menus (Ventes, Achats, Stock, etc.) pour chaque boutique. La configuration est sauvegardée sur Supabase pour s'appliquer instantanément et universellement à tous les téléphones et ordinateurs connectés.
 - **Sécurité Invisible (RLS) :** Cloisonnement physique des données de ventes, caisse et dépenses directement au niveau de la base de données. Il est impossible pour une boutique d'accéder aux données financières d'une autre boutique, même par piratage direct de l'API.

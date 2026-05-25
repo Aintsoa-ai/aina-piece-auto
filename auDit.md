@@ -150,3 +150,10 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - Vérification des calendriers : Le comportement natif bloquant a été retiré. Le module `react-datepicker` a été intégré avec succès sur toute la plateforme.
 - Vérification d'affichage : Test visuel validé pour l'apparition des "pastilles rouges" (jours d'activité) et "pastille bleue" (date du jour) directement dans les calendriers pop-up.
 - Statut du système : Parfaitement opérationnel et synchronisé avec Vercel.
+
+## Audit #22 - Correction d'Assignation des Caissiers (Radar Temps Réel)
+**Statut : Résolu & Déployé ✅**
+- **Objectif :** S'assurer que le radar de présence affiche les bonnes boutiques.
+- **Problème identifié :** La création d'un compte caissier échouait silencieusement à l'assigner à une boutique si le trigger de base de données était trop lent, créant des comptes "orphelins" (boutique `null`) ou assignés à la mauvaise boutique par défaut.
+- **Résolution :** Modification de la fonction de création dans `Settings.tsx` pour utiliser un `upsert` robuste au lieu d'un simple `update`. Le compte orphelin de test a été corrigé manuellement en base.
+- **Impact UI/UX :** Le radar de présence affiche dorénavant le statut en temps réel ("En ligne" / "Hors Ligne") exact pour chaque boutique distinctement.
