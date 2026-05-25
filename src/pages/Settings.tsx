@@ -823,7 +823,7 @@ export const Settings: React.FC = () => {
           }
         }
       } 
-      else if (format === 'word' || format === 'pdf' || format === 'powerpoint' || format === 'print') {
+      else if (format === 'word' || format === 'pdf' || format === 'print') {
         // Calculate variables for Venngage-style charts and pie
         const chartData = topSellers.slice(0, 8);
         const chartTotal = chartData.reduce((sum, ts) => sum + ts.revenue, 0) || 1;
@@ -850,7 +850,7 @@ export const Settings: React.FC = () => {
         const maxRev = Math.max(...chartData.map(t => t.revenue), 1);
 
         const bodyContent = `
-            <div style="width: 210mm; padding: 40px; margin: 0 auto; background: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; box-sizing: border-box;">
+            <div style="width: 100%; max-width: 800px; padding: 20px; margin: 0 auto; background: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; box-sizing: border-box;">
               <!-- HEADER -->
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #E0E0E0; padding-bottom: 20px;">
                 <div style="display: flex; flex-direction: column; width: 200px;">
@@ -1026,10 +1026,10 @@ export const Settings: React.FC = () => {
           </html>
         `;
 
-        if (format === 'word' || format === 'powerpoint') {
-          const mimeType = format === 'word' ? 'application/msword' : 'application/vnd.ms-powerpoint';
-          const extension = format === 'word' ? '.doc' : '.ppt';
-          const typeDesc = format === 'word' ? 'Document Word' : 'Présentation PowerPoint';
+        if (format === 'word') {
+          const mimeType = 'application/msword';
+          const extension = '.doc';
+          const typeDesc = 'Document Word';
 
           const blob = new Blob(['\ufeff', htmlContent], { type: mimeType });
           const fileName = `Rapport_${appName}_${reportStart}_au_${reportEnd}${extension}`;
@@ -2171,13 +2171,7 @@ export const Settings: React.FC = () => {
                 Annuler
               </button>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button 
-                  style={{ ...s.btnValider, backgroundColor: '#ea580c', borderColor: '#ea580c' }} 
-                  onClick={() => executeExport('powerpoint')}
-                  disabled={isExporting}
-                >
-                  <Presentation size={14} style={{ marginRight: '6px' }} /> PowerPoint
-                </button>
+
                 <button 
                   style={{ ...s.btnValider, backgroundColor: '#2563eb', borderColor: '#2563eb' }} 
                   onClick={() => executeExport('word')}
