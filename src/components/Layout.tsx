@@ -138,6 +138,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
 
   const userRole = role?.toLowerCase() || '';
   const isAdmin = userRole === 'administrateur';
+  const isBoutique = !isAdmin;
+  const displaySubtitle = isBoutique ? (profile?.full_name?.replace(/AINA PIECE /i, '') || appSubtitle) : appSubtitle;
 
   // Normalise current tab name for header
   const currentName = (() => {
@@ -163,7 +165,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
         </div>
         <div>
           <div style={s.logoTitle}>{appName}</div>
-          <div style={s.logoSub}>{appSubtitle}</div>
+          <div style={s.logoSub}>{displaySubtitle}</div>
         </div>
         {!isDesktop && (
           <button style={s.closeBtn} onClick={() => setSidebarOpen(false)}>
@@ -244,8 +246,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
 
       {/* User footer */}
       <div style={s.userFooter}>
-        <div style={s.userAvatar}>
-          {profile?.full_name?.charAt(0).toUpperCase() || 'A'}
+        <div style={isBoutique ? s.boutiqueAvatar : s.userAvatar}>
+          {isBoutique ? <Store size={20} /> : (profile?.full_name?.charAt(0).toUpperCase() || 'A')}
         </div>
         <div style={s.userInfo}>
           <span style={s.userName}>{profile?.full_name || 'Utilisateur'}</span>
@@ -517,6 +519,17 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: 13,
     fontWeight: 700,
     color: '#fff',
+    flexShrink: 0,
+  },
+  boutiqueAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: '8px',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    color: '#0066fe',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     flexShrink: 0,
   },
   userInfo: {
