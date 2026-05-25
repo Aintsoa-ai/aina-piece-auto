@@ -49,7 +49,7 @@ export const Sales: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [vendeurName, setVendeurName] = useState<string>('');
-  const [selectedBoutique, setSelectedBoutique] = useState<string>('Centre');
+  const [selectedBoutique, setSelectedBoutique] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -285,6 +285,9 @@ export const Sales: React.FC = () => {
         setPieces(parsedPieces);
         if (result.bData) {
           setDbBoutiques(result.bData);
+          if (result.bData.length > 0 && (!selectedBoutique || selectedBoutique === 'Centre')) {
+            setSelectedBoutique(result.bData[0].id);
+          }
         }
 
       } else {
@@ -399,7 +402,7 @@ export const Sales: React.FC = () => {
         calculatedTotal += pVente * item.quantity;
     });
 
-    const boutiqueIdToUse = profile?.boutique_id || selectedBoutique;
+    const boutiqueIdToUse = profile?.boutique_id || selectedBoutique || null;
 
     try {
       if (!navigator.onLine) {
@@ -791,10 +794,7 @@ export const Sales: React.FC = () => {
 
       {/* ─── RECEIPT MODAL PRINT ─────────────────────────── */}
       {receiptSale && (() => {
-        const matchingDbBoutique = dbBoutiques.find(b => 
-          (selectedBoutique === 'Centre' && (b.name.toLowerCase().includes('centre') || b.name.toLowerCase().includes('principal'))) ||
-          (selectedBoutique === 'Nord' && b.name.toLowerCase().includes('nord'))
-        ) || dbBoutiques[0];
+        const matchingDbBoutique = dbBoutiques.find(b => b.id === selectedBoutique) || dbBoutiques[0];
 
         const currentInfo = matchingDbBoutique ? boutiqueInfos[matchingDbBoutique.id] || {} : {};
 

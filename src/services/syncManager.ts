@@ -62,13 +62,15 @@ export const syncUp = async () => {
 
     console.log(`[SyncManager] Début de synchronisation de ${pendingVentes.length} ventes hors-ligne.`);
 
+    const isValidUUID = (uuid: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
+
     for (const vente of pendingVentes) {
       // 1. Insérer la vente principale
       const { data: insertedVente, error: venteErr } = await supabase
         .from('ventes')
         .insert({
-          boutique_id: vente.boutique_id || null,
-          caissier_id: vente.vendeur_id || null, // Mapping local vendeur_id to db caissier_id
+          boutique_id: isValidUUID(vente.boutique_id) ? vente.boutique_id : null,
+          caissier_id: isValidUUID(vente.vendeur_id) ? vente.vendeur_id : null,
           total: vente.total,
           created_at: vente.created_at
         })
