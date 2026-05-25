@@ -104,15 +104,15 @@ export const ImportExcel: React.FC = () => {
         const rawRows = XLSX.utils.sheet_to_json<any>(worksheet);
 
         const mappedRows: ExcelRow[] = rawRows.map((row) => ({
-          reference: String(row.reference || row.Reference || row['Référence'] || row['Reference'] || row.REF || row.ref || '').trim() || 'VIDE',
-          designation: String(row.designation || row.Designation || row['Désignation'] || row.DESIGNATION || row.nom || row.Piece || row['Pièce'] || row.piece || '').trim(),
+          reference: String(row.reference || row.Reference || row.REF || row.ref || '').trim() || 'VIDE',
+          designation: String(row.designation || row.Designation || row.DESIGNATION || row.nom || '').trim(),
           marque: String(row.marque || row.Marque || row.MARQUE || row.brand || '').trim(),
           categorie: String(row.categorie || row.Categorie || row.category || '').trim(),
-          compatibilite: String(row.compatibilite || row.vehicule || row.Vehicule || '').trim(),
+          compatibilite: String(row.compatibilite || row.vehicule || '').trim(),
           oem_number: String(row.oem || row.OEM || row.oem_number || '').trim(),
           description: String(row['historique vente(lieu et date)'] || row.description || '').trim(),
-          quantite_achetee: parseExcelNumber(row.quantite_achetee || row.quantite || row.Quantite || row['Quantité'] || row.Nbr || 0),
-          quantite_disponible: parseExcelNumber(row.quantite_disponible || row.disponible || row.Disponible || row.quantite || row.Quantite || row['Quantité'] || row.Nbr || 0),
+          quantite_achetee: parseExcelNumber(row.quantite_achetee || row.quantite || row.Nbr || 0),
+          quantite_disponible: parseExcelNumber(row.quantite_disponible || row.disponible || row.Nbr || 0),
           stock_minimum: parseExcelNumber(row.stock_minimum || row.min || 5),
           emplacement: String(row.STOCK || row.emplacement || row.location || '').trim(),
           prix_achat: parseExcelNumber(row.PU || row.prix_achat || row.achat || 0),
@@ -178,45 +178,37 @@ export const ImportExcel: React.FC = () => {
          }
       }
 
-      // 2. Process rows with chunks and local cache to avoid DB roundtrips and race conditions
-      const chunkSize = 25;
-      const piecesCache: Record<string, string> = {};
-
+      // 2. Process rows in chunks of 20 for massive speedup
+      const chunkSize = 20;
       for (let i = 0; i < parsedData.length; i += chunkSize) {
         const chunk = parsedData.slice(i, i + chunkSize);
 
-        // Process chunk sequentially to completely avoid database lock conflicts
-        for (const row of chunk) {
+        await Promise.all(chunk.map(async (row) => {
           try {
             if (!row.reference || !row.designation) { 
               ignoredCount++; 
-              continue; 
+              return; 
             }
 
-            let pieceId = piecesCache[row.reference];
+            const { data: existingPiece } = await supabase.from('pieces').select('id').eq('reference', row.reference).maybeSingle();
+            let pieceId = existingPiece?.id;
 
-            if (!pieceId) {
-              const { data: existingPiece } = await supabase.from('pieces').select('id').eq('reference', row.reference).maybeSingle();
-              if (existingPiece) {
-                pieceId = existingPiece.id;
-                piecesCache[row.reference] = pieceId;
-              }
-            }
-
-            if (pieceId) {
+            if (existingPiece) {
               if (replaceExisting) {
                 await supabase.from('pieces').update({ designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).eq('id', pieceId);
                 updatedCount++;
-              } else if (ignoreDuplicates) { ignoredCount++; continue; }
+              } else if (ignoreDuplicates) { ignoredCount++; return; }
               else if (updateExisting) {
                 await supabase.from('pieces').update({ designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined }).eq('id', pieceId);
                 updatedCount++;
               }
             } else {
               const { data: newPiece, error: insertError } = await supabase.from('pieces').insert({ reference: row.reference, designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).select('id').single();
-              if (insertError) { ignoredCount++; continue; }
+              if (insertError) {
+                console.error("ERREUR D'INSERTION PIECE:", insertError);
+                throw new Error("Ligne " + row.reference + " : " + insertError.message);
+              }
               pieceId = newPiece.id;
-              piecesCache[row.reference] = pieceId;
               insertedCount++;
             }
 
@@ -244,11 +236,11 @@ export const ImportExcel: React.FC = () => {
                 }
               }
             }
-          } catch (e) {
+          } catch (e: any) {
              console.error("Row import error", e);
-             ignoredCount++;
+             throw e;
           }
-        }
+        }));
         
         setProgress(Math.round((Math.min(i + chunkSize, parsedData.length) / parsedData.length) * 100));
       }
