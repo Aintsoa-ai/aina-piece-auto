@@ -98,6 +98,13 @@ const AnimatedNumber: React.FC<{ value: number; formatAr?: boolean }> = ({ value
 
 
 export const Dashboard: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [loading, setLoading] = useState(true);
   const [activeTooltip, setActiveTooltip] = useState<'mar' | 'mer' | 'jeu' | null>('mar');
   
@@ -362,10 +369,10 @@ export const Dashboard: React.FC = () => {
         <p style={s.pageSubtitle}>Vue d'ensemble de votre activité</p>
       </div>
 
-      <div style={{ display: 'flex', gap: '20px', flexDirection: 'row', alignItems: 'stretch' }}>
+      <div style={{ display: 'flex', gap: '20px', flexDirection: isMobile ? 'column' : 'row', alignItems: 'stretch' }}>
         
         {/* LEFT COLUMN: CALENDAR */}
-        <div style={{ flex: '0 0 350px', display: 'flex' }}>
+        <div style={{ flex: isMobile ? '1' : '0 0 350px', display: 'flex', minWidth: isMobile ? '100%' : '350px' }}>
           {renderCalendar()}
         </div>
 
