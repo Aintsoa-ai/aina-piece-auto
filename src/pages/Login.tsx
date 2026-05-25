@@ -121,14 +121,14 @@ export const Login: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
   container: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    width: '100vw',
+    flexDirection: 'column',
+    minHeight: '100dvh',
+    width: '100%',
     backgroundColor: 'var(--bg-main)',
     padding: '1.5rem',
     position: 'relative',
-    overflow: 'hidden',
+    overflowY: 'auto',
+    overflowX: 'hidden',
   },
   backgroundGlow1: {
     position: 'absolute',
@@ -158,6 +158,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: '1.75rem',
+    margin: 'auto',
   },
   header: {
     display: 'flex',
