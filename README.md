@@ -29,7 +29,7 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - **Importation Massive & Intelligente :** Importation depuis un fichier Excel (`.xlsx`). Gestion des doublons (remplacer, mettre à jour, ignorer) et sélecteur de destination avec option de "Déploiement Global" (Toutes les boutiques). Protection d'intégrité (lignes sans REF ignorées).
 
 ### 6. Rapports et Exports
-- **Exports Multiformats :** Génération de rapports en Excel, Word, PDF, et PowerPoint.
+- **Exports Multiformats :** Génération de rapports en Excel, Word, et PDF.
 - **Rapport Exécutif (PDF) :** Template d'entreprise haut de gamme (thème Vert Sarcelle/Gris Charbon) avec graphiques circulaires et barres + courbe d'évolution (100% SVG vectoriel natif). Tous les styles sont en `style="..."` *inline* pour contourner la limitation de `html2canvas` qui ignore les blocs `<style>` — garantissant couleurs, textes et fonds visibles sur Ordinateur et Téléphone.
 - **Filtres Avancés :** Filtrage des rapports par plage de dates et *par boutique spécifique*.
 - **Calendrier & Repères :** Affichage intelligent de l'activité sur le calendrier (Bleu = Aujourd'hui local, Rouge = Activité), avec synchronisation parfaite des fuseaux horaires.
@@ -59,4 +59,4 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ## Compatibilité Matérielle
 - **Ordinateur (Desktop) :** Interface complète avec menu latéral fixe.
-- **Téléphone (Mobile) :** Interface "Responsive" avec menu hamburger et cartes. Aucune fonctionnalité n'est altérée. (Ex: Le blocage du mode caissier et l'export des rapports fonctionnent parfaitement sur Mobile).
+- **Téléphone (Mobile) :** Interface "Responsive" avec menu hamburger et cartes. Aucune fonctionnalité n'est altérée. (Ex: Le blocage du mode caissier et l'export des rapports fonctionnent parfaitement sur Mobile). L'ergonomie prend en compte les claviers virtuels (`100dvh`, défilement actif) pour ne jamais bloquer la saisie.

@@ -4,7 +4,7 @@
 - [x] Remplacement des fausses données par la base de données Supabase.
 - [x] Intégration et validation du système d'importation Excel.
 - [x] Optimisation de l'ergonomie des barres de recherche pour la sélection de pièces.
-- [x] Implémentation du système complet de reporting (PDF, Excel, PPT) avec filtres.
+- [x] Implémentation du système complet de reporting (PDF, Excel, Word) avec filtres.
 - [x] Déploiement du système de sauvegarde de sécurité anti-vol (Cloud & Email).
 
 ## Phase 2 : Système de Permissions et Rôles (Terminée)

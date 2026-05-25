@@ -118,3 +118,22 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Analyse :** Une fonction de "smart merge" dans le code forçait l'affichage de ces profils en secours (`isDemoData` fallback).
 - **Résolution :** Suppression complète des constantes `demoUsers` dans `Users.tsx`. Dans `Sales.tsx`, remplacement du sélecteur de vendeur (qui contenait des `<option>` en dur) par un champ texte désactivé qui récupère dynamiquement et de façon sécurisée le nom du compte actuellement connecté (`profile?.full_name`).
 - **Impact Sécurité & UI :** Les employés ne peuvent plus tricher en sélectionnant le nom d'un collègue lors d'une vente. L'interface affiche la stricte réalité.
+
+## Audit #18 - Correction des Menus Déroulants (Boutiques "En Dur")
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Rendre l'interface 100% dynamique.
+- **Problème identifié :** Les listes déroulantes des pages "Stock" et "Nouvelle Vente" proposaient toujours "Boutique Centre" et "Boutique Nord" au lieu des boutiques de la base de données.
+- **Résolution :** Modification du code pour intégrer la liste dynamique `dbBoutiques` issue de Supabase, éradiquant les valeurs codées en dur. L'assignation des boutiques est maintenant toujours exacte.
+
+## Audit #19 - Ergonomie Mobile (Page de Connexion)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Permettre la connexion sur petit écran avec un clavier virtuel actif.
+- **Problème identifié :** Le conteneur bloquait le défilement (`overflow: hidden`), empêchant l'utilisateur de voir le champ "Mot de Passe" et le bouton "Se connecter" masqués par le clavier du téléphone.
+- **Résolution :** Remplacement de `100vh` par `100dvh` (Dynamic Viewport Height) et activation de `overflowY: 'auto'`. La page est désormais navigable sans bloquer l'expérience utilisateur mobile.
+
+## Audit #20 - Intégrité et Rendu des Exports (PDF/Word)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Garantir que les rapports générés s'affichent correctement et complètement.
+- **Problème identifié :** La colonne "Marge" du tableau des ventes était coupée lors de l'export PDF.
+- **Analyse :** Le conteneur HTML forçait une largeur rigide de `210mm` avec des marges internes de `40px`, ce qui débordait du cadre standard A4 capturé par `html2pdf.js`.
+- **Résolution :** Modification du code avec une largeur réactive (`width: 100%; max-width: 800px; padding: 20px;`) pour que le tableau se compacte proprement au lieu de déborder. Suppression de la fonctionnalité d'export PowerPoint, obsolète pour ce type de rapport. Le format Word a également été ajusté pour ouvrir parfaitement ce rendu web natif.
