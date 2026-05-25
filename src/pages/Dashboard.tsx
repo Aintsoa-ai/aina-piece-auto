@@ -110,6 +110,7 @@ export const Dashboard: React.FC = () => {
   
   const [stats, setStats] = useState<Stats>(emptyFallback);
   const [rawData, setRawData] = useState<{ pieces: any[], stock: any[], ventes: any[], achats: any[], depenses: any[] } | null>(null);
+  const [offlineConflicts, setOfflineConflicts] = useState<any[]>([]);
 
   // Time Machine States
   const dToday = new Date();
@@ -126,7 +127,7 @@ export const Dashboard: React.FC = () => {
 
     const queryPromise = (async () => {
       const { data: pieces } = await supabase.from('pieces').select('id');
-      const { data: stock } = await supabase.from('stock').select('*, pieces(designation)');
+      const { data: stock } = await supabase.from('stock').select('*, pieces(designation), boutiques(name)');
       const { data: ventes } = await supabase.from('ventes').select('*, details_ventes(quantite, prix_vente, pieces(designation))');
       const { data: achats } = await supabase.from('achats').select('*');
       const { data: depenses } = await supabase.from('depenses').select('*');
@@ -138,6 +139,8 @@ export const Dashboard: React.FC = () => {
 
       if (result && !result.isTimeout && result.pieces) {
         setRawData(result);
+        const conflicts = (result.stock || []).filter((s: any) => s.quantity_disponible < 0);
+        setOfflineConflicts(conflicts);
       } else {
         setRawData({ pieces: [], stock: [], ventes: [], achats: [], depenses: [] });
       }
@@ -363,6 +366,30 @@ export const Dashboard: React.FC = () => {
   return (
     <div style={s.wrapper}>
       
+      {/* ─── OFFLINE CONFLICT ALERTS ──────────────────────── */}
+      {offlineConflicts.length > 0 && (
+        <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.4)', borderRadius: '10px', padding: '16px', marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '10px', animation: 'fadeIn 0.4s ease' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <AlertTriangle size={20} color="#ef4444" />
+            <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#ef4444', margin: 0, textTransform: 'uppercase' }}>
+              Alerte de Conflit de Stock (Ventes Hors-Ligne)
+            </h3>
+          </div>
+          <p style={{ fontSize: '13px', color: '#ffffff', margin: 0, opacity: 0.9 }}>
+            Des ventes hors-ligne ont été synchronisées mais la quantité disponible de certaines pièces est tombée dans le négatif. Veuillez régulariser le stock.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+            {offlineConflicts.map((c, i) => (
+              <div key={i} style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px 12px', borderRadius: '6px', fontSize: '12.5px', color: '#fca5a5', display: 'flex', justifyContent: 'space-between' }}>
+                <span><strong>Pièce :</strong> {c.pieces?.designation || 'Inconnue'}</span>
+                <span><strong>Boutique :</strong> {c.boutiques?.name || 'Inconnue'}</span>
+                <span style={{ fontWeight: '800' }}>Stock actuel : {c.quantity_disponible}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ─── PAGE HEADER ───────────────────────────────────── */}
       <div style={s.headerRow}>
         <h1 style={s.pageTitle}>Tableau de bord</h1>
