@@ -473,6 +473,30 @@ export const Settings: React.FC = () => {
     }
   }, [isAdmin]);
 
+  const [dbStats, setDbStats] = useState({ usedMB: 0, totalMB: 500, loading: true });
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    const fetchDbSize = async () => {
+      try {
+        const { count: c1 } = await supabase.from('pieces').select('*', { count: 'exact', head: true });
+        const { count: c2 } = await supabase.from('ventes').select('*', { count: 'exact', head: true });
+        const { count: c3 } = await supabase.from('details_ventes').select('*', { count: 'exact', head: true });
+        const { count: c4 } = await supabase.from('mouvements_stock').select('*', { count: 'exact', head: true });
+        
+        const totalRows = (c1 || 0) + (c2 || 0) + (c3 || 0) + (c4 || 0);
+        // Supabase DB storage estimation: ~1.5 KB per row with indexes
+        let used = (totalRows * 1.5) / 1024;
+        used = Math.max(0.01, used); 
+        
+        setDbStats({ usedMB: used, totalMB: 500, loading: false });
+      } catch (e) {
+        setDbStats({ usedMB: 0, totalMB: 500, loading: false });
+      }
+    };
+    fetchDbSize();
+  }, [isAdmin]);
+
   const handleCreateBoutique = async (e: React.FormEvent) => {
     e.preventDefault();
     setBError(null);
@@ -1286,10 +1310,30 @@ export const Settings: React.FC = () => {
       {isAdmin && (
         <div style={{ ...s.card, marginBottom: '20px', overflowX: 'auto', padding: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px' }}>
-            <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', display: 'flex', alignItems: 'center', margin: 0 }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', display: 'flex', alignItems: 'center', margin: 0, whiteSpace: 'nowrap' }}>
               <Shield size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               Matrice des Autorisations (Utilisateurs & Boutiques)
             </h3>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, padding: '0 40px', maxWidth: '400px' }}>
+              <Database size={14} color="rgba(255,255,255,0.4)" />
+              <div style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '10px', height: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ 
+                  width: `${dbStats.loading ? 0 : Math.min(100, (dbStats.usedMB / dbStats.totalMB) * 100)}%`, 
+                  backgroundColor: dbStats.usedMB > 400 ? '#ef4444' : dbStats.usedMB > 250 ? '#f59e0b' : '#10b981', 
+                  height: '100%', 
+                  transition: 'width 1s ease-in-out' 
+                }} />
+              </div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <span style={{ fontWeight: '700', color: '#fff', fontSize: '11px' }}>
+                  {dbStats.loading ? '...' : dbStats.usedMB.toFixed(2)} / {dbStats.totalMB} Mo
+                </span>
+                <span style={{ fontSize: '9px', opacity: 0.8 }}>
+                  Libre : {dbStats.loading ? '...' : (dbStats.totalMB - dbStats.usedMB).toFixed(1)} Mo
+                </span>
+              </div>
+            </div>
             <button
               onClick={() => {
                 setPagePermissions(matrixPerms);
