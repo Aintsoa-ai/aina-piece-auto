@@ -219,7 +219,7 @@ export const ImportExcel: React.FC = () => {
                    throw updErr;
                 }
                 updatedCount++;
-              } else if (ignoreDuplicates) { ignoredCount++; continue; }
+              } else if (ignoreDuplicates) { ignoredCount++; return; }
               else if (updateExisting) {
                 let updatePayload = { designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined };
                 let { error: updErr } = await supabase.from('pieces').update(updatePayload).eq('id', pieceId);
