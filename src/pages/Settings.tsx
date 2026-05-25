@@ -1197,10 +1197,10 @@ export const Settings: React.FC = () => {
       let color = '#fff';
       
       if (isToday) {
-        bg = 'rgba(59, 130, 246, 0.4)'; // Blue plus visible
-        border = '1px solid #3b82f6';
+        bg = '#0078D4'; // Blue plus visible
+        border = '1px solid #0078D4';
       } else if (hasActivity) {
-        bg = 'rgba(239, 68, 68, 0.4)'; // Red plus visible
+        bg = '#ef4444'; // Solid Red like Dashboard
         border = '1px solid #ef4444';
       } else if (dateObj > new Date()) {
         color = 'rgba(255,255,255,0.2)';
@@ -2090,7 +2090,7 @@ export const Settings: React.FC = () => {
             <div style={s.modalBody}>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', marginBottom: '16px' }}>
                 Choisissez la période et les données à inclure dans votre rapport complet. 
-                Les dates avec une <span style={{ color: '#ef4444', fontWeight: 'bold' }}>bordure rouge</span> sont celles où une activité a été enregistrée.
+                Les dates marquées en <span style={{ backgroundColor: '#ef4444', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold', fontSize: '11px' }}>rouge</span> sont celles où une activité a été enregistrée.
               </p>
 
               <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
