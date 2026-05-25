@@ -163,78 +163,83 @@ export const ImportExcel: React.FC = () => {
 
       const fournisseursCache: Record<string, string> = {};
 
-      for (let i = 0; i < parsedData.length; i++) {
-        const row = parsedData[i];
-
-        try {
-          if (!row.reference || !row.designation) { 
-            ignoredCount++; 
-            continue; 
-          }
-
-          const { data: existingPiece } = await supabase.from('pieces').select('id').eq('reference', row.reference).maybeSingle();
-          let pieceId = existingPiece?.id;
-
-          if (existingPiece) {
-            if (replaceExisting) {
-              await supabase.from('pieces').update({ designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).eq('id', pieceId);
-              updatedCount++;
-            } else if (ignoreDuplicates) { ignoredCount++; continue; }
-            else if (updateExisting) {
-              await supabase.from('pieces').update({ designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined }).eq('id', pieceId);
-              updatedCount++;
+      // 1. Pre-fetch and cache all fournisseurs to avoid race conditions during parallel insert
+      const uniqueFournisseurs = Array.from(new Set(parsedData.map(r => r.fournisseur).filter(Boolean)));
+      for (const f of uniqueFournisseurs) {
+         const fName = f?.toUpperCase();
+         if (fName && !fournisseursCache[fName]) {
+            const { data: existingF } = await supabase.from('fournisseurs').select('id').ilike('nom', fName).maybeSingle();
+            if (existingF) {
+               fournisseursCache[fName] = existingF.id;
+            } else {
+               const { data: newF } = await supabase.from('fournisseurs').insert({ nom: f }).select('id').single();
+               if (newF) fournisseursCache[fName] = newF.id;
             }
-          } else {
-            const { data: newPiece, error: insertError } = await supabase.from('pieces').insert({ reference: row.reference, designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).select('id').single();
-            if (insertError) { ignoredCount++; continue; }
-            pieceId = newPiece.id;
-            insertedCount++;
-          }
+         }
+      }
 
-          if (pieceId) {
-            for (const bId of boutiqueIds) {
-              const { data: existingStock } = await supabase.from('stock').select('id, quantity_achetee, quantity_disponible').eq('piece_id', pieceId).eq('boutique_id', bId).maybeSingle();
-              if (existingStock) {
-                if (replaceExisting) await supabase.from('stock').update({ quantity_achetee: row.quantite_achetee, quantity_disponible: row.quantite_disponible, stock_minimum: row.stock_minimum, emplacement: row.emplacement }).eq('id', existingStock.id);
-                else if (updateExisting) await supabase.from('stock').update({ quantity_achetee: (existingStock.quantity_achetee || 0) + (row.quantite_achetee || 0), quantity_disponible: (existingStock.quantity_disponible || 0) + (row.quantite_disponible || 0) }).eq('id', existingStock.id);
-              } else {
-                await supabase.from('stock').insert({ piece_id: pieceId, boutique_id: bId, quantity_achetee: row.quantite_achetee, quantity_disponible: row.quantite_disponible, stock_minimum: row.stock_minimum, emplacement: row.emplacement });
+      // 2. Process rows in chunks of 20 for massive speedup
+      const chunkSize = 20;
+      for (let i = 0; i < parsedData.length; i += chunkSize) {
+        const chunk = parsedData.slice(i, i + chunkSize);
+
+        await Promise.all(chunk.map(async (row) => {
+          try {
+            if (!row.reference || !row.designation) { 
+              ignoredCount++; 
+              return; 
+            }
+
+            const { data: existingPiece } = await supabase.from('pieces').select('id').eq('reference', row.reference).maybeSingle();
+            let pieceId = existingPiece?.id;
+
+            if (existingPiece) {
+              if (replaceExisting) {
+                await supabase.from('pieces').update({ designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).eq('id', pieceId);
+                updatedCount++;
+              } else if (ignoreDuplicates) { ignoredCount++; return; }
+              else if (updateExisting) {
+                await supabase.from('pieces').update({ designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined }).eq('id', pieceId);
+                updatedCount++;
               }
+            } else {
+              const { data: newPiece, error: insertError } = await supabase.from('pieces').insert({ reference: row.reference, designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).select('id').single();
+              if (insertError) { ignoredCount++; return; }
+              pieceId = newPiece.id;
+              insertedCount++;
             }
 
-            // Handle Fournisseur
-            if (row.fournisseur) {
-              const fName = row.fournisseur.toUpperCase();
-              let fournisseurId = fournisseursCache[fName];
-              
-              if (!fournisseurId) {
-                const { data: existingF } = await supabase.from('fournisseurs').select('id').ilike('nom', fName).maybeSingle();
-                if (existingF) {
-                  fournisseurId = existingF.id;
-                  fournisseursCache[fName] = fournisseurId;
+            if (pieceId) {
+              for (const bId of boutiqueIds) {
+                const { data: existingStock } = await supabase.from('stock').select('id, quantity_achetee, quantity_disponible').eq('piece_id', pieceId).eq('boutique_id', bId).maybeSingle();
+                if (existingStock) {
+                  if (replaceExisting) await supabase.from('stock').update({ quantity_achetee: row.quantite_achetee, quantity_disponible: row.quantite_disponible, stock_minimum: row.stock_minimum, emplacement: row.emplacement }).eq('id', existingStock.id);
+                  else if (updateExisting) await supabase.from('stock').update({ quantity_achetee: (existingStock.quantity_achetee || 0) + (row.quantite_achetee || 0), quantity_disponible: (existingStock.quantity_disponible || 0) + (row.quantite_disponible || 0) }).eq('id', existingStock.id);
                 } else {
-                  const { data: newF } = await supabase.from('fournisseurs').insert({ nom: row.fournisseur }).select('id').single();
-                  if (newF) {
-                    fournisseurId = newF.id;
-                    fournisseursCache[fName] = fournisseurId;
+                  await supabase.from('stock').insert({ piece_id: pieceId, boutique_id: bId, quantity_achetee: row.quantite_achetee, quantity_disponible: row.quantite_disponible, stock_minimum: row.stock_minimum, emplacement: row.emplacement });
+                }
+              }
+
+              // Handle Fournisseur (using pre-cached IDs)
+              if (row.fournisseur) {
+                const fName = row.fournisseur.toUpperCase();
+                const fournisseurId = fournisseursCache[fName];
+                
+                if (fournisseurId) {
+                  const { data: existingLink } = await supabase.from('piece_fournisseurs').select('id').eq('piece_id', pieceId).eq('fournisseur_id', fournisseurId).maybeSingle();
+                  if (!existingLink) {
+                    await supabase.from('piece_fournisseurs').insert({ piece_id: pieceId, fournisseur_id: fournisseurId, prix_achat: row.prix_achat });
                   }
                 }
               }
-
-              if (fournisseurId) {
-                const { data: existingLink } = await supabase.from('piece_fournisseurs').select('id').eq('piece_id', pieceId).eq('fournisseur_id', fournisseurId).maybeSingle();
-                if (!existingLink) {
-                  await supabase.from('piece_fournisseurs').insert({ piece_id: pieceId, fournisseur_id: fournisseurId, prix_achat: row.prix_achat });
-                }
-              }
             }
+          } catch (e) {
+             console.error("Row import error", e);
+             ignoredCount++;
           }
-        } finally {
-          setProgress(Math.round(((i + 1) / parsedData.length) * 100));
-          if (i % 5 === 0) {
-            await new Promise((resolve) => setTimeout(resolve, 5));
-          }
-        }
+        }));
+        
+        setProgress(Math.round((Math.min(i + chunkSize, parsedData.length) / parsedData.length) * 100));
       }
 
       await supabase.from('import_logs').insert({ fichier_name: fileName || 'excel_upload', statut: 'SUCCESS', details: { inserted: insertedCount, updated: updatedCount, ignored: ignoredCount } });
