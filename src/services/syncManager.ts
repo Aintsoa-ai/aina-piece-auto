@@ -77,6 +77,7 @@ export const syncUp = async () => {
         
       if (venteErr) {
         console.error('[SyncManager] Erreur insertion vente:', venteErr);
+        alert(`Erreur de synchronisation (Vente principale) : ${venteErr.message || JSON.stringify(venteErr)}`);
         continue; // Passe à la vente suivante en cas d'erreur
       }
 
@@ -97,6 +98,7 @@ export const syncUp = async () => {
           
         if (detailsErr) {
           console.error('[SyncManager] Erreur insertion détails_ventes:', detailsErr);
+          alert(`Erreur de synchronisation (Détails) : ${detailsErr.message || JSON.stringify(detailsErr)}`);
           // Delete the incomplete main sale to retry later
           await supabase.from('ventes').delete().eq('id', insertedVente.id);
           continue; // Stop processing this sale, retry later
@@ -111,8 +113,9 @@ export const syncUp = async () => {
     // Re-synchroniser les stocks vers le local après l'upload
     await syncDown(pendingVentes[0]?.boutique_id);
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[SyncManager] Erreur générale lors du syncUp:', error);
+    alert(`Erreur générale SyncUp : ${error.message || JSON.stringify(error)}`);
     return false;
   }
 };
