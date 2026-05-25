@@ -183,11 +183,11 @@ export const ImportExcel: React.FC = () => {
       for (let i = 0; i < parsedData.length; i += chunkSize) {
         const chunk = parsedData.slice(i, i + chunkSize);
 
-        await Promise.all(chunk.map(async (row) => {
+        for (const row of chunk) {
           try {
             if (!row.reference || !row.designation) { 
               ignoredCount++; 
-              return; 
+              continue; 
             }
 
             const { data: existingPiece } = await supabase.from('pieces').select('id').eq('reference', row.reference).maybeSingle();
@@ -197,7 +197,7 @@ export const ImportExcel: React.FC = () => {
               if (replaceExisting) {
                 await supabase.from('pieces').update({ designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente }).eq('id', pieceId);
                 updatedCount++;
-              } else if (ignoreDuplicates) { ignoredCount++; return; }
+              } else if (ignoreDuplicates) { ignoredCount++; continue; }
               else if (updateExisting) {
                 await supabase.from('pieces').update({ designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined }).eq('id', pieceId);
                 updatedCount++;
@@ -240,7 +240,7 @@ export const ImportExcel: React.FC = () => {
              console.error("Row import error", e);
              throw e;
           }
-        }));
+        }
         
         setProgress(Math.round((Math.min(i + chunkSize, parsedData.length) / parsedData.length) * 100));
       }
