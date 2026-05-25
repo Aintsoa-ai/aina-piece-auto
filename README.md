@@ -75,6 +75,10 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - **Véritable Mode Hors-Ligne :** L'application fonctionne en tant que Progressive Web App (PWA). Les ventes peuvent être saisies sans internet et sont stockées localement (IndexedDB). Un indicateur visuel (Nuage) permet de suivre la synchronisation au retour du réseau.
 - **Suivi des connexions en Temps Réel :** Le PC administrateur peut voir en moins de 2 secondes si le téléphone d'une boutique s'est déconnecté du réseau, grâce au système WebSocket de Supabase (Presence).
 - **Tableau de bord réactif :** Le Dashboard s'actualise de lui-même dès que des ventes synchronisées arrivent dans la base.
+- **Import Excel Ultra-Rapide & Intelligent :** Refonte du moteur d'importation. Dédoublonnage instantané en mémoire et insertion massive en parallèle. Le système gère intelligemment les bases de données dont les schémas diffèrent (fallback automatique sans plantage).
+- **Maintenance Globale (Factory Reset) :** Outil intégré de purge sécurisée avec sélection précise (Transactions, Catalogue, Fournisseurs, Numérotation).
+- **Monitoring Supabase :** Affichage d'une jauge en temps réel sur le tableau de bord pour contrôler l'espace de stockage de la base de données.
+- **Identité Visuelle Adaptative :** Le menu latéral détecte automatiquement la boutique connectée, personnalisant le nom et l'icône, remplaçant l'affichage générique "OFFICIEL".
 
 ## Fonctionnalités Avancées (Mise à jour)
 - **Comparateur de Fournisseurs Intelligent :** Lors d'un réapprovisionnement, l'application analyse l'historique complet des achats et calcule le prix moyen ainsi que le dernier prix proposé par chaque fournisseur pour vous recommander le "MEILLEUR" prix automatiquement.

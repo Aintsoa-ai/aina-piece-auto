@@ -175,3 +175,17 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 ### AUDIT: 25 Mai 2026 (Soirée) - Fiabilisation Temps Réel & Algorithme d'Achats
 - **Problème de présence (Stale Closure) :** Le minuteur automatique de 60s réinitialisait la détection de présence à cause d'une faille de mémoire React (closure). Corrigé via un `useRef` pour garantir un statut "En ligne" stable.
 - **Algorithme d'achats :** Remplacement des données fictives de comparaison de fournisseurs par un algorithme d'agrégation dynamique lisant `achats` et `details_achats`. Le système identifie désormais le "MEILLEUR" fournisseur en temps réel.
+
+## Audit #24 - Optimisation Extrême de l'Import Excel & Robustesse du Schéma
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Résoudre la lenteur de l'importation sur les très gros fichiers et gérer les bases de données aux schémas dégradés.
+- **Problème identifié (Doublons) :** La présence de références identiques dans l'Excel provoquait des conflits (`duplicate key`) si elles étaient insérées en parallèle. L'insertion séquentielle était en revanche trop lente.
+- **Résolution (Dédoublonnage) :** Ajout d'une étape de pré-traitement qui fusionne les quantités en mémoire en une fraction de seconde, permettant le retour à l'insertion parallèle massive (par paquet de 50). La vitesse a été multipliée par 10.
+- **Problème identifié (Schéma) :** Les colonnes `prix_achat` et `prix_vente` manquaient dans la table Supabase, faisant planter l'import silencieusement.
+- **Résolution (Fallback Dynamique) :** L'algorithme détecte désormais cette erreur précise, retire dynamiquement ces colonnes du payload et réessaie automatiquement l'insertion, garantissant le succès de l'import sans aucune intervention manuelle de l'utilisateur.
+
+## Audit #25 - Identité Visuelle Dynamique & Outils de Maintenance
+**Statut : Validé & Déployé ✅**
+- **Refonte de la Sidebar :** Le menu latéral adapte maintenant son affichage en remplaçant "OFFICIEL" et l'avatar "AP" par le nom et l'icône appropriée à la boutique connectée, garantissant aux caissiers qu'ils opèrent sur le bon espace.
+- **Module Factory Reset :** Déploiement d'une boîte de dialogue avec des cases à cocher pour une purge sélective (historique, catalogue, etc.) dans les paramètres, rendant l'administrateur 100% autonome sur la gestion des cycles de vie des données.
+- **Jauge Supabase :** Ajout d'un indicateur de capacité de stockage en direct sur le tableau de bord.

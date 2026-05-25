@@ -34,10 +34,10 @@
 - [ ] Définir une grille tarifaire : Forfait installation + Abonnement mensuel maintenance.
 
 
-## Phase 6 : Optimisation de l'Expérience Utilisateur (En cours)
+## Phase 6 : Optimisation de l'Expérience Utilisateur (Terminée)
 - [x] Harmonisation de toutes les boîtes de dialogue (suppression des popups natifs bloquants).
 - [x] Standardisation du design des calendriers avec thématique sombre et indicateurs d'activité (pastilles rouges).
-- [ ] Revue complète de l'ergonomie sur mobile pour garantir que les claviers virtuels ne masquent plus aucune zone de saisie.
+- [x] Revue complète de l'ergonomie sur mobile pour garantir que les claviers virtuels ne masquent plus aucune zone de saisie.
 
 ## Phase 7 : Véritable Système Hors-Ligne (PWA & IndexedDB) (Terminée)
 - [x] Créer une base de données locale (IndexedDB) pour stocker temporairement les ventes sans réseau.
@@ -45,7 +45,12 @@
 - [x] Développer le système de synchronisation automatique (File d'attente) au retour de la connexion Internet.
 - [x] Gérer les conflits de stock lors de la synchronisation (vérification backend).
 
-
 ## Mise à jour Phase 7 : Fonctionnalités Intelligentes
 - [x] Comparateur dynamique de fournisseurs : Calcul instantané du meilleur prix d'achat basé sur l'historique réel de la base de données au lieu de données simulées.
 - [x] Résolution de la défaillance de rafraîchissement d'état (stale closure) sur l'indicateur de connexion des boutiques.
+
+## Phase 8 : Maintenance, Monitoring et Personnalisation
+- [x] Intégration du module "Factory Reset" pour permettre la purge sélective des données (catalogue, ventes, historiques).
+- [x] Monitoring de la capacité de stockage Supabase en temps réel sur le Dashboard.
+- [x] Rendre la barre latérale dynamique selon la boutique (nom et icône).
+- [ ] Mettre en place la détection de conflits de stock (Alerte de rupture post-synchronisation).

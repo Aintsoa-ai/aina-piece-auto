@@ -31,9 +31,8 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - **Aperçu PDF en temps réel :** Ajouter un bouton "Prévisualiser" qui affiche le rapport dans un panneau latéral (iframe) dans l'application elle-même avant de déclencher le téléchargement — évite de générer un mauvais fichier sans s'en rendre compte.
 
 ## 8. Gestion et Nettoyage Avancé
-- **Bouton de Remise à Zéro Totale :** Créer un bouton (sécurisé par mot de passe admin) dans les Paramètres permettant de vider entièrement la base de données (Boutiques, Ventes, Achats, Utilisateurs sauf Admin) pour pouvoir démarrer une nouvelle année ou redémarrer proprement un client SaaS sans lancer de scripts manuels.
 - **Validation stricte de la création d'utilisateur :** Obliger l'administrateur à sélectionner une boutique existante avant de valider la création d'un utilisateur pour éviter le croisement de permissions.
-
+- **Détection des Conflits de Stock (Offline) :** Créer un mécanisme serveur qui détecte les ruptures de stock après coup (si deux boutiques vendent la même dernière pièce hors-ligne) et envoie une notification "Alerte de conflit de stock" à l'administrateur.
 
 ### Améliorations Futures (Interface & UX)
 - **Calendriers Avancés :** Sélection des plages de dates avec animation de glissement.
