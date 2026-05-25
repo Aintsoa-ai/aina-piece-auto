@@ -32,3 +32,9 @@
 - [x] Pousser le code source sur un repository GitHub privé (une seule branche = tous les clients).
 - [ ] Créer une page de démonstration publique (avec fausses données) pour les prospects.
 - [ ] Définir une grille tarifaire : Forfait installation + Abonnement mensuel maintenance.
+
+
+## Phase 6 : Optimisation de l'Expérience Utilisateur (En cours)
+- [x] Harmonisation de toutes les boîtes de dialogue (suppression des popups natifs bloquants).
+- [x] Standardisation du design des calendriers avec thématique sombre et indicateurs d'activité (pastilles rouges).
+- [ ] Revue complète de l'ergonomie sur mobile pour garantir que les claviers virtuels ne masquent plus aucune zone de saisie.

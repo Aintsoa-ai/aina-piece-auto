@@ -33,3 +33,8 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 ## 8. Gestion et Nettoyage Avancé
 - **Bouton de Remise à Zéro Totale :** Créer un bouton (sécurisé par mot de passe admin) dans les Paramètres permettant de vider entièrement la base de données (Boutiques, Ventes, Achats, Utilisateurs sauf Admin) pour pouvoir démarrer une nouvelle année ou redémarrer proprement un client SaaS sans lancer de scripts manuels.
 - **Validation stricte de la création d'utilisateur :** Obliger l'administrateur à sélectionner une boutique existante avant de valider la création d'un utilisateur pour éviter le croisement de permissions.
+
+
+### Améliorations Futures (Interface & UX)
+- **Calendriers Avancés :** Sélection des plages de dates avec animation de glissement.
+- **Thématisation :** Permettre aux utilisateurs de choisir la couleur d'accentuation (au lieu de seulement bleu/rouge).

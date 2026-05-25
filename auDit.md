@@ -143,3 +143,10 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Objectif :** Standardiser l'expérience visuelle sur toute l'application.
 - **Problème identifié :** Le calendrier de la page "Paramètres" (Export de Rapport) affichait les dates d'activité avec une bordure rouge, alors que le calendrier du "Tableau de bord" les remplissait entièrement en rouge.
 - **Résolution :** Uniformisation du code CSS-in-JS dans `Settings.tsx` pour que les couleurs de fond (Bleu pour aujourd'hui, Rouge pour l'activité) soient strictement identiques à celles du tableau de bord.
+
+
+### AUDIT: 25 Mai 2026 - Remplacement des Calendriers et Messages Natifs
+- Vérification de l'interface des alertes : Tous les `alert()`, `confirm()` et `prompt()` ont été audités et remplacés par des modales professionnelles (SweetAlert2).
+- Vérification des calendriers : Le comportement natif bloquant a été retiré. Le module `react-datepicker` a été intégré avec succès sur toute la plateforme.
+- Vérification d'affichage : Test visuel validé pour l'apparition des "pastilles rouges" (jours d'activité) et "pastille bleue" (date du jour) directement dans les calendriers pop-up.
+- Statut du système : Parfaitement opérationnel et synchronisé avec Vercel.
