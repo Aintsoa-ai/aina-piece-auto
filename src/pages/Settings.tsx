@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { showAlert, showConfirm, showPrompt } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { createClient } from '@supabase/supabase-js';
@@ -361,10 +361,10 @@ export const Settings: React.FC = () => {
     reader.readAsText(file);
   };
 
-  const [activePresences, setActivePresences] = useState<any[]>([]);
+  const activePresencesRef = useRef<any[]>([]);
 
   // Fetch boutique online statuses from last activity logs
-  const fetchBoutiqueStatuses = async (currentPresences: any[] = activePresences) => {
+  const fetchBoutiqueStatuses = async (currentPresences: any[] = activePresencesRef.current) => {
     setStatusLoading(true);
     try {
       // Get all boutiques
@@ -441,7 +441,7 @@ export const Settings: React.FC = () => {
       const customEvent = e as CustomEvent;
       const presencesObj = customEvent.detail || {};
       const flatPresences = Object.values(presencesObj).flat();
-      setActivePresences(flatPresences);
+      activePresencesRef.current = flatPresences;
       fetchBoutiqueStatuses(flatPresences);
     };
     window.addEventListener('presenceUpdate', handlePresenceUpdate);
