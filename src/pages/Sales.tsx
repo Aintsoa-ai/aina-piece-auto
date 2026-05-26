@@ -692,6 +692,15 @@ export const Sales: React.FC = () => {
                         style={s.searchFieldInput}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && filteredPieces.length === 1) {
+                            e.preventDefault();
+                            if (filteredPieces[0].quantity_disponible > 0) {
+                              handleAddToCart(filteredPieces[0]);
+                              setSearchQuery('');
+                            }
+                          }
+                        }}
                         autoFocus
                       />
                     </div>
