@@ -1441,7 +1441,7 @@ export const Settings: React.FC = () => {
                 <tr>
                   <th style={{ ...s.th, width: '140px', borderBottom: 'none', borderRight: '1px solid rgba(255,255,255,0.2)', backgroundColor: '#1e293b' }}></th>
                   <th style={{ ...s.th, width: '40px', borderBottom: 'none', borderRight: '1px solid rgba(255,255,255,0.2)', backgroundColor: '#1e293b' }}></th>
-                  <th colSpan={4} style={{ ...s.th, textAlign: 'center', backgroundColor: '#1e293b', color: '#60a5fa', borderBottom: '1px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}>ACTIVITÉ</th>
+                  <th colSpan={5} style={{ ...s.th, textAlign: 'center', backgroundColor: '#1e293b', color: '#60a5fa', borderBottom: '1px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}>ACTIVITÉ</th>
                   <th colSpan={3} style={{ ...s.th, textAlign: 'center', backgroundColor: '#1e293b', color: '#f472b6', borderBottom: '1px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}>CATALOGUE</th>
                   <th colSpan={4} style={{ ...s.th, textAlign: 'center', backgroundColor: '#1e293b', color: '#c084fc', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>ADMINISTRATION</th>
                 </tr>
@@ -1452,7 +1452,8 @@ export const Settings: React.FC = () => {
                   <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)' }}><div title="Ventes" style={{ display: 'flex', justifyContent: 'center' }}><ShoppingCart size={16} /></div></th>
                   <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)' }}><div title="Achats" style={{ display: 'flex', justifyContent: 'center' }}><TrendingDown size={16} /></div></th>
                   <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)' }}><div title="Caisse" style={{ display: 'flex', justifyContent: 'center' }}><Wallet size={16} /></div></th>
-                  <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}><div title="Dépenses" style={{ display: 'flex', justifyContent: 'center' }}><BarChart2 size={16} /></div></th>
+                  <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)' }}><div title="Dépenses" style={{ display: 'flex', justifyContent: 'center' }}><BarChart2 size={16} /></div></th>
+                  <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}><div title="Clients & Crédits" style={{ display: 'flex', justifyContent: 'center' }}><Users size={16} /></div></th>
                   
                   <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)' }}><div title="Pièces" style={{ display: 'flex', justifyContent: 'center' }}><Boxes size={16} /></div></th>
                   <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)' }}><div title="Stock" style={{ display: 'flex', justifyContent: 'center' }}><Store size={16} /></div></th>
@@ -1469,9 +1470,9 @@ export const Settings: React.FC = () => {
               {profiles.map((p, i) => (
                 <tr key={p.id} style={{ ...s.tr, backgroundColor: i % 2 === 0 ? '#161b22' : '#0d1117' }}>
                   <td style={{ ...s.tdName, borderRight: '1px solid rgba(255,255,255,0.2)' }}>{p.full_name}</td>
-                  {['dashboard', 'sales', 'purchases', 'caisse', 'depenses', 'pieces', 'stock', 'fournisseurs', 'users', 'boutiques', 'excel', 'settings'].map(page => {
+                  {['dashboard', 'sales', 'purchases', 'caisse', 'depenses', 'clients', 'pieces', 'stock', 'fournisseurs', 'users', 'boutiques', 'excel', 'settings'].map(page => {
                     const enabled = getMatrixPerm(p.id, page);
-                    const isDivider = ['dashboard', 'depenses', 'fournisseurs'].includes(page);
+                    const isDivider = ['dashboard', 'clients', 'fournisseurs'].includes(page);
                     return (
                       <td key={page} style={{ ...s.tdCenter, borderRight: isDivider ? '1px solid rgba(255,255,255,0.2)' : s.tdCenter.borderRight }} onClick={() => toggleMatrixPerm(p.id, page)}>
                         <div style={{ ...s.eyeToggle, backgroundColor: enabled ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255, 255, 255, 0.05)' }}>
@@ -1488,9 +1489,9 @@ export const Settings: React.FC = () => {
               {boutiques.map((b, i) => (
                 <tr key={b.id} style={{ ...s.tr, backgroundColor: i % 2 === 0 ? '#161b22' : '#0d1117' }}>
                   <td style={{ ...s.tdName, borderRight: '1px solid rgba(255,255,255,0.2)' }}>{b.name}</td>
-                  {['dashboard', 'sales', 'purchases', 'caisse', 'depenses', 'pieces', 'stock', 'fournisseurs', 'users', 'boutiques', 'excel', 'settings'].map(page => {
+                  {['dashboard', 'sales', 'purchases', 'caisse', 'depenses', 'clients', 'pieces', 'stock', 'fournisseurs', 'users', 'boutiques', 'excel', 'settings'].map(page => {
                     const enabled = getMatrixPerm(b.id, page);
-                    const isDivider = ['dashboard', 'depenses', 'fournisseurs'].includes(page);
+                    const isDivider = ['dashboard', 'clients', 'fournisseurs'].includes(page);
                     return (
                       <td key={page} style={{ ...s.tdCenter, borderRight: isDivider ? '1px solid rgba(255,255,255,0.2)' : s.tdCenter.borderRight }} onClick={() => toggleMatrixPerm(b.id, page)}>
                         <div style={{ ...s.eyeToggle, backgroundColor: enabled ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255, 255, 255, 0.05)' }}>
