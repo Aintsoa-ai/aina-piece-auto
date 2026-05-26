@@ -111,6 +111,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
       items: [
         { id: 'sales',     name: 'Ventes',    icon: ShoppingCart, roles: ['administrateur', 'employe', 'caissier'] },
         { id: 'purchases', name: 'Achats',     icon: TrendingDown, roles: ['administrateur', 'employe', 'caissier'] },
+        { id: 'clients',   name: 'Clients & Crédits', icon: Users, roles: ['administrateur', 'employe', 'caissier'] },
         { id: 'caisse',    name: 'Caisse',     icon: Wallet,       roles: ['administrateur', 'employe', 'caissier'] },
         { id: 'depenses',  name: 'Dépenses',   icon: BarChart2,    roles: ['administrateur', 'employe', 'caissier'] },
       ],

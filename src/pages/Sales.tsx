@@ -62,6 +62,11 @@ export const Sales: React.FC = () => {
   const [dbBoutiques, setDbBoutiques] = useState<any[]>([]);
   const [boutiqueInfos, setBoutiqueInfos] = useState<Record<string, any>>({});
 
+  // Crédits / Garages
+  const [clients, setClients] = useState<any[]>([]);
+  const [isCredit, setIsCredit] = useState(false);
+  const [selectedClient, setSelectedClient] = useState('');
+
   // Pixel perfect Mock Sales matching screenshot 1
   const demoSales: SaleItem[] = [
     {
@@ -195,7 +200,10 @@ export const Sales: React.FC = () => {
       // 4. Fetch boutiques
       const { data: bData } = await supabase.from('boutiques').select('*');
 
-      return { salesData, stockData, pfData, bData };
+      // 5. Fetch clients (silencieux si la table n'existe pas encore)
+      const { data: clientsData } = await supabase.from('clients').select('id, nom').order('nom').catch(() => ({ data: [] }));
+
+      return { salesData, stockData, pfData, bData, clientsData };
     })();
 
     try {
@@ -293,6 +301,9 @@ export const Sales: React.FC = () => {
             setSelectedBoutique(result.bData[0].id);
           }
         }
+        if (result.clientsData) {
+          setClients(result.clientsData);
+        }
 
       } else {
         // Fallback to empty on timeout
@@ -389,6 +400,8 @@ export const Sales: React.FC = () => {
     setCart([]);
     setSearchQuery('');
     setVendeurName(profile?.full_name || 'Vendeur Inconnu');
+    setIsCredit(false);
+    setSelectedClient('');
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsModalOpen(true);
@@ -439,6 +452,10 @@ export const Sales: React.FC = () => {
       setErrorMsg("Le panier est vide.");
       return;
     }
+    if (isCredit && !selectedClient) {
+      setErrorMsg("Veuillez sélectionner un client pour une vente à crédit.");
+      return;
+    }
 
     setIsSubmitting(true);
     setErrorMsg(null);
@@ -467,13 +484,21 @@ export const Sales: React.FC = () => {
       const activeCaisseId = caisseData && caisseData.length > 0 ? caisseData[0].id : null;
 
       // 2. Insert main vente
+      const payloadVente: any = {
+        total: calculatedTotal,
+        caissier_id: profile?.id || null,
+        boutique_id: boutiqueIdToUse || null
+      };
+
+      if (clients.length > 0) {
+        payloadVente.statut_paiement = isCredit ? 'CREDIT' : 'PAYE';
+        payloadVente.client_id = isCredit ? selectedClient : null;
+        payloadVente.montant_paye = isCredit ? 0 : calculatedTotal;
+      }
+
       const { data: newVente, error: venteErr } = await supabase
         .from('ventes')
-        .insert({
-          total: calculatedTotal,
-          caissier_id: profile?.id || null,
-          boutique_id: boutiqueIdToUse || null
-        })
+        .insert(payloadVente)
         .select('*')
         .single();
 
@@ -855,6 +880,41 @@ export const Sales: React.FC = () => {
                       disabled
                     />
                   </div>
+
+                  {/* Vente à crédit */}
+                  {clients.length > 0 && (
+                    <div style={{ ...s.inputContainer, flexDirection: 'row', alignItems: 'center', gap: '8px', marginTop: '5px' }}>
+                      <input 
+                        type="checkbox" 
+                        id="credit-checkbox"
+                        checked={isCredit}
+                        onChange={(e) => {
+                          setIsCredit(e.target.checked);
+                          if (!e.target.checked) setSelectedClient('');
+                        }}
+                        style={{ width: '16px', height: '16px', accentColor: '#0066fe' }}
+                      />
+                      <label htmlFor="credit-checkbox" style={{ ...s.inputLabel, color: isCredit ? '#0066fe' : 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '13px' }}>
+                        Vente à crédit (Garages)
+                      </label>
+                    </div>
+                  )}
+                  
+                  {isCredit && (
+                    <div style={s.inputContainer}>
+                      <label style={s.inputLabel}>Sélectionner le Client / Garage</label>
+                      <select
+                        style={s.selectField}
+                        value={selectedClient}
+                        onChange={(e) => setSelectedClient(e.target.value)}
+                      >
+                        <option value="">-- Choisir un client --</option>
+                        {clients.map(c => (
+                          <option key={c.id} value={c.id}>{c.nom}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   {/* Boutique Config */}
                   <div style={s.inputContainer}>

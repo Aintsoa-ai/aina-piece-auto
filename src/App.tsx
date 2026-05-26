@@ -15,6 +15,7 @@ import { Caisse } from './pages/Caisse';
 import { Depenses } from './pages/Depenses';
 import { Fournisseurs } from './pages/Fournisseurs';
 import { Boutiques } from './pages/Boutiques';
+import { Clients } from './pages/Clients';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
@@ -52,6 +53,8 @@ const AppContent: React.FC = () => {
         return <Depenses />;
       case 'fournisseurs':
         return <Fournisseurs />;
+      case 'clients':
+        return <Clients />;
       case 'boutiques':
         return <Boutiques />;
       case 'excel':
