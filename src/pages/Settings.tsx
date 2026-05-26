@@ -300,43 +300,30 @@ export const Settings: React.FC = () => {
       link.click();
       document.body.removeChild(link);
 
-      if (backupEmail) {
-        try {
-          // Envoi 100% silencieux et automatique via l'API FormSubmit
-          const formData = new FormData();
-          formData.append('_subject', `SAUVEGARDE DE SÉCURITÉ: ${appName}`);
-          formData.append('Message', `Bonjour,\n\nVoici le point de sauvegarde automatique du ${new Date().toLocaleString('fr-FR')}.\nConservez ce fichier précieusement.\n\nL'équipe Aina Pièces Auto.`);
-          formData.append('_captcha', 'false'); // Désactive le captcha pour l'envoi en arrière-plan
-          // Utiliser un objet 'File' explicite, souvent mieux reconnu par FormSubmit que 'Blob'
-          const fileObj = new File([jsonStr], fileName, { type: 'text/plain' });
-          formData.append('attachment', fileObj); 
-          formData.append('file', fileObj);
-          
-          // Ajouter un résumé texte au cas où la pièce jointe est toujours bloquée par le fournisseur mail
-          formData.append('Resumé', `Sauvegarde réussie !\nTotal Ventes: ${ventes?.length || 0}\nTotal Pièces: ${pieces?.length || 0}\n\nLe fichier complet a également été téléchargé sur votre ordinateur.`);
-
-          const response = await fetch(`https://formsubmit.co/ajax/${backupEmail}`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json'
-            },
-            body: formData
+      // TENTATIVE D'UPLOAD VERS CLOUD DRIVE (Supabase Storage "backups")
+      // Cela remplace l'ancien système par email (Google Drive concept)
+      try {
+        const { error: storageErr } = await supabase.storage
+          .from('backups')
+          .upload(fileName, blob, {
+            contentType: 'text/plain',
+            upsert: true
           });
 
-          if (!response.ok) throw new Error("Erreur serveur API email");
-
-          if (!isAuto) {
-            showAlert(`✅ Point de sauvegarde généré ET envoyé automatiquement avec succès à ${backupEmail} !\n\nImportant : Si c'est la TOUTE PREMIÈRE FOIS, veuillez consulter votre boîte de réception (ou dossier Spam) pour valider l'adresse email auprès du service d'envoi.`, 'success');
-          }
-        } catch (mailErr) {
-          console.error("Erreur lors de l'envoi silencieux :", mailErr);
-          if (!isAuto) {
-            showAlert("La sauvegarde a été téléchargée sur l'ordinateur, mais l'envoi automatique par email a échoué. Vérifiez votre connexion internet.", "warning");
-          }
+        if (storageErr) {
+           console.warn("Le bucket 'backups' n'existe peut-être pas ou accès refusé :", storageErr);
+           if (!isAuto) {
+             showAlert(`Point de sauvegarde téléchargé. \n(Note: L'envoi Cloud a échoué. Créez un bucket "backups" public sur Supabase pour activer le Cloud Drive de 1Go).`, 'warning');
+           }
+        } else {
+           if (!isAuto) {
+             showAlert(`✅ Point de sauvegarde généré et uploadé avec succès sur le Cloud sécurisé (Storage) !`, 'success');
+           }
         }
-      } else {
-        if (!isAuto) showAlert("Point de sauvegarde téléchargé avec succès sur l'ordinateur ! (Aucun email de sécurité défini)", "success");
+      } catch (cloudErr) {
+         console.error("Erreur lors de l'upload Cloud :", cloudErr);
       }
+
     } catch (err: any) {
       console.error(err);
       if (!isAuto) showAlert("Erreur de sauvegarde: " + err.message, "error");

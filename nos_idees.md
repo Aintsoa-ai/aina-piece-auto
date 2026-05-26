@@ -8,11 +8,11 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 
 ## 2. Fonctionnalités Avancées
 - **Scan de Code-barres (Terminé) :** Prise en charge d'une douchette de code-barres USB. Un écouteur global détecte intelligemment le scan rapide pour l'ajout au panier (Ventes), la sélection (Achats) et l'enregistrement (Catalogue).
-- **Historique de prix :** Tracer l'évolution du prix d'achat d'une pièce pour visualiser si les fournisseurs augmentent leurs tarifs au fil des mois.
+- **Historique de prix (Terminé) :** Tracer l'évolution du prix d'achat d'une pièce pour visualiser si les fournisseurs augmentent leurs tarifs au fil des mois (Affichage du pourcentage de hausse/baisse).
 - **Gestion des retours clients (Terminé) :** Ajouter un module pour annuler ou rembourser une vente et réintégrer automatiquement la pièce en stock.
 
 ## 3. Sécurité et Backup (Nouvelles Idées)
-- **Synchronisation Google Drive API :** Remplacer le téléchargement du point de sauvegarde `.txt` par un upload direct et invisible vers un dossier Google Drive privé (pour contourner définitivement les blocages d'emails).
+- **Sauvegarde Cloud Native (Terminé) :** Remplacement de l'email par un upload silencieux et direct vers le Bucket Supabase "backups" (Cloud Drive 1Go intégré).
 - **Alerte SMS de vol/intrusion :** Envoyer un SMS d'alerte à l'administrateur si une tentative de connexion ou de purge échoue plusieurs fois.
 
 ## 4. Communication et Multi-boutique
@@ -40,7 +40,7 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 
 ## 9. Fonctionnement Hors-Ligne (PWA & Offline First)
 - **Diff-Sync pour le Catalogue :** Actuellement, le `syncDown` supprime et remet l'intégralité du catalogue. À l'avenir, implémenter un "Delta Sync" (ou Diff-Sync) qui ne télécharge que les lignes ajoutées/modifiées depuis le dernier horodatage afin d'économiser de la bande passante sur mobile.
-- **Support des Achats & Dépenses :** Étendre l'infrastructure Offline (IndexedDB) aux autres modules comme les Achats et les Dépenses (pour le moment, seules les ventes disposent d'une file d'attente hors-ligne).
+- **Support des Achats & Dépenses (Terminé) :** L'infrastructure Offline (IndexedDB) gère désormais les Achats et les Dépenses (files d'attente hors-ligne complètes synchronisées au retour réseau).
 
 
 ### Améliorations Futures (Synchronisation)

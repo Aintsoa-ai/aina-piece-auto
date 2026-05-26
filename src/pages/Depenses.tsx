@@ -8,6 +8,8 @@ import {
   AlertCircle, 
   CheckCircle2
 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
+import { db } from '../services/db';
 
 interface ExpenseItem {
   id: string;
@@ -227,8 +229,19 @@ export const Depenses: React.FC = () => {
       const month = String(today.getMonth() + 1).padStart(2, '0');
       const year = today.getFullYear();
 
+      const offlineId = uuidv4();
+
+      await db.pending_depenses.add({
+        id: offlineId,
+        motif: motif.trim(),
+        montant: numMontant,
+        boutique_id: profile?.boutique_id || '',
+        utilisateur_id: profile?.id || '',
+        created_at: new Date().toISOString()
+      });
+
       const simulatedItem: ExpenseItem = {
-        id: Math.random().toString(36).substring(7),
+        id: offlineId,
         date: `${day}/${month}/${year}`,
         motif: motif.trim(),
         commentaire: commentaire.trim() || '—',
@@ -237,7 +250,7 @@ export const Depenses: React.FC = () => {
       };
 
       setExpenses([simulatedItem, ...expenses]);
-      setSuccessMsg("Dépense enregistrée localement.");
+      setSuccessMsg("Dépense enregistrée localement (hors-ligne).");
       setTimeout(() => setIsModalOpen(false), 800);
     } finally {
       setIsSubmitting(false);

@@ -45,15 +45,17 @@
 - [x] Développer le système de synchronisation automatique (File d'attente) au retour de la connexion Internet.
 - [x] Gérer les conflits de stock lors de la synchronisation (vérification backend).
 
-## Mise à jour Phase 7 : Fonctionnalités Intelligentes
+## Mise à jour Phase 7 : Fonctionnalités Intelligentes (Terminée)
 - [x] Comparateur dynamique de fournisseurs : Calcul instantané du meilleur prix d'achat basé sur l'historique réel de la base de données au lieu de données simulées.
+- [x] Historique d'évolution des prix : Calcul des pourcentages de hausse/baisse (+15%) directement sur le comparateur.
 - [x] Résolution de la défaillance de rafraîchissement d'état (stale closure) sur l'indicateur de connexion des boutiques.
 
-## Phase 8 : Maintenance, Monitoring et Personnalisation
+## Phase 8 : Maintenance, Monitoring et Personnalisation (Terminée)
 - [x] Intégration du module "Factory Reset" pour permettre la purge sélective des données (catalogue, ventes, historiques).
 - [x] Monitoring de la capacité de stockage Supabase en temps réel sur le Dashboard.
 - [x] Rendre la barre latérale dynamique selon la boutique (nom et icône).
-- [ ] Mettre en place la détection de conflits de stock (Alerte de rupture post-synchronisation).
+- [x] Sauvegarde Cloud Supabase (Drive Native) : Envoi direct des backups `.txt` dans un Storage Bucket pour remplacer les emails instables.
+- [x] Mode Hors-Ligne Total : Ajout du support IndexedDB pour les Achats et les Dépenses.
 
 ## Phase 9 : Intégration Code-barres (Hardware Douchette) - (Terminée)
 - [x] Ajouter la colonne `code_barre` à la table `pieces` dans Supabase.

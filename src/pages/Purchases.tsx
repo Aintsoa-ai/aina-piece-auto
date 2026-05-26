@@ -12,6 +12,8 @@ import {
   ChevronDown,
   TrendingDown
 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
+import { db } from '../services/db';
 
 interface PurchaseItem {
   id: string;
@@ -64,7 +66,7 @@ export const Purchases: React.FC = () => {
   const [purchases, setPurchases] = useState<PurchaseItem[]>([]);
   const [pieces, setPieces] = useState<PieceOption[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
-  const [dbPriceHistory, setDbPriceHistory] = useState<{piece_id: string, sup_name: string, price: number}[]>([]);
+  const [dbPriceHistory, setDbPriceHistory] = useState<{piece_id: string, sup_name: string, price: number, date: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const isDemoData = false;
 
@@ -241,13 +243,14 @@ export const Purchases: React.FC = () => {
         setSuppliers(parsedSuppliers);
 
         // Build price history for comparison
-        const history: {piece_id: string, sup_name: string, price: number}[] = [];
+        const history: {piece_id: string, sup_name: string, price: number, date: string}[] = [];
         if (result.achatsData) {
           result.achatsData.forEach((a: any) => {
             const supName = a.fournisseurs?.nom || 'Fournisseur Central';
+            const achatDate = a.created_at;
             a.details_achats?.forEach((d: any) => {
                if (d.piece_id && d.prix_unitaire) {
-                 history.push({ piece_id: d.piece_id, sup_name: supName, price: d.prix_unitaire });
+                 history.push({ piece_id: d.piece_id, sup_name: supName, price: d.prix_unitaire, date: achatDate });
                }
             });
           });
@@ -508,9 +511,26 @@ export const Purchases: React.FC = () => {
       // Simulating local offline success
       const targetPiece = pieces.find(p => p.id === selectedPieceId);
       const targetSupplier = suppliers.find(s => s.id === selectedSupplierId);
+      const offlineId = uuidv4();
+
+      await db.pending_achats.add({
+        id: offlineId,
+        fournisseur_id: selectedSupplierId,
+        boutique_id: boutiqueId || '',
+        utilisateur_id: profile?.id || '',
+        total: calculatedTotal,
+        created_at: new Date().toISOString(),
+        details: [{
+          piece_id: selectedPieceId,
+          quantite: qty,
+          prix_unitaire: price,
+          remise: rem,
+          total: calculatedTotal
+        }]
+      });
 
       const simulatedPurchase: PurchaseItem = {
-        id: Math.random().toString(36).substring(7),
+        id: offlineId,
         date: new Date().toLocaleDateString('fr-FR'),
         fournisseur: targetSupplier?.nom || 'Fournisseur Central',
         piece_name: targetPiece?.designation || 'Pièce',
@@ -551,11 +571,31 @@ export const Purchases: React.FC = () => {
       statsMap[h.sup_name].count += 1;
     });
 
-    const results = Object.keys(statsMap).map(sup => ({
-      name: sup,
-      current: statsMap[sup].current,
-      moy: statsMap[sup].sum / statsMap[sup].count
-    }));
+    const results = Object.keys(statsMap).map(sup => {
+      const supHistory = pieceHistory
+        .filter(h => h.sup_name === sup)
+        .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      
+      let evolutionText = "";
+      if (supHistory.length > 1) {
+        const oldest = supHistory[0].price;
+        const newest = supHistory[supHistory.length - 1].price;
+        if (newest > oldest) {
+           const percent = Math.round(((newest - oldest) / oldest) * 100);
+           evolutionText = `+${percent}%`;
+        } else if (newest < oldest) {
+           const percent = Math.round(((oldest - newest) / oldest) * 100);
+           evolutionText = `-${percent}%`;
+        }
+      }
+
+      return {
+        name: sup,
+        current: statsMap[sup].current,
+        moy: statsMap[sup].sum / statsMap[sup].count,
+        evolution: evolutionText
+      };
+    });
 
     // Sort by current price to find best
     results.sort((a, b) => a.current - b.current);
@@ -722,7 +762,10 @@ export const Purchases: React.FC = () => {
                         <span style={s.compName}>{comp.name}</span>
                       </div>
                       <div style={s.compRight}>
-                        <span style={s.compMoy}>Moy : {formatAr(comp.moy)}</span>
+                        <span style={s.compMoy}>
+                          Moy : {formatAr(comp.moy)} 
+                          {comp.evolution && <span style={{ color: comp.evolution.startsWith('+') ? '#ef4444' : '#10b981', marginLeft: '6px', fontWeight: 'bold' }}>{comp.evolution}</span>}
+                        </span>
                         <span style={s.compVal}>{formatAr(comp.current)}</span>
                       </div>
                     </div>

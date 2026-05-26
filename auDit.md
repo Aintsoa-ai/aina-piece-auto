@@ -233,3 +233,18 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Faille détectée :** Lors d'une vente à crédit sans internet (PWA), la base locale IndexedDB ne mémorisait pas les champs de crédit (client, statut_paiement). Au retour du réseau, la vente était uploadée comme "PAYÉE".
 - **Résolution :** Mise à jour du schéma `PendingVente` dans Dexie. Injection des attributs manquants dans le payload temporaire, et modification du moteur de `syncManager.ts` pour transmettre ces champs à Supabase.
 - **Résultat :** Les ventes à crédit enregistrées hors-ligne atterrissent correctement dans la dette du client lors de la reconnexion automatique.
+
+## Audit #33 - Mode Hors-Ligne Total (Achats & Dépenses)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Protéger l'enregistrement des réapprovisionnements et décaissements lors de coupures réseau.
+- **Résolution :** Ajout des tables `pending_achats` et `pending_depenses` dans Dexie (IndexedDB). Modification de `syncManager.ts` pour traiter et uploader ces files d'attente. L'application est désormais 100% Offline-First.
+
+## Audit #34 - Historique d'Évolution des Prix (Fournisseurs)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Donner un pouvoir de négociation via la détection d'inflation sur une pièce.
+- **Résolution :** L'algorithme des Achats analyse l'historique complet et calcule la tendance (ex: `+15%` ou `-5%`) pour chaque fournisseur par rapport aux anciens achats.
+
+## Audit #35 - Backup Cloud Sécurisé (Alternative Drive)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Remplacer l'envoi d'email capricieux par un véritable Cloud Drive d'1Go.
+- **Résolution :** Suppression de l'API `FormSubmit`. Implémentation de l'upload direct du fichier `.txt` vers le bucket de stockage Supabase `backups`. Le système fonctionne nativement avec la même capacité et fiabilité qu'un compte Google Drive classique, mais sans nécessiter de configuration OAuth complexe côté client.

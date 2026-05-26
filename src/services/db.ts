@@ -37,17 +37,46 @@ export interface PendingVente {
   }[];
 }
 
+export interface PendingAchat {
+  id: string; // uuid
+  fournisseur_id: string;
+  boutique_id: string;
+  utilisateur_id: string;
+  total: number;
+  created_at: string;
+  details: {
+    piece_id: string;
+    quantite: number;
+    prix_unitaire: number;
+    remise: number;
+    total: number;
+  }[];
+}
+
+export interface PendingDepense {
+  id: string; // uuid
+  motif: string;
+  montant: number;
+  boutique_id: string;
+  utilisateur_id: string;
+  created_at: string;
+}
+
 export class AinaDatabase extends Dexie {
   pieces!: Table<Piece>;
   stock!: Table<Stock>;
   pending_ventes!: Table<PendingVente>;
+  pending_achats!: Table<PendingAchat>;
+  pending_depenses!: Table<PendingDepense>;
 
   constructor() {
     super('AinaDatabase');
-    this.version(1).stores({
+    this.version(2).stores({
       pieces: 'id, reference, designation',
       stock: 'id, piece_id, boutique_id, [piece_id+boutique_id]',
-      pending_ventes: 'id, boutique_id, created_at'
+      pending_ventes: 'id, boutique_id, created_at',
+      pending_achats: 'id, boutique_id, created_at',
+      pending_depenses: 'id, boutique_id, created_at'
     });
   }
 }

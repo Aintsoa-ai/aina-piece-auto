@@ -114,9 +114,58 @@ export const syncUp = async () => {
       await db.pending_ventes.delete(vente.id);
     }
     
-    console.log('[SyncManager] Synchronisation terminée avec succès.');
+    // 5. SYNCHRONISATION DES ACHATS HORS-LIGNE
+    const pendingAchats = await db.pending_achats.toArray();
+    for (const achat of pendingAchats) {
+      const { data: insertedAchat, error: achatErr } = await supabase
+        .from('achats')
+        .insert({
+          fournisseur_id: achat.fournisseur_id,
+          boutique_id: isValidUUID(achat.boutique_id) ? achat.boutique_id : null,
+          utilisateur_id: isValidUUID(achat.utilisateur_id) ? achat.utilisateur_id : null,
+          total: achat.total,
+          created_at: achat.created_at
+        })
+        .select()
+        .single();
+
+      if (achatErr) {
+        console.error('[SyncManager] Erreur insertion achat:', achatErr);
+        continue;
+      }
+
+      if (insertedAchat && achat.details.length > 0) {
+        const detailsToInsert = achat.details.map(d => ({
+          achat_id: insertedAchat.id,
+          piece_id: d.piece_id,
+          quantite: d.quantite,
+          prix_unitaire: d.prix_unitaire,
+          remise: d.remise,
+          total: d.total
+        }));
+        await supabase.from('details_achats').insert(detailsToInsert);
+      }
+      await db.pending_achats.delete(achat.id);
+    }
+
+    // 6. SYNCHRONISATION DES DÉPENSES HORS-LIGNE
+    const pendingDepenses = await db.pending_depenses.toArray();
+    for (const depense of pendingDepenses) {
+      const { error: depErr } = await supabase.from('depenses').insert({
+        motif: depense.motif,
+        montant: depense.montant,
+        boutique_id: isValidUUID(depense.boutique_id) ? depense.boutique_id : null,
+        utilisateur_id: isValidUUID(depense.utilisateur_id) ? depense.utilisateur_id : null,
+        created_at: depense.created_at
+      });
+      if (!depErr) {
+        await db.pending_depenses.delete(depense.id);
+      }
+    }
+
+    console.log('[SyncManager] Synchronisation complète (Ventes, Achats, Dépenses) terminée avec succès.');
     // Re-synchroniser les stocks vers le local après l'upload
-    await syncDown(pendingVentes[0]?.boutique_id);
+    await syncDown(pendingVentes[0]?.boutique_id || pendingAchats[0]?.boutique_id);
     return true;
   } catch (error: any) {
     console.error('[SyncManager] Erreur générale lors du syncUp:', error);
