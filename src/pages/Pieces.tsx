@@ -948,18 +948,6 @@ export const Pieces: React.FC = () => {
     </div>
   );
 };
-                  {isSubmitting ? "Enregistrement..." : "Enregistrer"}
-                </button>
-              </div>
-            </form>
-
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
-};
 
 // ─── STYLES MATCHING THE REFERENCE PRECISELY ───────────
 const s: Record<string, React.CSSProperties> = {
