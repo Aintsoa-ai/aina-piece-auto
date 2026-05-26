@@ -59,8 +59,8 @@ C'est la fonctionnalité la plus complexe et vitale de l'application.
 
 1. **`syncManager.ts`** : Le chef d'orchestre.
 2. **SyncDown (Téléchargement) :** Dès qu'internet est présent, l'app télécharge tout le catalogue (`pieces`) et le `stock` de la boutique locale dans la base de données du navigateur (IndexedDB via Dexie).
-3. **La Vente Sans Réseau :** Si le wifi coupe, la vente s'enregistre dans `db.pending_ventes` (Local). Elle prend le statut "CREDIT" ou "PAYE" localement.
-4. **SyncUp (Remontée) :** Au retour de la connexion, `window.addEventListener('online', ...)` se déclenche. `syncManager.ts` lit IndexedDB et pousse silencieusement toutes les ventes en attente vers Supabase.
+3. **La Transaction Sans Réseau :** Si le wifi coupe, l'action s'enregistre localement (`db.pending_ventes`, `db.pending_achats`, `db.pending_depenses`).
+4. **SyncUp (Remontée) :** Au retour de la connexion, `window.addEventListener('online', ...)` se déclenche. `syncManager.ts` lit IndexedDB et pousse silencieusement toutes les files d'attentes (Ventes, Achats, Dépenses) vers Supabase. L'application est donc 100% Offline-First.
 
 ⚠️ **Ne touchez pas au schéma IndexedDB (`db.ts`) sans comprendre les conséquences sur la file d'attente des caisses non synchronisées.**
 
@@ -87,7 +87,10 @@ L'algorithme (`ImportExcel.tsx`) est optimisé pour des milliers de lignes. Il r
 
 ## 7. MAINTENANCE ET DÉPLOIEMENT
 
-### 7.1. Comment effacer toutes les données ? (Factory Reset)
+### 7.1. Cloud Drive (Supabase Storage) & Sauvegarde
+Le projet dispose d'une fonction de sauvegarde automatisée. Les données sont exportées en `.txt` et envoyées **directement dans un bucket de stockage Supabase nommé `backups`**. Cela remplace l'ancienne méthode par email (FormSubmit) qui était trop contraignante pour les gros fichiers et évite la lourde configuration de l'API Google Drive. L'admin a accès à ses fichiers depuis son tableau de bord Supabase (Menu Storage).
+
+### 7.2. Comment effacer toutes les données ? (Factory Reset)
 Si vous devez remettre l'ERP à zéro :
 1. Soit via l'application (Menu Paramètres > Bouton **Réinitialiser**).
 2. Soit via le script `reset_db.ts` (Nécessite la clé Service Role `SERVICE_ROLE_KEY`) qui effectue une suppression en cascade (effacer les boutiques efface automatiquement tout le reste grâce aux contraintes SQL `ON DELETE CASCADE`).
