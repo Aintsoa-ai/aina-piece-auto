@@ -210,16 +210,18 @@ export const Clients: React.FC = () => {
                     {formatAr(c.total_du || 0)}
                   </td>
                   <td style={{ ...s.td, textAlign: 'right' }}>
-                    <button 
-                      style={{...s.actionBtn, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', padding: '6px 12px', borderRadius: '4px'}}
-                      onClick={() => {
-                        setSelectedClient(c); setMontantPaiement(''); setErrorMsg(null); setSuccessMsg(null); setIsPayModalOpen(true);
-                      }}
-                      disabled={(c.total_du || 0) <= 0}
-                    >
-                      <CreditCard size={14} style={{ marginRight: '6px' }} /> 
-                      Encaisser
-                    </button>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button 
+                        style={{...s.actionBtn, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', padding: '6px 12px', borderRadius: '4px'}}
+                        onClick={() => {
+                          setSelectedClient(c); setMontantPaiement(''); setErrorMsg(null); setSuccessMsg(null); setIsPayModalOpen(true);
+                        }}
+                        disabled={(c.total_du || 0) <= 0}
+                      >
+                        <CreditCard size={14} style={{ marginRight: '6px' }} /> 
+                        Encaisser
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
