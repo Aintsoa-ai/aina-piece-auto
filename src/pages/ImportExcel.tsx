@@ -28,6 +28,7 @@ interface ExcelRow {
   remise?: number;
   fournisseur?: string;
   date_arrivage?: string;
+  code_barre?: string | null;
 }
 
 interface RowError {
@@ -120,6 +121,7 @@ export const ImportExcel: React.FC = () => {
           remise: parseExcelNumber(row.remise || 0),
           fournisseur: String(row.FOURNISSEUR || row.fournisseur || '').trim(),
           date_arrivage: String(row['date arrivage'] || '').trim(),
+          code_barre: String(row.code_barre || row['CODE BARRE'] || row['Code Barre'] || row.CODE_BARRE || row.EAN || row.codebarre || '').trim() || null,
         }));
 
         validateData(mappedRows);
@@ -208,7 +210,7 @@ export const ImportExcel: React.FC = () => {
 
             if (existingPiece) {
               if (replaceExisting) {
-                let updatePayload = { designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente };
+                let updatePayload = { designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente, code_barre: row.code_barre };
                 let { error: updErr } = await supabase.from('pieces').update(updatePayload).eq('id', pieceId);
                 if (updErr && updErr.message.includes('prix_achat')) {
                    delete updatePayload.prix_achat;
@@ -221,7 +223,7 @@ export const ImportExcel: React.FC = () => {
                 updatedCount++;
               } else if (ignoreDuplicates) { ignoredCount++; return; }
               else if (updateExisting) {
-                let updatePayload = { designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined };
+                let updatePayload = { designation: row.designation, marque: row.marque || undefined, categorie: row.categorie || undefined, prix_achat: row.prix_achat || undefined, prix_vente: row.prix_vente || undefined, code_barre: row.code_barre || undefined };
                 let { error: updErr } = await supabase.from('pieces').update(updatePayload).eq('id', pieceId);
                 if (updErr && updErr.message.includes('prix_achat')) {
                    delete updatePayload.prix_achat;
@@ -234,7 +236,7 @@ export const ImportExcel: React.FC = () => {
                 updatedCount++;
               }
             } else {
-              let insertPayload = { reference: row.reference, designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente };
+              let insertPayload = { reference: row.reference, designation: row.designation, marque: row.marque, categorie: row.categorie, compatibilite: row.compatibilite, oem_number: row.oem_number, description: row.description, prix_achat: row.prix_achat, prix_vente: row.prix_vente, code_barre: row.code_barre };
               let { data: newPiece, error: insertError } = await supabase.from('pieces').insert(insertPayload).select('id').single();
               
               if (insertError && insertError.message.includes('prix_achat')) {
@@ -471,7 +473,7 @@ export const ImportExcel: React.FC = () => {
                 <table style={s.table}>
                   <thead>
                     <tr>
-                      {['Référence', 'Pièce', 'Marque', 'Fournisseur', 'Qté Achetée', 'Qté Restante', 'Prix Achat', 'PV Estimé', 'Emplacement'].map((col) => (
+                      {['Référence', 'Code-barres', 'Pièce', 'Marque', 'Fournisseur', 'Qté Achetée', 'Qté Restante', 'Prix Achat', 'PV Estimé'].map((col) => (
                         <th key={col} style={s.th}>{col.toUpperCase()}</th>
                       ))}
                     </tr>
@@ -482,6 +484,7 @@ export const ImportExcel: React.FC = () => {
                       return (
                         <tr key={idx} style={{ ...s.tr, backgroundColor: hasFatal ? 'rgba(239, 68, 68, 0.05)' : 'transparent' }}>
                           <td style={{ ...s.td, fontWeight: '700', color: hasFatal ? '#ef4444' : 'rgba(255,255,255,0.45)' }}>{row.reference || 'MANQUANT'}</td>
+                          <td style={{ ...s.td, fontFamily: 'monospace' }}>{row.code_barre || '—'}</td>
                           <td style={{ ...s.td, fontWeight: '700', color: '#0066fe' }}>{row.designation || 'NOM MANQUANT'}</td>
                           <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{row.marque || '—'}</td>
                           <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{row.fournisseur || '—'}</td>
@@ -489,7 +492,6 @@ export const ImportExcel: React.FC = () => {
                           <td style={s.td}>{row.quantite_disponible}</td>
                           <td style={s.td}>{row.prix_achat ? `${row.prix_achat.toLocaleString('fr-FR')} Ar` : '—'}</td>
                           <td style={s.td}>{row.prix_vente ? `${row.prix_vente.toLocaleString('fr-FR')} Ar` : '—'}</td>
-                          <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)', fontFamily: 'monospace' }}>{row.emplacement || '—'}</td>
                         </tr>
                       );
                     })}

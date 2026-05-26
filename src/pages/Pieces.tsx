@@ -272,6 +272,47 @@ export const Pieces: React.FC = () => {
     fetchData();
   }, []);
 
+  // Barcode Scanner Listener pour la recherche rapide dans le catalogue
+  useEffect(() => {
+    if (isModalOpen) return; // Désactivé si une modale (Création/Édition) est ouverte
+
+    let barcodeBuffer = '';
+    let lastKeyTime = Date.now();
+
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Ignorer si on tape déjà dans un autre champ (sauf la barre de recherche elle-même)
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        if (e.target.placeholder !== "Rechercher par référence, pièce, marque...") {
+          return;
+        }
+      }
+      
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      
+      const currentTime = Date.now();
+      
+      if (currentTime - lastKeyTime > 50) {
+        barcodeBuffer = '';
+      }
+      
+      if (e.key === 'Enter') {
+        if (barcodeBuffer.length >= 3) {
+           e.preventDefault();
+           e.stopPropagation();
+           setSearchQuery(barcodeBuffer); // Remplit la barre de recherche avec le code scanné
+           barcodeBuffer = '';
+        }
+      } else if (e.key.length === 1) {
+        barcodeBuffer += e.key;
+      }
+      
+      lastKeyTime = currentTime;
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
+  }, [isModalOpen]);
+
   const handleOpenAddModal = () => {
     setEditId(null);
     setReference('');
@@ -469,7 +510,8 @@ export const Pieces: React.FC = () => {
     p.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.marque.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.categorie.toLowerCase().includes(searchQuery.toLowerCase())
+    p.categorie.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.code_barre && p.code_barre.includes(searchQuery))
   );
 
   const totalReferences = filteredPieces.length;
