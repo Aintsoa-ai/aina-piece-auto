@@ -54,3 +54,9 @@
 - [x] Monitoring de la capacité de stockage Supabase en temps réel sur le Dashboard.
 - [x] Rendre la barre latérale dynamique selon la boutique (nom et icône).
 - [ ] Mettre en place la détection de conflits de stock (Alerte de rupture post-synchronisation).
+
+## Phase 9 : Intégration Code-barres (Hardware Douchette)
+- [ ] Ajouter la colonne `code_barre` à la table `pieces` dans Supabase.
+- [ ] Mettre à jour l'interface de création/modification des pièces pour inclure le champ `code_barre`.
+- [ ] Intégrer l'écouteur/champ de saisie dans le module "Ventes / Caisse" pour ajout rapide au panier.
+- [ ] Intégrer la sélection rapide par scan dans le module "Achats / Réception".

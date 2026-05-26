@@ -189,3 +189,9 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Refonte de la Sidebar :** Le menu latéral adapte maintenant son affichage en remplaçant "OFFICIEL" et l'avatar "AP" par le nom et l'icône appropriée à la boutique connectée, garantissant aux caissiers qu'ils opèrent sur le bon espace.
 - **Module Factory Reset :** Déploiement d'une boîte de dialogue avec des cases à cocher pour une purge sélective (historique, catalogue, etc.) dans les paramètres, rendant l'administrateur 100% autonome sur la gestion des cycles de vie des données.
 - **Jauge Supabase :** Ajout d'un indicateur de capacité de stockage en direct sur le tableau de bord.
+
+## Audit #26 - Vérification de la compatibilité globale avant nouvelles fonctionnalités (Code-barres)
+**Statut : Validé ✅**
+- **Objectif :** S'assurer qu'aucune fonctionnalité n'a été perdue sur ordinateur ou téléphone avant de commencer l'intégration des douchettes de code-barres.
+- **Action :** Revue croisée de `README.md`, `nos_idees.md`, et `plan.md`. Vérification théorique des impacts de l'ajout d'un écouteur global ou d'un champ code-barres sur l'ergonomie mobile et desktop.
+- **Résultat :** Tout est prêt pour accueillir la mise à jour sans casser l'existant. L'application est sécurisée avec des points de sauvegarde.
