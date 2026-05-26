@@ -28,6 +28,7 @@ interface PurchaseItem {
 interface PieceOption {
   id: string;
   reference: string;
+  code_barre?: string | null;
   designation: string;
   marque: string;
 }
@@ -170,7 +171,7 @@ export const Purchases: React.FC = () => {
       // 2. Fetch Pieces catalog
       const { data: piecesData } = await supabase
         .from('pieces')
-        .select('id, reference, designation, marque');
+        .select('id, reference, code_barre, designation, marque');
 
       // 3. Fetch Suppliers
       const { data: suppliersData } = await supabase
@@ -217,6 +218,7 @@ export const Purchases: React.FC = () => {
             parsedPieces.push({
               id: p.id,
               reference: p.reference,
+              code_barre: p.code_barre || null,
               designation: p.designation,
               marque: p.marque || '—'
             });
@@ -272,6 +274,51 @@ export const Purchases: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Barcode Scanner Listener
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    let barcodeBuffer = '';
+    let lastKeyTime = Date.now();
+
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      
+      const currentTime = Date.now();
+      
+      if (currentTime - lastKeyTime > 30) {
+        barcodeBuffer = '';
+      }
+      
+      if (e.key === 'Enter') {
+        if (barcodeBuffer.length >= 3) {
+           e.preventDefault();
+           e.stopPropagation();
+           const scannedCode = barcodeBuffer;
+           barcodeBuffer = '';
+           
+           const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
+           if (piece) {
+             handlePieceChange(piece.id);
+             setPieceSearch('');
+             setSuccessMsg(`Pièce sélectionnée via Scan : ${piece.designation}`);
+             setErrorMsg(null);
+           } else {
+             setErrorMsg(`Code-barres introuvable : ${scannedCode}`);
+             setSuccessMsg(null);
+           }
+        }
+      } else if (e.key.length === 1) {
+        barcodeBuffer += e.key;
+      }
+      
+      lastKeyTime = currentTime;
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
+  }, [isModalOpen, pieces]);
 
   const handleOpenModal = () => {
     setSelectedPieceId('');

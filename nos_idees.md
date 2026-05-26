@@ -7,7 +7,7 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - Ajouter un mode "Plein écran" (Kiosk Mode) exclusif pour les caissiers pour éviter qu'ils ne cliquent ailleurs.
 
 ## 2. Fonctionnalités Avancées
-- **Scan de Code-barres (Validé - En cours) :** Intégrer la prise en charge d'une douchette de code-barres (Option 1 : clavier USB). Quand on est sur la page Ventes, scanner le code ajoute la pièce au panier. Lors de la réception de stock (Achats), scanner sélectionne la pièce. Fonctionnalité priorisée pour le développement.
+- **Scan de Code-barres (Terminé) :** Prise en charge d'une douchette de code-barres USB. Un écouteur global détecte intelligemment le scan rapide pour l'ajout au panier (Ventes), la sélection (Achats) et l'enregistrement (Catalogue).
 - **Historique de prix :** Tracer l'évolution du prix d'achat d'une pièce pour visualiser si les fournisseurs augmentent leurs tarifs au fil des mois.
 - **Gestion des retours clients :** Ajouter un module pour annuler ou rembourser une vente et réintégrer automatiquement la pièce en stock.
 

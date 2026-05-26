@@ -195,3 +195,11 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Objectif :** S'assurer qu'aucune fonctionnalité n'a été perdue sur ordinateur ou téléphone avant de commencer l'intégration des douchettes de code-barres.
 - **Action :** Revue croisée de `README.md`, `nos_idees.md`, et `plan.md`. Vérification théorique des impacts de l'ajout d'un écouteur global ou d'un champ code-barres sur l'ergonomie mobile et desktop.
 - **Résultat :** Tout est prêt pour accueillir la mise à jour sans casser l'existant. L'application est sécurisée avec des points de sauvegarde.
+
+## Audit #27 - Intégration Douchette (Codes-barres)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Accélérer les processus de caisse et de réception de stock via l'utilisation d'une douchette matérielle (scanner de codes-barres type clavier USB).
+- **Problème identifié (Interférence de saisie) :** Si on utilise un champ de texte classique, l'utilisateur doit obligatoirement cliquer dedans avant de scanner.
+- **Résolution (Global Keydown Listener) :** Implémentation d'un écouteur d'événements global (`window.addEventListener('keydown')`) dans les modales de Ventes et d'Achats. L'algorithme mesure le temps entre les frappes : si le temps est `< 30ms`, c'est un scan matériel, la séquence est capturée en tampon (buffer) jusqu'à la touche `Enter`. Si c'est plus lent, c'est une saisie humaine (le tampon est réinitialisé).
+- **Impact Base de données :** Ajout réussi de la colonne `code_barre` à la table `pieces`. L'interface de création/modification du catalogue gère maintenant ce nouveau champ.
+- **Impact Fonctionnel :** En Caisse, scanner ajoute instantanément au panier. En Réception, scanner sélectionne automatiquement la bonne pièce dans le menu déroulant. L'interface est devenue extrêmement rapide et Plug-and-Play.

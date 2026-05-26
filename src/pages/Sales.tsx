@@ -28,6 +28,7 @@ interface PieceItem {
   id: string; // This is the stock_id
   piece_id?: string; // This is the actual piece_id
   reference: string;
+  code_barre?: string | null;
   designation: string;
   marque: string;
   prix_vente: number;
@@ -272,6 +273,7 @@ export const Sales: React.FC = () => {
               id: st.id, // stock id
               piece_id: st.piece_id, // actual piece id
               reference: st.pieces?.reference || 'REF-UNK',
+              code_barre: st.pieces?.code_barre || null,
               designation: st.pieces?.designation || 'Pièce',
               marque: st.pieces?.marque || 'Origine',
               prix_vente: st.pieces?.prix_vente || pAchat * 1.4,
@@ -328,6 +330,49 @@ export const Sales: React.FC = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Barcode Scanner Listener
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    let barcodeBuffer = '';
+    let lastKeyTime = Date.now();
+
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      
+      const currentTime = Date.now();
+      
+      // If time between keystrokes is more than 30ms, it's human typing (reset buffer)
+      if (currentTime - lastKeyTime > 30) {
+        barcodeBuffer = '';
+      }
+      
+      if (e.key === 'Enter') {
+        if (barcodeBuffer.length >= 3) {
+           e.preventDefault();
+           e.stopPropagation();
+           const scannedCode = barcodeBuffer;
+           barcodeBuffer = '';
+           
+           const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
+           if (piece) {
+             handleAddToCart(piece);
+             setSearchQuery('');
+           } else {
+             setErrorMsg(`Code-barres introuvable : ${scannedCode}`);
+           }
+        }
+      } else if (e.key.length === 1) {
+        barcodeBuffer += e.key;
+      }
+      
+      lastKeyTime = currentTime;
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
+  }, [isModalOpen, pieces]);
 
   // Filter pieces based on search inside modal
   const filteredPieces = pieces.filter(p => 

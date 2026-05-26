@@ -4,6 +4,7 @@ import type { Table } from 'dexie';
 export interface Piece {
   id: string;
   reference: string;
+  code_barre?: string | null;
   designation: string;
   prix_achat: number;
   prix_vente: number;

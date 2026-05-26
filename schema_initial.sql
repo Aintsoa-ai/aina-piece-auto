@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS public.fournisseurs (
 CREATE TABLE IF NOT EXISTS public.pieces (
   id            uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   reference     text UNIQUE NOT NULL,
+  code_barre    text,
   designation   text NOT NULL,
   marque        text,
   categorie     text,

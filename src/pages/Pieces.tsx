@@ -22,6 +22,7 @@ interface PieceItem {
   achat: number;
   vente: number;
   stockStatus: 'OK' | 'Faible' | 'Rupture';
+  code_barre?: string | null;
   compatibilite?: string;
   oem_number?: string;
   emplacement?: string;
@@ -54,6 +55,7 @@ export const Pieces: React.FC = () => {
 
   // Inputs matching Nouvelle pièce screenshots 2 and 3
   const [reference, setReference] = useState('');
+  const [codeBarre, setCodeBarre] = useState('');
   const [designation, setDesignation] = useState('');
   const [marque, setMarque] = useState('');
   const [categorie, setCategorie] = useState('');
@@ -238,6 +240,7 @@ export const Pieces: React.FC = () => {
             achat: achatPrice,
             vente: ventePrice,
             stockStatus: status,
+            code_barre: item.code_barre || '',
             compatibilite: item.compatibilite || '',
             oem_number: item.oem_number || '',
             emplacement: pieceStocks[0]?.emplacement || '',
@@ -272,6 +275,7 @@ export const Pieces: React.FC = () => {
   const handleOpenAddModal = () => {
     setEditId(null);
     setReference('');
+    setCodeBarre('');
     setDesignation('');
     setMarque('');
     setCategorie('');
@@ -293,6 +297,7 @@ export const Pieces: React.FC = () => {
   const handleOpenEditModal = (piece: PieceItem) => {
     setEditId(piece.id);
     setReference(piece.reference);
+    setCodeBarre(piece.code_barre || '');
     setDesignation(piece.designation);
     setMarque(piece.marque || '');
     setCategorie(piece.categorie || '');
@@ -323,6 +328,7 @@ export const Pieces: React.FC = () => {
 
     const payloadPiece = {
       reference: reference.toUpperCase().trim(),
+      code_barre: codeBarre.trim() || null,
       designation: designation.trim(),
       marque: marque.trim() || null,
       categorie: categorie.trim() || null,
@@ -349,6 +355,7 @@ export const Pieces: React.FC = () => {
           achat: parseNum(prixAchat),
           vente: parseNum(prixVente),
           stockStatus: status,
+          code_barre: codeBarre.trim(),
           compatibilite: compatibilite.trim(),
           oem_number: oemNumber.trim(),
           emplacement: emplacement.trim(),
@@ -421,6 +428,7 @@ export const Pieces: React.FC = () => {
         achat: parseNum(prixAchat),
         vente: parseNum(prixVente),
         stockStatus: 'OK',
+        code_barre: codeBarre.trim(),
         compatibilite: compatibilite.trim(),
         oem_number: oemNumber.trim(),
         emplacement: emplacement.trim(),
@@ -629,6 +637,16 @@ export const Pieces: React.FC = () => {
 
                   {/* Row 2 */}
                   <div style={s.inputContainer}>
+                    <label style={s.inputLabel}>Code-barres (Scan)</label>
+                    <input 
+                      type="text"
+                      style={s.inputField}
+                      value={codeBarre}
+                      onChange={(e) => setCodeBarre(e.target.value)}
+                      placeholder="Scannez ou tapez le code"
+                    />
+                  </div>
+                  <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Marque</label>
                     <input 
                       type="text"
@@ -638,6 +656,8 @@ export const Pieces: React.FC = () => {
                       placeholder="ex: Bosch, Purflux..."
                     />
                   </div>
+
+                  {/* Row 3 */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Catégorie</label>
                     <input 
@@ -648,8 +668,18 @@ export const Pieces: React.FC = () => {
                       placeholder="ex: Filtration, Freinage..."
                     />
                   </div>
+                  <div style={s.inputContainer}>
+                    <label style={s.inputLabel}>Numéro OEM</label>
+                    <input 
+                      type="text"
+                      style={s.inputField}
+                      value={oemNumber}
+                      onChange={(e) => setOemNumber(e.target.value)}
+                      placeholder="ex: 1567.C6"
+                    />
+                  </div>
 
-                  {/* Row 3 - Full Width Compatibilité véhicule */}
+                  {/* Row 4 - Full Width Compatibilité véhicule */}
                   <div style={{ ...s.inputContainer, gridColumn: 'span 2' }}>
                     <label style={s.inputLabel}>Compatibilité véhicule</label>
                     <input 
@@ -661,17 +691,7 @@ export const Pieces: React.FC = () => {
                     />
                   </div>
 
-                  {/* Row 4 */}
-                  <div style={s.inputContainer}>
-                    <label style={s.inputLabel}>Numéro OEM</label>
-                    <input 
-                      type="text"
-                      style={s.inputField}
-                      value={oemNumber}
-                      onChange={(e) => setOemNumber(e.target.value)}
-                      placeholder="ex: 1567.C6"
-                    />
-                  </div>
+                  {/* Row 5 */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Emplacement</label>
                     <input 
@@ -682,8 +702,6 @@ export const Pieces: React.FC = () => {
                       placeholder="ex: Étagère A-4"
                     />
                   </div>
-
-                  {/* Row 5 */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Quantité</label>
                     <input 
@@ -694,6 +712,7 @@ export const Pieces: React.FC = () => {
                       placeholder=""
                     />
                   </div>
+
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Stock minimum</label>
                     <input 
@@ -705,7 +724,7 @@ export const Pieces: React.FC = () => {
                     />
                   </div>
 
-                  {/* Row 6 */}
+                  {/* Row 7 */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Prix d'achat (Ar)</label>
                     <input 
@@ -727,7 +746,7 @@ export const Pieces: React.FC = () => {
                     />
                   </div>
 
-                  {/* Row 7 - Boutiques / Fournisseurs list */}
+                  {/* Row 8 - Boutiques / Fournisseurs list */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Boutique</label>
                     <select
@@ -753,7 +772,7 @@ export const Pieces: React.FC = () => {
                     </select>
                   </div>
 
-                  {/* Row 8 - Full Width Description */}
+                  {/* Row 9 - Full Width Description */}
                   <div style={{ ...s.inputContainer, gridColumn: 'span 2' }}>
                     <label style={s.inputLabel}>Description</label>
                     <textarea 
