@@ -60,3 +60,9 @@
 - [x] Mettre à jour l'interface de création/modification des pièces pour inclure le champ `code_barre`.
 - [x] Intégrer l'écouteur/champ de saisie dans le module "Ventes / Caisse" pour ajout rapide au panier.
 - [x] Intégrer la sélection rapide par scan dans le module "Achats / Réception".
+
+## Phase 10 : Fonctionnalités Métiers (Retours, Étiquettes, Crédits) - (Terminée)
+- [x] Déploiement d'un générateur d'étiquettes thermiques pour les codes-barres avec bwip-js.
+- [x] Implémentation du remboursement client et restauration de stock dans l'historique des ventes.
+- [x] Création d'un module "Clients & Crédits" pour le suivi des factures impayées des garages partenaires.
+- [x] Compatibilité Hors-Ligne des Ventes à Crédit (Synchronisation des statuts de paiement avec IndexedDB).

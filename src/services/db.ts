@@ -24,6 +24,9 @@ export interface PendingVente {
   client_nom: string;
   client_contact: string;
   status: string;
+  statut_paiement?: string;
+  client_id?: string;
+  montant_paye?: number;
   total: number;
   created_at: string;
   details: {

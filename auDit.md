@@ -212,3 +212,24 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
   1. L'import Excel ignorait les codes-barres. -> *Correction : Ajout du mapping `code_barre` dans `ImportExcel.tsx`.*
   2. Le catalogue était statique au scan. -> *Correction : Ajout d'un écouteur global sur `Pieces.tsx` qui redirige les frappes rapides du scan vers la barre de recherche principale (Inventaire Éclair).*
 - **Vérification Mobile/Desktop :** Les écouteurs globaux ont des sécurités strictes (`e.target` checks) pour ne jamais bloquer la saisie manuelle sur smartphone ni les raccourcis système (`Ctrl`, `Alt`) sur ordinateur. Le fallback "Touche Entrée" garantit l'opérabilité sans douchette matérielle.
+
+## Audit #29 - Impression d'Étiquettes Code-barres
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Permettre l'impression d'étiquettes autocollantes de codes-barres sur imprimante thermique.
+- **Résolution :** Utilisation de l'API web `bwip-js` pour la génération dynamique et de CSS `@media print` pour garantir le rendu parfait sur 50x30mm. Fonctionne sur Desktop.
+
+## Audit #30 - Annulation de Ventes & Retours Clients
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Annuler une vente, rembourser et corriger le stock.
+- **Résolution :** Ajout d'un bouton de retour dans l'historique des ventes. L'action recrédite le stock avec précision et trace un mouvement 'ENTREE'. Sécurité : fonctionnalité strictement réservée à l'Administrateur.
+
+## Audit #31 - Gestion des Crédits et Garages
+**Statut : Validé & Déployé ✅**
+- **Objectif :** Vendre à crédit à des garages partenaires et suivre les encaissements différés.
+- **Résolution :** Création d'une interface "Clients & Crédits" dédiée. Intégration dans le flux de Caisse avec un menu déroulant pour affecter le client.
+
+## Audit #32 - Intégrité du Mode Hors-Ligne pour les Crédits
+**Statut : Validé & Déployé ✅**
+- **Faille détectée :** Lors d'une vente à crédit sans internet (PWA), la base locale IndexedDB ne mémorisait pas les champs de crédit (client, statut_paiement). Au retour du réseau, la vente était uploadée comme "PAYÉE".
+- **Résolution :** Mise à jour du schéma `PendingVente` dans Dexie. Injection des attributs manquants dans le payload temporaire, et modification du moteur de `syncManager.ts` pour transmettre ces champs à Supabase.
+- **Résultat :** Les ventes à crédit enregistrées hors-ligne atterrissent correctement dans la dette du client lors de la reconnexion automatique.

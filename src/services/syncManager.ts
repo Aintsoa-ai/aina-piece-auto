@@ -71,6 +71,9 @@ export const syncUp = async () => {
         .insert({
           boutique_id: isValidUUID(vente.boutique_id) ? vente.boutique_id : null,
           caissier_id: isValidUUID(vente.vendeur_id) ? vente.vendeur_id : null,
+          statut_paiement: vente.statut_paiement || 'PAYE',
+          client_id: vente.client_id || null,
+          montant_paye: vente.montant_paye !== undefined ? vente.montant_paye : vente.total,
           total: vente.total,
           created_at: vente.created_at
         })

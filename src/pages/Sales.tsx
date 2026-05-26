@@ -551,6 +551,9 @@ export const Sales: React.FC = () => {
         client_nom: 'Client Divers',
         client_contact: '',
         status: 'COMPLETED',
+        statut_paiement: isCredit ? 'CREDIT' : 'PAYE',
+        client_id: isCredit ? selectedClient : undefined,
+        montant_paye: isCredit ? 0 : calculatedTotal,
         total: calculatedTotal,
         created_at: new Date().toISOString(),
         details: cart.map(item => ({

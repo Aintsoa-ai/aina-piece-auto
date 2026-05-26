@@ -9,7 +9,7 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 ## 2. Fonctionnalités Avancées
 - **Scan de Code-barres (Terminé) :** Prise en charge d'une douchette de code-barres USB. Un écouteur global détecte intelligemment le scan rapide pour l'ajout au panier (Ventes), la sélection (Achats) et l'enregistrement (Catalogue).
 - **Historique de prix :** Tracer l'évolution du prix d'achat d'une pièce pour visualiser si les fournisseurs augmentent leurs tarifs au fil des mois.
-- **Gestion des retours clients :** Ajouter un module pour annuler ou rembourser une vente et réintégrer automatiquement la pièce en stock.
+- **Gestion des retours clients (Terminé) :** Ajouter un module pour annuler ou rembourser une vente et réintégrer automatiquement la pièce en stock.
 
 ## 3. Sécurité et Backup (Nouvelles Idées)
 - **Synchronisation Google Drive API :** Remplacer le téléchargement du point de sauvegarde `.txt` par un upload direct et invisible vers un dossier Google Drive privé (pour contourner définitivement les blocages d'emails).
