@@ -9,7 +9,8 @@ import {
   Edit, 
   Trash2,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Printer
 } from 'lucide-react';
 
 interface PieceItem {
@@ -52,6 +53,7 @@ export const Pieces: React.FC = () => {
   // Form / Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [printLabelPiece, setPrintLabelPiece] = useState<PieceItem | null>(null);
 
   // Inputs matching Nouvelle pièce screenshots 2 and 3
   const [reference, setReference] = useState('');
@@ -597,6 +599,9 @@ export const Pieces: React.FC = () => {
                   {/* Actions buttons */}
                   <td style={{ ...s.td, textAlign: 'right' }}>
                     <div style={s.actionGroup}>
+                      <button style={{ ...s.actionBtn, color: '#10b981' }} onClick={() => setPrintLabelPiece(piece)} title="Imprimer Étiquette">
+                        <Printer size={14} />
+                      </button>
                       <button style={s.actionBtn} onClick={() => handleOpenEditModal(piece)} title="Modifier">
                         <Edit size={14} />
                       </button>
@@ -842,9 +847,107 @@ export const Pieces: React.FC = () => {
                 </button>
                 <button 
                   type="submit"
-                  style={s.btnValider} 
+                  style={{ ...s.btnAnnuler, backgroundColor: '#3b82f6', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   disabled={isSubmitting}
                 >
+                  {isSubmitting ? <div style={{ ...s.spinner, width: '16px', height: '16px', borderWidth: '2px', marginRight: '8px' }}></div> : null}
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL D'IMPRESSION D'ÉTIQUETTE ─────────────── */}
+      {printLabelPiece && (
+        <div style={s.modalOverlay}>
+          <style>
+            {`
+              @media print {
+                body * {
+                  visibility: hidden;
+                }
+                .print-only-label, .print-only-label * {
+                  visibility: visible;
+                }
+                .print-only-label {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  width: 100vw;
+                  height: 100vh;
+                  background: white !important;
+                  display: flex !important;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  margin: 0 !important;
+                  padding: 10px !important;
+                  box-sizing: border-box;
+                }
+                @page {
+                  size: 50mm 30mm; /* Standard thermal label size */
+                  margin: 0;
+                }
+              }
+            `}
+          </style>
+          <div style={{ ...s.modalCard, maxWidth: '400px' }}>
+            <div style={s.modalHeader} className="no-print">
+              <h3 style={s.modalTitle}>Étiquette Code-barres</h3>
+              <button style={s.modalCloseBtn} onClick={() => setPrintLabelPiece(null)}>
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
+              <div className="print-only-label" style={{ 
+                backgroundColor: '#fff', 
+                color: '#000',
+                padding: '15px', 
+                borderRadius: '8px',
+                textAlign: 'center',
+                width: '100%',
+                maxWidth: '300px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '4px', lineHeight: '1.2' }}>
+                  {printLabelPiece.designation.length > 28 ? printLabelPiece.designation.substring(0, 25) + '...' : printLabelPiece.designation}
+                </div>
+                <div style={{ fontSize: '11px', color: '#444', marginBottom: '8px' }}>
+                  Ref: {printLabelPiece.reference}
+                </div>
+                
+                <img 
+                  src={`https://bwipjs-api.metafloor.com/?bcid=code128&text=${printLabelPiece.code_barre || printLabelPiece.reference}&scale=3&includetext`} 
+                  alt="Code Barres" 
+                  style={{ maxWidth: '100%', height: '55px', objectFit: 'contain' }}
+                />
+                
+                <div style={{ fontSize: '16px', fontWeight: '900', marginTop: '8px' }}>
+                  {new Intl.NumberFormat('fr-FR').format(printLabelPiece.vente)} Ar
+                </div>
+              </div>
+            </div>
+            
+            <div style={s.modalFooter} className="no-print">
+              <button style={s.btnAnnuler} onClick={() => setPrintLabelPiece(null)}>Fermer</button>
+              <button 
+                style={{ ...s.btnAnnuler, backgroundColor: '#10b981', color: '#fff', border: 'none', display: 'flex', alignItems: 'center' }} 
+                onClick={() => window.print()}
+              >
+                <Printer size={16} style={{ marginRight: '8px' }} />
+                Imprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
                   {isSubmitting ? "Enregistrement..." : "Enregistrer"}
                 </button>
               </div>
