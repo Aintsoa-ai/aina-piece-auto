@@ -16,8 +16,10 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ### 3. Gestion des Ventes (Caisse & Panier)
 - **Système de Panier (Vente Multiple) :** Interface à double panneau permettant d'ajouter plusieurs pièces avec calcul dynamique du total.
-- **Intégration Douchette (Scan Rapide) :** Prise en charge native des lecteurs de codes-barres. Scanner une pièce l'ajoute instantanément au panier sans aucune saisie clavier. L'algorithme distingue une saisie humaine d'un scan matériel.
-- **Mode Scan Manuel (Fallback) :** Possibilité de rechercher manuellement un code-barres et d'appuyer sur "Entrée" pour simuler une douchette et ajouter directement au panier.
+- **Intégration Douchette (Scan Rapide) :** Prise en charge native des lecteurs de codes-barres de bout en bout (Caisse, Achats, Catalogue). L'algorithme distingue une saisie humaine d'un scan matériel.
+- **Mode Scan Manuel (Fallback) :** Possibilité de rechercher manuellement un code-barres et d'appuyer sur "Entrée" pour simuler une douchette. Totalement compatible Mobile et Desktop.
+- **Inventaire Éclair :** Sur la liste du catalogue, le scan d'une pièce filtre instantanément la vue pour afficher ses informations de stock et de prix.
+- **Importation de Masse avec Codes-barres :** L'outil d'importation Excel reconnait et intègre automatiquement la colonne `CODE_BARRE`, permettant d'initialiser des centaines de références sans scan manuel.
 - **Sélection Intelligente :** Recherche fluide avec boutons d'ajustement de quantité directement dans le panier.
 - **Impression Thermique Auto-Adaptable :** Formatage natif (CSS @media print) qui s'adapte automatiquement à n'importe quelle imprimante thermique (58mm ou 80mm) générant un véritable ticket de caisse.
 - Calcul automatique du bénéfice basé sur le dernier prix d'achat.

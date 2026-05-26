@@ -204,3 +204,11 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Mode Fallback Manuel (Mobile/Desktop) :** Ajout de la colonne `code_barre` dans l'algorithme de recherche classique. Si la recherche donne un résultat unique, l'appui sur `Entrée` ajoute la pièce au panier (simule une douchette manuellement). Compatibilité totale conservée pour mobile (clavier virtuel) et desktop.
 - **Impact Base de données :** Ajout de la colonne `code_barre` à la table `pieces`.
 - **Impact Fonctionnel :** En Caisse, scanner ajoute instantanément au panier. En Réception, scanner sélectionne automatiquement la bonne pièce dans le menu déroulant. L'interface est devenue extrêmement rapide et Plug-and-Play.
+
+## Audit #28 - Inspection d'Intégrité de l'Écosystème Code-barres (A à Z)
+**Statut : Validé & Déployé ✅**
+- **Objectif :** S'assurer que le système de douchette couvre 100% des workflows sans faille et ne casse pas l'expérience mobile.
+- **Failles détectées et corrigées :** 
+  1. L'import Excel ignorait les codes-barres. -> *Correction : Ajout du mapping `code_barre` dans `ImportExcel.tsx`.*
+  2. Le catalogue était statique au scan. -> *Correction : Ajout d'un écouteur global sur `Pieces.tsx` qui redirige les frappes rapides du scan vers la barre de recherche principale (Inventaire Éclair).*
+- **Vérification Mobile/Desktop :** Les écouteurs globaux ont des sécurités strictes (`e.target` checks) pour ne jamais bloquer la saisie manuelle sur smartphone ni les raccourcis système (`Ctrl`, `Alt`) sur ordinateur. Le fallback "Touche Entrée" garantit l'opérabilité sans douchette matérielle.
