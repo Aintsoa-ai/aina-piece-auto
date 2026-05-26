@@ -22,6 +22,8 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - **Importation de Masse avec Codes-barres :** L'outil d'importation Excel reconnait et intègre automatiquement la colonne `CODE_BARRE`, permettant d'initialiser des centaines de références sans scan manuel.
 - **Sélection Intelligente :** Recherche fluide avec boutons d'ajustement de quantité directement dans le panier.
 - **Impression Thermique Auto-Adaptable :** Formatage natif (CSS @media print) qui s'adapte automatiquement à n'importe quelle imprimante thermique (58mm ou 80mm) générant un véritable ticket de caisse.
+- **Remboursements et Retours Clients :** Fonction exclusive (Réservée Admin) pour annuler une vente. L'opération supprime la transaction, recrédite le stock avec exactitude et trace le mouvement dans l'historique d'inventaire.
+- **Ventes à Crédit (Garages) :** Le module permet d'associer une transaction à un compte "Client/Garage". Le total s'ajoute à la dette du garage sans fausser les encaissements du jour.
 - Calcul automatique du bénéfice basé sur le dernier prix d'achat.
 
 ### 4. Gestion des Achats & Fournisseurs
@@ -32,6 +34,7 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 ### 5. Catalogue & Stock
 - Affichage complet des pièces avec gestion des quantités.
 - **Gestion des Codes-barres :** Ajout ou modification des codes-barres d'une pièce directement via la douchette dans la fenêtre "Nouvelle Pièce".
+- **Génération & Impression d'Étiquettes :** Génération dynamique (API bwip-js) et impression d'autocollants code-barres au format (50x30mm) directement sur imprimante thermique. 
 - **Importation Massive & Intelligente :** Importation depuis un fichier Excel (`.xlsx`). Gestion des doublons (remplacer, mettre à jour, ignorer) et sélecteur de destination avec option de "Déploiement Global" (Toutes les boutiques). Protection d'intégrité (lignes sans REF ignorées).
 
 ### 6. Rapports et Exports
@@ -89,3 +92,4 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 ## Fonctionnalités Avancées (Mise à jour)
 - **Comparateur de Fournisseurs Intelligent :** Lors d'un réapprovisionnement, l'application analyse l'historique complet des achats et calcule le prix moyen ainsi que le dernier prix proposé par chaque fournisseur pour vous recommander le "MEILLEUR" prix automatiquement.
 - **Douchette Code-barres (POS) :** Déploiement d'un écouteur global asynchrone permettant le scan matériel dans toutes les interfaces transactionnelles (Ventes, Achats). Le système est Plug-and-Play (clavier USB émulé).
+- **Gestion des Clients (Avoirs / Crédits) :** Un module complet dédié au suivi des factures impayées des Garages Partenaires. Vue centralisée des dettes et module d'encaissement de règlements partiels.
