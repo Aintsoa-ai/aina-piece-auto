@@ -6,7 +6,6 @@ import { Printer, AlertCircle, Plus, Search, CheckCircle2, X, ShoppingCart, User
 import { db } from '../services/db';
 import { v4 as uuidv4 } from 'uuid';
 import { showAlert, showConfirm } from '../utils/alerts';
-import { v4 as uuidv4 } from 'uuid';
 
 interface SaleItem {
   id: string;
@@ -41,6 +40,7 @@ interface PieceItem {
 export const Sales: React.FC = () => {
   const { t } = useSettings();
   const { profile, role } = useAuth();
+  const isAdmin = role === 'administrateur';
   
   const [sales, setSales] = useState<SaleItem[]>([]);
   const [pieces, setPieces] = useState<PieceItem[]>([]);
