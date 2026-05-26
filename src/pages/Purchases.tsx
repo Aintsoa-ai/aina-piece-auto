@@ -287,7 +287,7 @@ export const Purchases: React.FC = () => {
       
       const currentTime = Date.now();
       
-      if (currentTime - lastKeyTime > 30) {
+      if (currentTime - lastKeyTime > 50) {
         barcodeBuffer = '';
       }
       
@@ -694,7 +694,7 @@ export const Purchases: React.FC = () => {
                   >
                     <option value="">-- Sélectionnez une pièce --</option>
                     {pieces
-                      .filter(p => `${p.reference} ${p.designation}`.toLowerCase().includes(pieceSearch.toLowerCase()))
+                      .filter(p => `${p.reference} ${p.designation} ${p.code_barre || ''}`.toLowerCase().includes(pieceSearch.toLowerCase()))
                       .map(p => (
                         <option key={p.id} value={p.id}>
                           {p.reference} — {p.designation}

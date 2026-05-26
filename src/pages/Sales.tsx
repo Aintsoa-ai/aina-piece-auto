@@ -343,8 +343,8 @@ export const Sales: React.FC = () => {
       
       const currentTime = Date.now();
       
-      // If time between keystrokes is more than 30ms, it's human typing (reset buffer)
-      if (currentTime - lastKeyTime > 30) {
+      // If time between keystrokes is more than 50ms, it's human typing (reset buffer)
+      if (currentTime - lastKeyTime > 50) {
         barcodeBuffer = '';
       }
       
@@ -378,7 +378,8 @@ export const Sales: React.FC = () => {
   const filteredPieces = pieces.filter(p => 
     p.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.marque.toLowerCase().includes(searchQuery.toLowerCase())
+    p.marque.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.code_barre && p.code_barre.includes(searchQuery))
   );
 
   // Triggered when "+ Nouvelle vente" is clicked
