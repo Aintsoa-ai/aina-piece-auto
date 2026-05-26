@@ -25,7 +25,7 @@ const AppContent: React.FC = () => {
     return (
       <div style={styles.loadingContainer}>
         <div style={styles.spinner}></div>
-        <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>Initialisation du Mini-ERP Aina...</p>
+        <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>Initialisation de AINA PIÈCE AUTO...</p>
       </div>
     );
   }
