@@ -201,7 +201,8 @@ export const Sales: React.FC = () => {
       const { data: bData } = await supabase.from('boutiques').select('*');
 
       // 5. Fetch clients (silencieux si la table n'existe pas encore)
-      const { data: clientsData } = await supabase.from('clients').select('id, nom').order('nom').catch(() => ({ data: [] }));
+      const { data: cData } = await supabase.from('clients').select('id, nom').order('nom');
+      const clientsData = cData || [];
 
       return { salesData, stockData, pfData, bData, clientsData };
     })();
