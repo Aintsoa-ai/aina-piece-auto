@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../context/AuthContext';
-import { Printer, AlertCircle, Plus, Search, CheckCircle2, X, ShoppingCart, User, ArrowRight, TrendingUp } from 'lucide-react';
+import { Printer, AlertCircle, Plus, Search, CheckCircle2, X, ShoppingCart, User, ArrowRight, TrendingUp, RotateCcw } from 'lucide-react';
 import { db } from '../services/db';
+import { v4 as uuidv4 } from 'uuid';
+import { showAlert, showConfirm } from '../utils/alerts';
 import { v4 as uuidv4 } from 'uuid';
 
 interface SaleItem {
@@ -580,6 +582,52 @@ export const Sales: React.FC = () => {
     setReceiptSale(sale);
   };
 
+  const handleRefund = async (sale: SaleItem) => {
+    if (!isAdmin) {
+      showAlert("Seul un administrateur peut annuler une vente.", "warning");
+      return;
+    }
+    const confirmed = await showConfirm(`Voulez-vous vraiment annuler cette vente de ${formatAr(sale.total)} ?\nLa transaction sera supprimée et les pièces seront remises en stock.`, true);
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      const realSaleId = sale.id.split('-detail-')[0];
+      
+      const { data: details } = await supabase.from('details_ventes').select('*').eq('vente_id', realSaleId);
+      
+      if (details) {
+        for (const detail of details) {
+          const { data: stockItems } = await supabase.from('stock').select('*').eq('piece_id', detail.piece_id).limit(1);
+          if (stockItems && stockItems.length > 0) {
+            const stockItem = stockItems[0];
+            const newQty = (stockItem.quantity_disponible || 0) + detail.quantite;
+            await supabase.from('stock').update({ quantity_disponible: newQty }).eq('id', stockItem.id);
+            
+            await supabase.from('mouvements_stock').insert({
+              stock_id: stockItem.id,
+              type: 'ENTREE',
+              quantite: detail.quantite,
+              utilisateur_id: profile?.id || null,
+              commentaire: `Retour client - Annulation vente ${realSaleId.substring(0,6)}`
+            });
+          }
+        }
+      }
+
+      const { error } = await supabase.from('ventes').delete().eq('id', realSaleId);
+      if (error) throw error;
+      
+      showAlert("Vente annulée et stock restauré avec succès !", "success");
+      fetchSalesAndStock();
+    } catch (err: any) {
+      console.error(err);
+      showAlert("Erreur lors de l'annulation : " + err.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   // Calculates global metrics
@@ -646,13 +694,24 @@ export const Sales: React.FC = () => {
                     <td style={s.tdTotal}>{formatAr(sale.total)}</td>
                     <td style={s.tdBenef}>{formatAr(sale.benefice)}</td>
                     <td style={s.tdAction}>
-                      <button 
-                        style={s.printBtn} 
-                        onClick={() => triggerPrintReceipt(sale)}
-                        title="Imprimer le ticket"
-                      >
-                        <Printer size={15} />
-                      </button>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {isAdmin && (
+                          <button 
+                            style={{ ...s.printBtn, color: '#ef4444' }} 
+                            onClick={() => handleRefund(sale)}
+                            title="Annuler et Rembourser"
+                          >
+                            <RotateCcw size={15} />
+                          </button>
+                        )}
+                        <button 
+                          style={s.printBtn} 
+                          onClick={() => triggerPrintReceipt(sale)}
+                          title="Imprimer le ticket"
+                        >
+                          <Printer size={15} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
