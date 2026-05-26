@@ -46,7 +46,7 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ### 7. Maintenance & Sécurité (Points de Sauvegarde)
 - **Sauvegarde Intelligente :** Création de "Points de Sauvegarde" de l'état complet de l'ERP.
-- **Alerte Email :** Envoi automatique (via API FormSubmit) avec un résumé et fichier crypté.
+- **Sauvegarde Cloud Native (Drive) :** Upload silencieux et sécurisé des fichiers de sauvegarde vers un Storage Bucket intégré à Supabase (1 Go d'espace, totalement automatisé pour remplacer l'ancienne méthode par email).
 - **Restauration :** Importation du fichier en cas de vol du matériel.
 - **Purge de base :** Fonction pour nettoyer l'historique d'une période sans altérer le stock.
 
@@ -68,8 +68,8 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ### 11. Fonctionnement Hors-Ligne (PWA & IndexedDB)
 - **Base de Données Locale :** Utilisation de `Dexie.js` pour créer une base de données IndexedDB stockant un cache du catalogue et le stock disponible (syncDown).
-- **Vente Sans Connexion :** En cas de coupure WiFi, le module de Caisse sauvegarde la vente localement de manière totalement transparente.
-- **Synchronisation Automatique :** Dès le retour de la connexion Internet, un écouteur déclenche automatiquement un `syncUp`, poussant la file d'attente des ventes directement sur Supabase, mettant ainsi à jour l'interface de l'Administrateur instantanément.
+- **Mode Hors-Ligne Total (Ventes, Achats, Dépenses) :** En cas de coupure WiFi, l'ERP sauvegarde l'intégralité des transactions métier dans des files d'attente locales.
+- **Synchronisation Automatique :** Dès le retour de la connexion Internet, un écouteur déclenche automatiquement un `syncUp`, poussant la file d'attente directement sur Supabase, mettant ainsi à jour l'interface de l'Administrateur instantanément.
 - **Statut en Temps Réel :** Le panneau d'administration affiche la pastille (Mode En Ligne / Hors-Ligne) avec le compte des ventes en attente.
 
 ## Compatibilité Matérielle
@@ -90,6 +90,6 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - **Identité Visuelle Adaptative :** Le menu latéral détecte automatiquement la boutique connectée, personnalisant le nom et l'icône, remplaçant l'affichage générique "OFFICIEL".
 
 ## Fonctionnalités Avancées (Mise à jour)
-- **Comparateur de Fournisseurs Intelligent :** Lors d'un réapprovisionnement, l'application analyse l'historique complet des achats et calcule le prix moyen ainsi que le dernier prix proposé par chaque fournisseur pour vous recommander le "MEILLEUR" prix automatiquement.
+- **Comparateur Intelligent & Historique d'Évolution :** Lors d'un réapprovisionnement, l'application analyse l'historique complet et calcule la tendance d'inflation (ex: +15% de hausse du prix d'achat) pour vous recommander le "MEILLEUR" prix.
 - **Douchette Code-barres (POS) :** Déploiement d'un écouteur global asynchrone permettant le scan matériel dans toutes les interfaces transactionnelles (Ventes, Achats). Le système est Plug-and-Play (clavier USB émulé).
-- **Gestion des Clients (Avoirs / Crédits) :** Un module complet dédié au suivi des factures impayées des Garages Partenaires. Vue centralisée des dettes et module d'encaissement de règlements partiels.
+- **Gestion des Clients (Avoirs / Crédits) :** Un module complet dédié au suivi des factures impayées des Garages Partenaires. Vue centralisée des dettes et module d'encaissement de règlements partiels (compatibles hors-ligne).
