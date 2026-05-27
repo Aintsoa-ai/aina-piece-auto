@@ -394,14 +394,13 @@ export const Sales: React.FC = () => {
                setErrorMsg(null);
                setSuccessMsg(null);
                setIsModalOpen(true);
-               // On utilise l'ancienne valeur du cart (qui peut être vide) pour éviter d'écraser s'il y a une micro-latence
-               setCart(prev => {
-                 if (piece.quantity_disponible <= 0) {
-                   setErrorMsg("Cette pièce est en rupture de stock.");
-                   return prev;
-                 }
-                 return [{ piece, quantity: 1 }];
-               });
+               // On vérifie le stock avant
+               if (piece.quantity_disponible <= 0) {
+                 setErrorMsg("Cette pièce est en rupture de stock.");
+                 setIsModalOpen(true); // Ouvre la modale pour afficher l'erreur
+               } else {
+                 setCart([{ piece, quantity: 1 }]);
+               }
              } else {
                // Déjà ouverte, on ajoute simplement au panier
                handleAddToCart(piece);
