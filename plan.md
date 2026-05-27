@@ -74,3 +74,11 @@
 - [x] Ajouter l'option GLOBAL pour créer des pièces partout à la fois.
 - [x] Mettre en place un vrai calcul d'encaissement (Espèces vs Total = Reste à rendre).
 - [ ] Formation de l'équipe client sur la fluidité des encaissements rapides.
+
+
+### Nouvelles Ã©tapes ajoutÃ©es le 27/05/2026
+- [x] Corriger le blocage du scanner (Intrus du focus).
+- [x] Mettre en place la limitation des heures de travail.
+- [x] DÃ©ployer l'Ã©cran de verrouillage avec dÃ©rogation admin.
+- [x] CrÃ©er l'avertisseur "Fermeture dans 15 min".
+

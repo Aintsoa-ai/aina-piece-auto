@@ -113,3 +113,11 @@ Pour toute mise à jour de la base de données (ajout d'une colonne, création d
 
 ---
 *Ce guide a été généré par l'IA experte afin d'assurer la pérennité du système Aina Pièce Auto. L'architecture est solide, prête à supporter l'expansion du réseau de boutiques du client.*
+
+
+### 7.4. Gestion des Horaires et Sécurité
+L'Administrateur a accès au panneau **Paramètres** pour définir les **Horaires d'Ouverture et Fermeture**.
+- En dehors de ces heures, les boutiques (vendeurs) sont **bloquées** par un écran de verrouillage.
+- 15 minutes avant l'heure fatidique, une **alerte animée** apparaît sur leurs écrans.
+- Si besoin, l'Administrateur peut activer **"L'Interrupteur d'Urgence"** pour donner un accès exceptionnel (heures supplémentaires, inventaires).
+

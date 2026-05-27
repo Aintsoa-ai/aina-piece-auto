@@ -57,3 +57,9 @@ Ce fichier rassemble toutes les idÃ©es d'amÃ©lioration et d'Ã©volution pour le f
 ### Idées suite aux correctifs d'encaissement (27/05/2026 13:02)
 - Ajouter plus tard un support pour le paiement Mobile Money (Mvola, Orange Money) directement dans la fenêtre d'encaissement, avec un champ "Numéro de transaction" au lieu de "Reste à rendre".
 - Créer un résumé visuel de fin de journée de l'espèce exacte qui devrait se trouver dans le tiroir caisse, basé sur les montants encaissés.
+
+
+### IdÃ©es suite au verrouillage horaire (27/05/2026)
+- Permettre Ã  l'administrateur de dÃ©finir des horaires diffÃ©rents par jour de la semaine (ex: Samedi 08:00 - 12:00).
+- Ajouter un message personnalisÃ© sur l'Ã©cran de verrouillage que l'admin peut modifier (ex: "Fermeture pour inventaire annuel").
+

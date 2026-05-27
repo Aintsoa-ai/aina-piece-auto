@@ -273,3 +273,13 @@ Historique et suivi des audits de sÃ©curitÃ©, de performance et de stabilitÃ© de
 - **Action 1 (Ventes) :** Il n'est plus nécessaire de cliquer sur "Nouvelle Vente". Scanner directement un article sur la page Ventes ouvre automatiquement la fenêtre et l'ajoute au panier.
 - **Action 2 (Achats) :** Même comportement, un scan sur la page Achats ouvre directement la fenêtre d'approvisionnement avec l'article sélectionné.
 - **Action 3 (Catalogue de Pièces) :** Si on scanne un code-barres inconnu dans l'inventaire, le système comprend que c'est une nouvelle pièce et ouvre automatiquement le formulaire "Nouvelle pièce" avec le code-barres pré-rempli.
+
+
+## Audit #10 - SÃ©curitÃ© et Heures d'Ouverture (27/05/2026 14:00)
+**Statut : ValidÃ© ğŸŸ¢**
+- **Action 1 (Scanner) :** Identification de l'"intrus" (les restrictions de focus) qui bloquait parfois le scan si l'utilisateur cliquait mal. RemplacÃ© par un algorithme 100% basÃ© sur le temps (500ms).
+- **Action 2 (Horaires) :** Stockage des horaires dans `app_settings` (`page_permissions`) pour propager Ã  toutes les boutiques sans modifier le schÃ©ma SQL de Supabase.
+- **Action 3 (Verrouillage) :** ImplÃ©mentation d'un Ã©cran de blocage interdisant l'accÃ¨s aux vendeurs en dehors des horaires.
+- **Action 4 (UX) :** CrÃ©ation d'une animation (toast) de 15 minutes avant la fermeture pour un meilleur confort d'utilisation.
+- **Impact :** Parfaitement fonctionnel sur Desktop et Mobile, l'overlay couvre l'ensemble de l'Ã©cran avec un design premium.
+

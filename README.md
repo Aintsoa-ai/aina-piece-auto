@@ -108,3 +108,11 @@ L'ERP devient 100% centr� sur la vitesse :
 - Prenez la douchette � n'importe quel moment sur les pages (Ventes, Achats, Catalogue) et scannez.
 - Le syst�me devine votre intention et ouvre la bonne fen�tre automatiquement ! 
 - Gain de temps massif : plus besoin de toucher la souris pour d�marrer une op�ration.
+
+
+### Mises à jour de Sécurité et Horaires (27/05/2026)
+- **Scanner sans contrainte :** Suppression totale des vérifications de focus sur les barres de recherche. Le scanner utilise la vélocité (500ms) pour distinguer la douchette d'un humain, rendant le scan-to-open infaillible.
+- **Horaires de Boutique :** Configuration de l'ouverture et fermeture via le panneau Administrateur. 
+- **Verrouillage Automatique :** Écran rouge empêchant toute action des employés en dehors des heures définies, avec bouton de dérogation d'urgence pour l'administrateur.
+- **Alerte de Fermeture :** Affichage d'une fenêtre d'alerte animée 15 minutes avant la fermeture pour préparer la clôture de caisse.
+
