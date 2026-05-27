@@ -1026,39 +1026,61 @@ export const Sales: React.FC = () => {
               <button style={s.modalCloseBtn} onClick={() => setIsCheckoutModalOpen(false)}><X size={18} /></button>
             </div>
             <div style={s.modalBody}>
-              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Total à payer</div>
-                <div style={{ fontSize: '32px', fontWeight: '800', color: '#22c55e' }}>
-                  {formatAr(cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0))}
-                </div>
-              </div>
-              {!isCredit && (
-                <div style={s.inputContainer}>
-                  <label style={s.inputLabel}>Montant reçu du client (Espèce)</label>
-                  <input
-                    type="number"
-                    style={{ ...s.searchFieldInput, fontSize: '20px', fontWeight: 'bold', textAlign: 'center', padding: '14px' }}
-                    value={especeRecue}
-                    onChange={(e) => setEspeceRecue(e.target.value)}
-                    placeholder="Saisir la somme donnée..."
-                    autoFocus
-                  />
-                </div>
-              )}
-              {!isCredit && especeRecue && Number(especeRecue) >= cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0) ? (
-                <div style={{ textAlign: 'center', marginTop: '10px', padding: '10px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', fontWeight: 'bold' }}>Reste à rendre</div>
-                  <div style={{ fontSize: '24px', fontWeight: '800', color: '#3b82f6' }}>
-                    {formatAr(Number(especeRecue) - cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0))}
-                  </div>
-                </div>
-              ) : null}
+              {(() => {
+                const cartTotal = cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0);
+                const isValidAmount = isCredit || (especeRecue && Number(especeRecue) >= cartTotal);
+                
+                return (
+                  <>
+                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Total à payer</div>
+                      <div style={{ fontSize: '32px', fontWeight: '800', color: '#22c55e' }}>
+                        {formatAr(cartTotal)}
+                      </div>
+                    </div>
+                    {!isCredit && (
+                      <div style={s.inputContainer}>
+                        <label style={s.inputLabel}>Montant reçu du client (Espèce)</label>
+                        <input
+                          type="text"
+                          style={{ ...s.searchFieldInput, fontSize: '24px', fontWeight: 'bold', textAlign: 'center', padding: '16px', letterSpacing: '1px', color: '#ffffff', backgroundColor: '#0d1117' }}
+                          value={especeRecue ? new Intl.NumberFormat('fr-FR').format(Number(especeRecue)) : ''}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, '');
+                            setEspeceRecue(val);
+                          }}
+                          placeholder="Ex: 30 000"
+                          autoFocus
+                        />
+                      </div>
+                    )}
+                    {!isCredit && especeRecue && Number(especeRecue) >= cartTotal ? (
+                      <div style={{ textAlign: 'center', marginTop: '15px', padding: '15px', backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '8px' }}>
+                        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', fontWeight: 'bold' }}>Reste à rendre</div>
+                        <div style={{ fontSize: '28px', fontWeight: '800', color: '#3b82f6' }}>
+                          {formatAr(Number(especeRecue) - cartTotal)}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                );
+              })()}
             </div>
             <div style={s.modalFooter}>
               <button style={s.btnAnnuler} onClick={() => setIsCheckoutModalOpen(false)}>Annuler</button>
-              <button style={{ ...s.btnValider, opacity: isSubmitting ? 0.5 : 1 }} onClick={handleConfirmVente} disabled={isSubmitting}>
-                {isSubmitting ? "Validation..." : "Confirmer la vente"}
-              </button>
+              {(() => {
+                const cartTotal = cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0);
+                const isAmountValid = isCredit || (especeRecue && Number(especeRecue) >= cartTotal);
+                return (
+                  <button 
+                    style={{ ...s.btnValider, opacity: (isSubmitting || !isAmountValid) ? 0.5 : 1 }} 
+                    onClick={handleConfirmVente} 
+                    disabled={isSubmitting || !isAmountValid}
+                  >
+                    {isSubmitting ? "Validation..." : "Confirmer la vente"}
+                  </button>
+                );
+              })()}
             </div>
           </div>
         </div>
