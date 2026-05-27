@@ -51,8 +51,8 @@ interface SettingsContextType {
   activeBoutiqueId: string;
   setActiveBoutiqueId: (id: string) => void;
   isOffline: boolean;
-  pagePermissions: Record<string, boolean>;
-  setPagePermissions: (perms: Record<string, boolean>) => void;
+  pagePermissions: Record<string, any>;
+  setPagePermissions: (perms: Record<string, any>) => void;
   shopHours: ShopHours;
   setShopHours: (hours: ShopHours) => void;
   t: (key: keyof typeof translations['fr']) => string;
@@ -89,7 +89,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   // Page access permissions for employees (admin only controls these)
-  const [pagePermissions, setPagePermissionsState] = useState<Record<string, boolean>>(() => {
+  const [pagePermissions, setPagePermissionsState] = useState<Record<string, any>>(() => {
     try {
       const saved = localStorage.getItem('aina_erp_page_perms');
       if (saved) {
@@ -98,7 +98,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return { ...DEFAULT_PERMISSIONS, ...parsed };
       }
     } catch { /* ignore */ }
-    return DEFAULT_PERMISSIONS as Record<string, boolean>;
+    return DEFAULT_PERMISSIONS as Record<string, any>;
   });
 
   const [shopHours, setShopHoursState] = useState<ShopHours>(() => {
@@ -109,7 +109,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return DEFAULT_SHOP_HOURS;
   });
 
-  const setPagePermissions = async (perms: Record<string, boolean>) => {
+  const setPagePermissions = async (perms: Record<string, any>) => {
     const newPerms = { ...perms, _shopHours: shopHours };
     setPagePermissionsState(newPerms);
     localStorage.setItem('aina_erp_page_perms', JSON.stringify(newPerms));

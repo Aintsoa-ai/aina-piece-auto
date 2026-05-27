@@ -1732,7 +1732,7 @@ export const Settings: React.FC = () => {
 
               <div style={{ 
                 backgroundColor: shopHours.forceOpen ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.02)', 
-                border: \`1px solid \${shopHours.forceOpen ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.05)'}\`,
+                border: `1px solid ${shopHours.forceOpen ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.05)'}`,
                 padding: '16px', 
                 borderRadius: '8px',
                 display: 'flex',
