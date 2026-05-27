@@ -478,6 +478,9 @@ export const Sales: React.FC = () => {
         calculatedTotal += pVente * item.quantity;
     });
 
+    const especeNum = Number(especeRecue) || calculatedTotal;
+    const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
+
     const boutiqueIdToUse = profile?.boutique_id || selectedBoutique || null;
 
     try {
@@ -500,9 +503,6 @@ export const Sales: React.FC = () => {
         caissier_id: profile?.id || null,
         boutique_id: boutiqueIdToUse || null
       };
-
-      const especeNum = Number(especeRecue) || calculatedTotal;
-      const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
 
       if (clients.length > 0) {
         payloadVente.statut_paiement = isCredit ? 'CREDIT' : 'PAYE';
@@ -549,8 +549,6 @@ export const Sales: React.FC = () => {
       }
 
       // Build local item for immediate receipt
-      const especeNum = Number(especeRecue) || calculatedTotal;
-      const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
       const localSaleItems = cart.map((item, index) => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         return {
@@ -607,13 +605,10 @@ export const Sales: React.FC = () => {
       });
 
       // Mettre à jour visuellement le stock local dans l'état (simulation locale)
-      const especeNum = Number(especeRecue) || calculatedTotal;
-      const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
-
       const simulatedSales = cart.map((item, index) => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         return {
-          id: `${newVente?.id || offlineSaleId}-sim-${index}`,
+          id: `${offlineSaleId}-sim-${index}`,
           date: new Date().toLocaleString('fr-FR', {
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
