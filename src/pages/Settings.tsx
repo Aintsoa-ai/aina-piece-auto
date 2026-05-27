@@ -1909,7 +1909,8 @@ export const Settings: React.FC = () => {
             />
           </div>
         </div>
-        {/* Formulaire de création d'accès boutique */}
+      </div>
+      {/* Formulaire de création d'accès boutique */}
         <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
           <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', marginBottom: '12px', display: 'flex', alignItems: 'center' }}>
             <Users size={16} style={{ marginRight: '8px', color: 'var(--accent-purple)' }} />
@@ -2013,7 +2014,6 @@ export const Settings: React.FC = () => {
             </div>
           </form>
         </div>
-      </div>
       </div>
 
       {/* ── INTELLIGENCE HORS NORME : SÉCURITÉ & SAUVEGARDES ─────────────── */}
