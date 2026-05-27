@@ -294,7 +294,7 @@ export const Pieces: React.FC = () => {
       
       const currentTime = Date.now();
       
-      if (currentTime - lastKeyTime > 50) {
+      if (currentTime - lastKeyTime > 500) {
         barcodeBuffer = '';
       }
       

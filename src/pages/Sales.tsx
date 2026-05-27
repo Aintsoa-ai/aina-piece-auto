@@ -358,8 +358,8 @@ export const Sales: React.FC = () => {
       
       const currentTime = Date.now();
       
-      // If time between keystrokes is more than 50ms, it's human typing (reset buffer)
-      if (currentTime - lastKeyTime > 50) {
+      // If time between keystrokes is more than 500ms, it's human typing (reset buffer)
+      if (currentTime - lastKeyTime > 500) {
         barcodeBuffer = '';
       }
       
