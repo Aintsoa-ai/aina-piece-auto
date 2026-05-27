@@ -791,7 +791,6 @@ export const Sales: React.FC = () => {
                             }
                           }
                         }}
-                        autoFocus
                       />
                     </div>
                   </div>
