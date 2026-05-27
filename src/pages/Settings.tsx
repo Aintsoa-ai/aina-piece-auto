@@ -2308,6 +2308,8 @@ export const Settings: React.FC = () => {
         );
       })()}
 
+      </div> {/* Fermeture du wrapper systeme de la ligne 2020 */}
+
       {/* ── REPORT EXPORT MODAL ─────────────────────────── */}
       {reportModalOpen && (
         <div style={s.modalOverlay}>
@@ -2568,7 +2570,6 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 };
