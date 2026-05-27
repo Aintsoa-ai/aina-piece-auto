@@ -1837,7 +1837,6 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
-      </div>
 
       {/* ── PERSONNALISATION DE L'APPLICATION ────────────────────────── */}
       <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
@@ -1910,6 +1909,7 @@ export const Settings: React.FC = () => {
             />
           </div>
         </div>
+      </div>
       </div>
 
       {/* ── INTELLIGENCE HORS NORME : SÉCURITÉ & SAUVEGARDES ─────────────── */}
@@ -2612,8 +2612,8 @@ const s: Record<string, React.CSSProperties> = {
   },
   settingsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '16px'
+    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+    gap: '20px'
   },
   card: {
     backgroundColor: '#161b22',
