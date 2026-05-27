@@ -18,6 +18,7 @@ import { decodeAzertyBarcode } from '../utils/barcode';
 interface StockRow {
   id: string;
   reference: string;
+  code_barre?: string;
   designation: string;
   boutique: string;
   emplacement: string;
@@ -224,6 +225,7 @@ export const Stock: React.FC = () => {
           return {
             id: item.id,
             reference: refStr,
+            code_barre: piece?.code_barre || '',
             designation: nameStr,
             boutique: item.boutiques?.name || 'Inconnu',
             emplacement: item.emplacement || '—',
@@ -310,6 +312,7 @@ export const Stock: React.FC = () => {
     // 1. Search Query
     const matchesSearch = searchQuery.trim() === '' || 
       row.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (row.code_barre && row.code_barre.toLowerCase().includes(searchQuery.toLowerCase())) ||
       row.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
       row.emplacement.toLowerCase().includes(searchQuery.toLowerCase());
 
