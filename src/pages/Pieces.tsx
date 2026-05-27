@@ -378,7 +378,9 @@ export const Pieces: React.FC = () => {
       categorie: categorie.trim() || null,
       compatibilite: compatibilite.trim() || null,
       oem_number: oemNumber.trim() || null,
-      description: description.trim() || null
+      description: description.trim() || null,
+      prix_achat: parseNum(prixAchat),
+      prix_vente: parseNum(prixVente)
     };
 
     try {
@@ -425,6 +427,33 @@ export const Pieces: React.FC = () => {
           .update(payloadPiece)
           .eq('id', editId);
         if (error) throw error;
+
+        // Update stock
+        if (selectedBoutique) {
+          const { data: existStock } = await supabase
+            .from('stock')
+            .select('id')
+            .eq('piece_id', editId)
+            .eq('boutique_id', selectedBoutique)
+            .maybeSingle();
+
+          if (existStock) {
+            await supabase.from('stock').update({
+              quantity_disponible: parseNum(quantite),
+              stock_minimum: parseNum(stockMinimum) || 5,
+              emplacement: emplacement.trim() || null
+            }).eq('id', existStock.id);
+          } else {
+            await supabase.from('stock').insert({
+              piece_id: editId,
+              boutique_id: selectedBoutique,
+              quantity_disponible: parseNum(quantite),
+              quantity_achetee: parseNum(quantite),
+              stock_minimum: parseNum(stockMinimum) || 5,
+              emplacement: emplacement.trim() || null
+            });
+          }
+        }
       } else {
         // Insert new piece
         const { data: newPiece, error: pieceErr } = await supabase
