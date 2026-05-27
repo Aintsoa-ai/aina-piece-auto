@@ -559,7 +559,7 @@ export const Stock: React.FC = () => {
       {/* HEADER SECTION exactly matching reference screenshot */}
       <div style={s.headerRow}>
         <div>
-          <h1 style={s.pageTitle}>Gestion du stock</h1>
+          <h1 style={s.pageTitle}>Gestion du stock (v2)</h1>
           <p style={s.pageSubtitle}>
             Vue d'ensemble, ajustements, transferts et historique des mouvements
           </p>
