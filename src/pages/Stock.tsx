@@ -262,6 +262,52 @@ export const Stock: React.FC = () => {
     fetchData();
   }, []);
 
+  // ==========================================
+  // SCANNER DE CODE-BARRES GLOBAL (Stock)
+  // ==========================================
+  useEffect(() => {
+    let barcode = '';
+    let lastKeyTime = 0;
+
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Ignorer si l'utilisateur est dans une modale
+      if (isAdjustModalOpen || isTransferModalOpen) return;
+
+      const currentTime = new Date().getTime();
+      
+      // Tolérance de 500ms entre les touches pour la douchette
+      if (currentTime - lastKeyTime > 500) {
+        barcode = '';
+      }
+      lastKeyTime = currentTime;
+
+      if (e.key === 'Enter') {
+        if (barcode.length > 2) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Conversion de certaines douchettes mal paramétrées (AZERTY)
+          const azertyToQwerty: Record<string, string> = {
+            '&': '1', 'é': '2', '"': '3', "'": '4', '(': '5',
+            '-': '6', 'è': '7', '_': '8', 'ç': '9', 'à': '0',
+            'a': 'q', 'q': 'a', 'z': 'w', 'w': 'z', 'm': ',', ',': 'm'
+          };
+          const translatedBarcode = barcode.split('').map(char => azertyToQwerty[char] || char).join('');
+          
+          setSearchQuery(translatedBarcode.toUpperCase());
+          barcode = '';
+        }
+      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        barcode += e.key;
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
+    };
+  }, [isAdjustModalOpen, isTransferModalOpen]);
+
   // Filter stocks dynamically
   const filteredStocks = stockRows.filter(row => {
     // 1. Search Query
