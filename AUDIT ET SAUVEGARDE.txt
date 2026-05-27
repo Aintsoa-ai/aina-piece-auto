@@ -1,0 +1,8 @@
+dite moi ce qu'on avait fait en se referant à ça : regarde et constate et agis comme un inspecteur et expert en detection de faille 
+README.md : ce qu'on avait fait 
+nos_idees.md: mettre ici tous nos idées 
+auDit.md : ici on met les audits qu'on avait effectuer 
+plan.md : pour mettre notre plan 
+GUIDE.md : pour le guide de l'utilisateur la manipulation du projet 
+et reverifier README.md,nos_idees.md,auDit.md et plan.md si au cour de nos modification on a oubliez ou avaler des fonctionnalité sur telephone et ordinateur et n'oublie pas de toujours de reverifier le l'impacte des nouveau mise à jours sur la fonctionnalité de l'application en se referant au README.md,
+nos_idees.md,auDit.md ,d' enregistrer les fonctionnalité qui marche dans README.md  et nos idées dans nos_idees.md et auDit.md de creer une point de sauvegarde . 

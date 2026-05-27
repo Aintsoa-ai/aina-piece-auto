@@ -19,6 +19,8 @@ interface SaleItem {
   pu: number;
   total: number;
   benefice: number;
+  espece?: number;
+  reste?: number;
 }
 
 interface CartItem {
@@ -57,6 +59,8 @@ export const Sales: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [especeRecue, setEspeceRecue] = useState<string>('');
 
   // Print Receipt Modal
   const [receiptSale, setReceiptSale] = useState<SaleItem | null>(null);
@@ -450,7 +454,7 @@ export const Sales: React.FC = () => {
   };
 
   // Perform Sale registration
-  const handleValiderVente = async () => {
+  const handleOpenCheckout = () => {
     if (cart.length === 0) {
       setErrorMsg("Le panier est vide.");
       return;
@@ -459,7 +463,11 @@ export const Sales: React.FC = () => {
       setErrorMsg("Veuillez sélectionner un client pour une vente à crédit.");
       return;
     }
+    setEspeceRecue('');
+    setIsCheckoutModalOpen(true);
+  };
 
+  const handleConfirmVente = async () => {
     setIsSubmitting(true);
     setErrorMsg(null);
 
@@ -493,10 +501,13 @@ export const Sales: React.FC = () => {
         boutique_id: boutiqueIdToUse || null
       };
 
+      const especeNum = Number(especeRecue) || calculatedTotal;
+      const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
+
       if (clients.length > 0) {
         payloadVente.statut_paiement = isCredit ? 'CREDIT' : 'PAYE';
         payloadVente.client_id = isCredit ? selectedClient : null;
-        payloadVente.montant_paye = isCredit ? 0 : calculatedTotal;
+        payloadVente.montant_paye = isCredit ? 0 : Math.max(calculatedTotal, especeNum);
       }
 
       const { data: newVente, error: venteErr } = await supabase
@@ -537,9 +548,38 @@ export const Sales: React.FC = () => {
           });
       }
 
+      // Build local item for immediate receipt
+      const especeNum = Number(especeRecue) || calculatedTotal;
+      const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
+      const localSaleItems = cart.map((item, index) => {
+        const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
+        return {
+          id: `${newVente.id}-sim-${index}`,
+          date: new Date().toLocaleString('fr-FR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+          }),
+          piece_name: item.piece.designation,
+          piece_ref: item.piece.reference,
+          vendeur: vendeurName,
+          boutique_name: 'Boutique',
+          quantity: item.quantity,
+          pu: pVente,
+          total: pVente * item.quantity,
+          benefice: (pVente * item.quantity) - ((item.piece.prix_achat || 0) * item.quantity),
+          espece: isCredit ? 0 : especeNum,
+          reste: isCredit ? 0 : resteARendre
+        } as SaleItem;
+      });
+
       setSuccessMsg("Vente enregistrée avec succès !");
       fetchSalesAndStock();
+      setIsCheckoutModalOpen(false);
       setIsModalOpen(false);
+      
+      if (localSaleItems.length > 0) {
+        setReceiptSale(localSaleItems[0]);
+      }
 
     } catch (err: any) {
       console.warn("Réseau indisponible, enregistrement local (IndexedDB) pour la PWA :", err);
@@ -567,10 +607,13 @@ export const Sales: React.FC = () => {
       });
 
       // Mettre à jour visuellement le stock local dans l'état (simulation locale)
+      const especeNum = Number(especeRecue) || calculatedTotal;
+      const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
+
       const simulatedSales = cart.map((item, index) => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         return {
-          id: `${offlineSaleId}-sim-${index}`,
+          id: `${newVente?.id || offlineSaleId}-sim-${index}`,
           date: new Date().toLocaleString('fr-FR', {
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
@@ -578,11 +621,13 @@ export const Sales: React.FC = () => {
           piece_name: item.piece.designation,
           piece_ref: item.piece.reference,
           vendeur: vendeurName,
-          boutique_name: 'Boutique (Hors-Ligne)',
+          boutique_name: 'Boutique',
           quantity: item.quantity,
           pu: pVente,
           total: pVente * item.quantity,
-          benefice: (pVente * item.quantity) - ((item.piece.prix_achat || 0) * item.quantity)
+          benefice: (pVente * item.quantity) - ((item.piece.prix_achat || 0) * item.quantity),
+          espece: isCredit ? 0 : especeNum,
+          reste: isCredit ? 0 : resteARendre
         } as SaleItem;
       });
 
@@ -597,8 +642,13 @@ export const Sales: React.FC = () => {
         return p;
       }));
 
-      setSuccessMsg("Mode Hors-Ligne: Vente sécurisée localement. Synchronisation prévue au retour réseau.");
-      setTimeout(() => setIsModalOpen(false), 2000);
+      setSuccessMsg("Vente enregistrée avec succès !");
+      setIsCheckoutModalOpen(false);
+      setIsModalOpen(false);
+
+      if (simulatedSales.length > 0) {
+        setReceiptSale(simulatedSales[0]);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -960,13 +1010,60 @@ export const Sales: React.FC = () => {
                   ...s.btnValider,
                   opacity: (cart.length === 0 || isSubmitting) ? 0.5 : 1
                 }} 
-                onClick={handleValiderVente}
+                onClick={handleOpenCheckout}
                 disabled={cart.length === 0 || isSubmitting}
               >
                 {isSubmitting ? "Enregistrement..." : "Valider l'encaissement"}
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Modal */}
+      {isCheckoutModalOpen && (
+        <div style={{ ...s.modalOverlay, zIndex: 1100 }}>
+          <div style={{ ...s.modalCard, maxWidth: '400px' }}>
+            <div style={s.modalHeader}>
+              <h3 style={s.modalTitle}>Encaissement</h3>
+              <button style={s.modalCloseBtn} onClick={() => setIsCheckoutModalOpen(false)}><X size={18} /></button>
+            </div>
+            <div style={s.modalBody}>
+              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Total à payer</div>
+                <div style={{ fontSize: '32px', fontWeight: '800', color: '#22c55e' }}>
+                  {formatAr(cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0))}
+                </div>
+              </div>
+              {!isCredit && (
+                <div style={s.inputContainer}>
+                  <label style={s.inputLabel}>Montant reçu du client (Espèce)</label>
+                  <input
+                    type="number"
+                    style={{ ...s.searchFieldInput, fontSize: '20px', fontWeight: 'bold', textAlign: 'center', padding: '14px' }}
+                    value={especeRecue}
+                    onChange={(e) => setEspeceRecue(e.target.value)}
+                    placeholder="Saisir la somme donnée..."
+                    autoFocus
+                  />
+                </div>
+              )}
+              {!isCredit && especeRecue && Number(especeRecue) >= cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0) ? (
+                <div style={{ textAlign: 'center', marginTop: '10px', padding: '10px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', fontWeight: 'bold' }}>Reste à rendre</div>
+                  <div style={{ fontSize: '24px', fontWeight: '800', color: '#3b82f6' }}>
+                    {formatAr(Number(especeRecue) - cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <div style={s.modalFooter}>
+              <button style={s.btnAnnuler} onClick={() => setIsCheckoutModalOpen(false)}>Annuler</button>
+              <button style={{ ...s.btnValider, opacity: isSubmitting ? 0.5 : 1 }} onClick={handleConfirmVente} disabled={isSubmitting}>
+                {isSubmitting ? "Validation..." : "Confirmer la vente"}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1042,11 +1139,11 @@ export const Sales: React.FC = () => {
                   
                   <div style={s.ticketPaymentRow}>
                     <div>Espèces</div>
-                    <div>{formatAr(totalAmount)}</div>
+                    <div>{formatAr(receiptSale.espece ?? totalAmount)}</div>
                   </div>
                   <div style={s.ticketPaymentRow}>
                     <div>À rendre</div>
-                    <div>0 Ar</div>
+                    <div>{formatAr(receiptSale.reste ?? 0)}</div>
                   </div>
                   
                   <div style={{ ...s.ticketTotalRow, marginTop: '10px' }}>

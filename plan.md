@@ -68,3 +68,9 @@
 - [x] ImplÃ©mentation du remboursement client et restauration de stock dans l'historique des ventes.
 - [x] CrÃ©ation d'un module "Clients & CrÃ©dits" pour le suivi des factures impayÃ©es des garages partenaires.
 - [x] CompatibilitÃ© Hors-Ligne des Ventes Ã  CrÃ©dit (Synchronisation des statuts de paiement avec IndexedDB).
+### Nouvelles étapes ajoutées le 27/05/2026 13:02
+- [x] Implémenter le traducteur AZERTY pour les codes-barres en Caisse et Catalogue.
+- [x] Assurer que les clics dans le vide ne sont plus obligatoires (tolérance 500ms).
+- [x] Ajouter l'option GLOBAL pour créer des pièces partout à la fois.
+- [x] Mettre en place un vrai calcul d'encaissement (Espèces vs Total = Reste à rendre).
+- [ ] Formation de l'équipe client sur la fluidité des encaissements rapides.

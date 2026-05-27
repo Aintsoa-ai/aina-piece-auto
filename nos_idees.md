@@ -54,3 +54,6 @@ Ce fichier rassemble toutes les idÃ©es d'amÃ©lioration et d'Ã©volution pour le f
 ## 10. Tests et Validation MatÃ©rielle (Nouveau)
 - **Outil de Diagnostic Scanner :** CrÃ©er une petite interface cachÃ©e dans les paramÃ¨tres ou une page secrÃ¨te pour tester la vitesse de frappe et le suffixe (Enter) du lecteur de codes-barres matÃ©riel rÃ©cemment reÃ§u.
 - **Responsive Hybride pour Calendriers :** Si le nouveau `react-datepicker` s'avÃ¨re peu pratique sur petit Ã©cran tactile, implÃ©menter une bascule automatique : utiliser `react-datepicker` sur Ordinateur et `<input type="date">` natif sur TÃ©lÃ©phone pour rÃ©cupÃ©rer les "roulettes" de sÃ©lection rapide iOS/Android.
+### Idées suite aux correctifs d'encaissement (27/05/2026 13:02)
+- Ajouter plus tard un support pour le paiement Mobile Money (Mvola, Orange Money) directement dans la fenêtre d'encaissement, avec un champ "Numéro de transaction" au lieu de "Reste à rendre".
+- Créer un résumé visuel de fin de journée de l'espèce exacte qui devrait se trouver dans le tiroir caisse, basé sur les montants encaissés.
