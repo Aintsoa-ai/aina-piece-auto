@@ -294,7 +294,7 @@ export const Stock: React.FC = () => {
           setSearchQuery(scannedCode.toUpperCase());
           barcodeBuffer = '';
         }
-      } else if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt') {
+      } else if (e.key.length === 1) {
         barcodeBuffer += e.key;
       }
       
@@ -310,11 +310,12 @@ export const Stock: React.FC = () => {
   // Filter stocks dynamically
   const filteredStocks = stockRows.filter(row => {
     // 1. Search Query
-    const matchesSearch = searchQuery.trim() === '' || 
-      row.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (row.code_barre && row.code_barre.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      row.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.emplacement.toLowerCase().includes(searchQuery.toLowerCase());
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+    const matchesSearch = normalizedSearch === '' || 
+      row.reference.toLowerCase().includes(normalizedSearch) ||
+      (row.code_barre && row.code_barre.toLowerCase().includes(normalizedSearch)) ||
+      row.designation.toLowerCase().includes(normalizedSearch) ||
+      row.emplacement.toLowerCase().includes(normalizedSearch);
 
     // 2. Boutique filter
     const matchesBoutique = selectedBoutique === 'all' || 
