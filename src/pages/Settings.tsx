@@ -1909,6 +1909,110 @@ export const Settings: React.FC = () => {
             />
           </div>
         </div>
+        {/* Formulaire de création d'accès boutique */}
+        <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', marginBottom: '12px', display: 'flex', alignItems: 'center' }}>
+            <Users size={16} style={{ marginRight: '8px', color: 'var(--accent-purple)' }} />
+            Créer un identifiant de connexion pour une boutique
+          </h4>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginBottom: '16px' }}>
+            Remplissez ce formulaire pour créer un accès "Caissier" qui sera directement restreint à une boutique précise, sans quitter cette page.
+          </p>
+          
+          {caissierMessage && (
+            <div style={{ 
+              padding: '10px 14px', 
+              borderRadius: '6px', 
+              marginBottom: '16px', 
+              fontSize: '13px',
+              backgroundColor: caissierMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+              color: caissierMessage.type === 'success' ? '#22c55e' : '#ef4444',
+              border: `1px solid ${caissierMessage.type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
+            }}>
+              {caissierMessage.text}
+            </div>
+          )}
+
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            const emailBackup = newCaissierEmail;
+            const pwdBackup = newCaissierPassword;
+            const boutiqueName = boutiques.find(b => b.id === newCaissierBoutique)?.name || 'Boutique';
+            
+            await handleCreateCaissier(e);
+            
+            const newAcc = { email: emailBackup, password: pwdBackup, boutique: boutiqueName, date: new Date().toLocaleDateString('fr-FR') };
+            const updated = [newAcc, ...createdAccounts];
+            setCreatedAccounts(updated);
+            localStorage.setItem('boutique_accounts', JSON.stringify(updated));
+          }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</label>
+              <input 
+                type="email" 
+                required
+                placeholder="boutique.nord@aina.com" 
+                style={s.inputField} 
+                value={newCaissierEmail}
+                onChange={(e) => setNewCaissierEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Mot de passe</label>
+              <input 
+                type="text" 
+                required
+                minLength={6}
+                placeholder="Minimum 6 caractères" 
+                style={s.inputField} 
+                value={newCaissierPassword}
+                onChange={(e) => setNewCaissierPassword(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assigner à la boutique</label>
+              <select 
+                required
+                style={s.inputField}
+                value={newCaissierBoutique}
+                onChange={(e) => setNewCaissierBoutique(e.target.value)}
+              >
+                <option value="">-- Choisir une boutique --</option>
+                {boutiques.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <button 
+                type="submit" 
+                disabled={caissierLoading}
+                style={{
+                  height: '42px',
+                  width: '100%',
+                  padding: '0 24px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  backgroundColor: caissierLoading ? 'rgba(255,255,255,0.1)' : '#FCD25B',
+                  color: caissierLoading ? '#ffffff' : '#0f172a',
+                  fontWeight: '800',
+                  fontSize: '13px',
+                  cursor: caissierLoading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: caissierLoading ? 'none' : '0 4px 15px rgba(252, 210, 91, 0.3)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {caissierLoading ? 'Création...' : (
+                  <><Plus size={16} /> Créer l'accès</>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
       </div>
 
@@ -2107,122 +2211,7 @@ export const Settings: React.FC = () => {
           </table>
         </div>
 
-        {/* Formulaire de création d'accès boutique */}
-        <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', marginBottom: '12px', display: 'flex', alignItems: 'center' }}>
-            <Users size={16} style={{ marginRight: '8px', color: 'var(--accent-purple)' }} />
-            Créer un identifiant de connexion pour une boutique
-          </h4>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginBottom: '16px' }}>
-            Remplissez ce formulaire pour créer un accès "Caissier" qui sera directement restreint à une boutique précise, sans quitter cette page.
-          </p>
-          
-          {caissierMessage && (
-            <div style={{ 
-              padding: '10px 14px', 
-              borderRadius: '6px', 
-              marginBottom: '16px', 
-              fontSize: '13px',
-              backgroundColor: caissierMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-              color: caissierMessage.type === 'success' ? '#22c55e' : '#ef4444',
-              border: `1px solid ${caissierMessage.type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
-            }}>
-              {caissierMessage.text}
-            </div>
-          )}
 
-          <form onSubmit={async (e) => {
-            e.preventDefault();
-            const emailBackup = newCaissierEmail;
-            const pwdBackup = newCaissierPassword;
-            const boutiqueName = boutiques.find(b => b.id === newCaissierBoutique)?.name || 'Boutique';
-            
-            await handleCreateCaissier(e);
-            
-            // Assume success if loading finished without error/throw, or if we want to force save it locally anyway
-            const newAcc = { email: emailBackup, password: pwdBackup, boutique: boutiqueName, date: new Date().toLocaleDateString('fr-FR') };
-            const updated = [newAcc, ...createdAccounts];
-            setCreatedAccounts(updated);
-            localStorage.setItem('boutique_accounts', JSON.stringify(updated));
-          }} style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            <div style={{ flex: '1', minWidth: '200px' }}>
-              <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</label>
-              <input 
-                type="email" 
-                required
-                placeholder="boutique.nord@aina.com" 
-                style={s.inputField} 
-                value={newCaissierEmail}
-                onChange={(e) => setNewCaissierEmail(e.target.value)}
-              />
-            </div>
-            <div style={{ flex: '1', minWidth: '150px' }}>
-              <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Mot de passe</label>
-              <input 
-                type="text" 
-                required
-                minLength={6}
-                placeholder="Minimum 6 caractères" 
-                style={s.inputField} 
-                value={newCaissierPassword}
-                onChange={(e) => setNewCaissierPassword(e.target.value)}
-              />
-            </div>
-            <div style={{ flex: '1', minWidth: '200px' }}>
-              <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assigner à la boutique</label>
-              <select 
-                required
-                style={s.inputField}
-                value={newCaissierBoutique}
-                onChange={(e) => setNewCaissierBoutique(e.target.value)}
-              >
-                <option value="">-- Choisir une boutique --</option>
-                {boutiques.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-            </div>
-            <div style={{ paddingBottom: '2px' }}>
-              <button 
-                type="submit" 
-                disabled={caissierLoading}
-                style={{
-                  height: '42px',
-                  padding: '0 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: caissierLoading ? 'rgba(255,255,255,0.1)' : '#FCD25B',
-                  color: caissierLoading ? '#ffffff' : '#0f172a',
-                  fontWeight: '800',
-                  fontSize: '13px',
-                  cursor: caissierLoading ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  boxShadow: caissierLoading ? 'none' : '0 4px 15px rgba(252, 210, 91, 0.3)',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap'
-                }}
-                onMouseEnter={(e) => {
-                  if(!caissierLoading) {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(252, 210, 91, 0.5)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if(!caissierLoading) {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(252, 210, 91, 0.3)';
-                  }
-                }}
-              >
-                {caissierLoading ? 'Création...' : (
-                  <><Plus size={16} /> Créer l'accès</>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
 
       {/* ── TABLEAU DES COMPTES CRÉÉS ─────────────────────────── */}
