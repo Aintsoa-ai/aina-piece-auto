@@ -690,7 +690,7 @@ export const Pieces: React.FC = () => {
                       type="text"
                       style={s.inputField}
                       value={codeBarre}
-                      onChange={(e) => setCodeBarre(e.target.value)}
+                      onChange={(e) => setCodeBarre(decodeAzertyBarcode(e.target.value))}
                       placeholder="Scannez ou tapez le code"
                     />
                   </div>

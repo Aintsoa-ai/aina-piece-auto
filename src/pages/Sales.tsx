@@ -376,6 +376,7 @@ export const Sales: React.FC = () => {
              setSearchQuery('');
            } else {
              setErrorMsg(`Code-barres introuvable : ${scannedCode}`);
+             setSearchQuery('');
            }
         }
       } else if (e.key.length === 1) {

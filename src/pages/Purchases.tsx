@@ -311,6 +311,7 @@ export const Purchases: React.FC = () => {
            } else {
              setErrorMsg(`Code-barres introuvable : ${scannedCode}`);
              setSuccessMsg(null);
+             setPieceSearch('');
            }
         }
       } else if (e.key.length === 1) {
