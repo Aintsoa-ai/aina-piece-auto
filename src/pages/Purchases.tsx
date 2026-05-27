@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../context/AuthContext';
+import { decodeAzertyBarcode } from '../utils/barcode';
 import { 
   Plus, 
   X, 
@@ -298,7 +299,7 @@ export const Purchases: React.FC = () => {
         if (barcodeBuffer.length >= 3) {
            e.preventDefault();
            e.stopPropagation();
-           const scannedCode = barcodeBuffer;
+           const scannedCode = decodeAzertyBarcode(barcodeBuffer);
            barcodeBuffer = '';
            
            const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
@@ -393,11 +394,12 @@ export const Purchases: React.FC = () => {
     setErrorMsg(null);
 
     const calculatedTotal = (price * qty) - rem;
+    let boutiqueId: string | undefined | null = null;
 
     try {
       // 1. Get first boutique
       const { data: boutique } = await supabase.from('boutiques').select('id').limit(1).single();
-      const boutiqueId = boutique?.id;
+      boutiqueId = boutique?.id;
 
       if (!boutiqueId) {
         throw new Error("Aucune boutique configurée pour recevoir le stock.");
@@ -719,7 +721,7 @@ export const Purchases: React.FC = () => {
                     <Search size={14} color="rgba(255,255,255,0.45)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
                     <input
                       type="text"
-                      placeholder="Rechercher une pièce..."
+                      placeholder="Scanner un code-barres, ou chercher..."
                       value={pieceSearch}
                       onChange={(e) => setPieceSearch(e.target.value)}
                       style={{ ...s.inputField, paddingLeft: '34px', backgroundColor: 'rgba(255,255,255,0.03)', height: '36px' }}

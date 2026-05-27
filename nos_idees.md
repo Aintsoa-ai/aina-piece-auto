@@ -50,3 +50,7 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 ### Améliorations Futures (Achats & IA)
 - **Graphique d'évolution des prix :** Afficher une petite courbe (sparkline) montrant l'inflation ou la baisse du prix d'une pièce chez un fournisseur sélectionné au fil des mois.
 - **Alerte de marge :** Bloquer ou alerter le vendeur si le prix de vente saisi est inférieur au prix d'achat moyen calculé dynamiquement.
+
+## 10. Tests et Validation Matérielle (Nouveau)
+- **Outil de Diagnostic Scanner :** Créer une petite interface cachée dans les paramètres ou une page secrète pour tester la vitesse de frappe et le suffixe (Enter) du lecteur de codes-barres matériel récemment reçu.
+- **Responsive Hybride pour Calendriers :** Si le nouveau `react-datepicker` s'avère peu pratique sur petit écran tactile, implémenter une bascule automatique : utiliser `react-datepicker` sur Ordinateur et `<input type="date">` natif sur Téléphone pour récupérer les "roulettes" de sélection rapide iOS/Android.

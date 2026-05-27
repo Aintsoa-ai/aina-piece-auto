@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { showConfirm, showAlert } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { decodeAzertyBarcode } from '../utils/barcode';
 import { 
   Plus, 
   X, 
@@ -301,7 +302,7 @@ export const Pieces: React.FC = () => {
         if (barcodeBuffer.length >= 3) {
            e.preventDefault();
            e.stopPropagation();
-           setSearchQuery(barcodeBuffer); // Remplit la barre de recherche avec le code scanné
+           setSearchQuery(decodeAzertyBarcode(barcodeBuffer)); // Remplit la barre de recherche avec le code scanné
            barcodeBuffer = '';
         }
       } else if (e.key.length === 1) {

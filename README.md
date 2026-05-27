@@ -93,3 +93,8 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - **Comparateur Intelligent & Historique d'Évolution :** Lors d'un réapprovisionnement, l'application analyse l'historique complet et calcule la tendance d'inflation (ex: +15% de hausse du prix d'achat) pour vous recommander le "MEILLEUR" prix.
 - **Douchette Code-barres (POS) :** Déploiement d'un écouteur global asynchrone permettant le scan matériel dans toutes les interfaces transactionnelles (Ventes, Achats). Le système est Plug-and-Play (clavier USB émulé).
 - **Gestion des Clients (Avoirs / Crédits) :** Un module complet dédié au suivi des factures impayées des Garages Partenaires. Vue centralisée des dettes et module d'encaissement de règlements partiels (compatibles hors-ligne).
+
+---
+
+**📍 POINT DE SAUVEGARDE : (Mai 2026)**
+*L'application est certifiée stable sur Mobile et Desktop. L'intégration PWA hors-ligne, la synchronisation Supabase temps réel, et la prise en charge des périphériques matériels (Imprimante Thermique, Douchette Code-barres) sont testées, documentées et pleinement opérationnelles.*

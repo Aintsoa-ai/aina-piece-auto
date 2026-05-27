@@ -6,6 +6,7 @@ import { Printer, AlertCircle, Plus, Search, CheckCircle2, X, ShoppingCart, User
 import { db } from '../services/db';
 import { v4 as uuidv4 } from 'uuid';
 import { showAlert, showConfirm } from '../utils/alerts';
+import { decodeAzertyBarcode } from '../utils/barcode';
 
 interface SaleItem {
   id: string;
@@ -366,7 +367,7 @@ export const Sales: React.FC = () => {
         if (barcodeBuffer.length >= 3) {
            e.preventDefault();
            e.stopPropagation();
-           const scannedCode = barcodeBuffer;
+           const scannedCode = decodeAzertyBarcode(barcodeBuffer);
            barcodeBuffer = '';
            
            const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
@@ -776,7 +777,7 @@ export const Sales: React.FC = () => {
                       <Search size={16} style={s.searchFieldIcon} />
                       <input 
                         type="text"
-                        placeholder="Référence, nom, marque..."
+                        placeholder="Scanner un code-barres, ou chercher (Nom, Réf)..."
                         style={s.searchFieldInput}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}

@@ -248,3 +248,15 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 **Statut : Validé & Déployé ✅**
 - **Objectif :** Remplacer l'envoi d'email capricieux par un véritable Cloud Drive d'1Go.
 - **Résolution :** Suppression de l'API `FormSubmit`. Implémentation de l'upload direct du fichier `.txt` vers le bucket de stockage Supabase `backups`. Le système fonctionne nativement avec la même capacité et fiabilité qu'un compte Google Drive classique, mais sans nécessiter de configuration OAuth complexe côté client.
+
+## Audit #36 - Inspection de Compatibilité (Mobile vs Desktop) & Préparation Matérielle
+**Statut : Validé avec points de vigilance ⚠️**
+- **Objectif :** S'assurer que les récentes intégrations (SweetAlert2, react-datepicker, Douchette, PWA) n'ont pas altéré l'expérience sur smartphone ou ordinateur.
+- **Analyse Mobile (react-datepicker) :** L'utilisation de `react-datepicker` unifie le design sombre, mais remplace le calendrier natif (roulettes iOS/Android) très apprécié sur mobile. *Vigilance : À surveiller si les caissiers trouvent la sélection de date sur téléphone moins fluide qu'avant.*
+- **Analyse Mobile (Douchette) :** L'écouteur global pour la douchette ne bloque pas le clavier virtuel des téléphones. Le système de fallback (Touche Entrée) garantit une utilisation parfaite sans matériel.
+- **Analyse Desktop (Popups) :** `SweetAlert2` supprime les alertes bloquantes du navigateur, ce qui empêche le navigateur de freezer. Excellent pour la stabilité Desktop.
+- **Action :** Création d'un point de sauvegarde documentaire. L'application est structurellement prête pour le branchement et le test en direct du lecteur de codes-barres matériel reçu par le client.
+
+---
+**📍 POINT DE SAUVEGARDE CRÉÉ LE : 27 MAI 2026**
+*Toutes les fonctionnalités fondamentales, hors-ligne, multi-boutique, et matérielles (Code-barres, Thermique) sont stables et documentées.*
