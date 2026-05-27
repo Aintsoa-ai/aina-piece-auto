@@ -19,6 +19,18 @@ export const ALL_PAGES = [
 
 export type PageId = typeof ALL_PAGES[number]['id'];
 
+export interface ShopHours {
+  open: string;
+  close: string;
+  forceOpen: boolean;
+}
+
+const DEFAULT_SHOP_HOURS: ShopHours = {
+  open: '08:00',
+  close: '17:30',
+  forceOpen: false
+};
+
 // Default: all pages enabled for employees
 const DEFAULT_PERMISSIONS: Record<PageId, boolean> = {
   sales: true,
@@ -41,6 +53,8 @@ interface SettingsContextType {
   isOffline: boolean;
   pagePermissions: Record<string, boolean>;
   setPagePermissions: (perms: Record<string, boolean>) => void;
+  shopHours: ShopHours;
+  setShopHours: (hours: ShopHours) => void;
   t: (key: keyof typeof translations['fr']) => string;
   appName: string;
   setAppName: (name: string) => void;
@@ -87,11 +101,34 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return DEFAULT_PERMISSIONS as Record<string, boolean>;
   });
 
-  const setPagePermissions = async (perms: Record<string, boolean>) => {
-    setPagePermissionsState(perms);
-    localStorage.setItem('aina_erp_page_perms', JSON.stringify(perms));
+  const [shopHours, setShopHoursState] = useState<ShopHours>(() => {
     try {
-      await supabase.from('app_settings').update({ page_permissions: perms, updated_at: new Date().toISOString() }).eq('id', 'global');
+      const saved = localStorage.getItem('aina_erp_shop_hours');
+      if (saved) return JSON.parse(saved);
+    } catch { /* ignore */ }
+    return DEFAULT_SHOP_HOURS;
+  });
+
+  const setPagePermissions = async (perms: Record<string, boolean>) => {
+    const newPerms = { ...perms, _shopHours: shopHours };
+    setPagePermissionsState(newPerms);
+    localStorage.setItem('aina_erp_page_perms', JSON.stringify(newPerms));
+    try {
+      await supabase.from('app_settings').update({ page_permissions: newPerms, updated_at: new Date().toISOString() }).eq('id', 'global');
+    } catch (err) {
+      console.error('Error saving global settings:', err);
+    }
+  };
+
+  const setShopHours = async (hours: ShopHours) => {
+    setShopHoursState(hours);
+    localStorage.setItem('aina_erp_shop_hours', JSON.stringify(hours));
+    
+    const newPerms = { ...pagePermissions, _shopHours: hours };
+    setPagePermissionsState(newPerms);
+    localStorage.setItem('aina_erp_page_perms', JSON.stringify(newPerms));
+    try {
+      await supabase.from('app_settings').update({ page_permissions: newPerms, updated_at: new Date().toISOString() }).eq('id', 'global');
     } catch (err) {
       console.error('Error saving global settings:', err);
     }
@@ -104,6 +141,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const { data, error } = await supabase.from('app_settings').select('page_permissions').eq('id', 'global').single();
         if (data && data.page_permissions) {
           const perms = typeof data.page_permissions === 'string' ? JSON.parse(data.page_permissions) : data.page_permissions;
+          if (perms._shopHours) {
+            setShopHoursState(perms._shopHours);
+            localStorage.setItem('aina_erp_shop_hours', JSON.stringify(perms._shopHours));
+          }
           const merged = { ...DEFAULT_PERMISSIONS, ...perms };
           setPagePermissionsState(merged);
           localStorage.setItem('aina_erp_page_perms', JSON.stringify(merged));
@@ -215,6 +256,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       isOffline,
       pagePermissions,
       setPagePermissions,
+      shopHours,
+      setShopHours,
       t,
       appName,
       setAppName,

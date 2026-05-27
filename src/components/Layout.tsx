@@ -25,7 +25,8 @@ import {
   ChevronRight,
   Cloud,
   CloudOff,
-  RefreshCw
+  RefreshCw,
+  Lock
 } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../services/db';
@@ -39,7 +40,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) => {
   const { profile, role, signOut } = useAuth();
-  const { theme, setTheme, pagePermissions, appName, appSubtitle, appLogoText, appLogoImage } = useSettings();
+  const { theme, setTheme, pagePermissions, appName, appSubtitle, appLogoText, appLogoImage, shopHours } = useSettings();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
     typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
@@ -141,6 +142,45 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
   const isAdmin = userRole === 'administrateur';
   const isBoutique = !isAdmin;
   const displaySubtitle = isBoutique ? (profile?.full_name?.replace(/AINA PIECE /i, '') || appSubtitle) : appSubtitle;
+
+  const [isStoreClosed, setIsStoreClosed] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin) {
+      setIsStoreClosed(false);
+      return;
+    }
+    if (shopHours?.forceOpen) {
+      setIsStoreClosed(false);
+      return;
+    }
+
+    const checkTime = () => {
+      const now = new Date();
+      const currentH = now.getHours();
+      const currentM = now.getMinutes();
+      const currentTotal = currentH * 60 + currentM;
+
+      const parseTime = (tStr: string) => {
+        if (!tStr) return 0;
+        const [h, m] = tStr.split(':').map(Number);
+        return h * 60 + (m || 0);
+      };
+
+      const openM = parseTime(shopHours?.open || '08:00');
+      const closeM = parseTime(shopHours?.close || '17:30');
+
+      if (currentTotal < openM || currentTotal >= closeM) {
+        setIsStoreClosed(true);
+      } else {
+        setIsStoreClosed(false);
+      }
+    };
+
+    checkTime();
+    const interval = setInterval(checkTime, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [isAdmin, shopHours]);
 
   // Normalise current tab name for header
   const currentName = (() => {
@@ -263,6 +303,33 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
 
   return (
     <div style={s.wrapper}>
+      {/* ── LOCKDOWN SCREEN ───────────────────── */}
+      {isStoreClosed && (
+        <div style={{
+          position: 'fixed', inset: 0, backgroundColor: '#0d1117', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', textAlign: 'center'
+        }}>
+          <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+            <Lock size={36} color="#ef4444" />
+          </div>
+          <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '-0.02em' }}>
+            Boutique Fermée
+          </h1>
+          <p style={{ fontSize: '14.5px', color: 'rgba(255,255,255,0.5)', maxWidth: '400px', lineHeight: '1.6', marginBottom: '40px' }}>
+            Les horaires d'ouverture sont de <strong style={{ color: '#fff' }}>{shopHours?.open || '08:00'}</strong> à <strong style={{ color: '#fff' }}>{shopHours?.close || '17:30'}</strong>.<br />
+            L'accès à l'application est actuellement verrouillé.
+          </p>
+          <button 
+            onClick={signOut}
+            style={{ padding: '12px 24px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+          >
+            <LogOut size={16} />
+            Se déconnecter
+          </button>
+        </div>
+      )}
+
       {/* ── SIDEBAR DESKTOP ───────────────────── */}
       {isDesktop && (
         <aside style={s.sidebar}>

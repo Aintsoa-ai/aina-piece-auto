@@ -19,7 +19,7 @@ interface Boutique {
 }
 
 export const Settings: React.FC = () => {
-  const { t, language, setLanguage, theme, setTheme, isOffline, pagePermissions, setPagePermissions, appName, setAppName, appSubtitle, setAppSubtitle, appLogoText, setAppLogoText, appLogoImage, setAppLogoImage } = useSettings();
+  const { t, language, setLanguage, theme, setTheme, isOffline, pagePermissions, setPagePermissions, appName, setAppName, appSubtitle, setAppSubtitle, appLogoText, setAppLogoText, appLogoImage, setAppLogoImage, shopHours, setShopHours } = useSettings();
   const { role } = useAuth();
 
   const [boutiques, setBoutiques] = useState<Boutique[]>([]);
@@ -1691,6 +1691,89 @@ export const Settings: React.FC = () => {
                     <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>{label}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── HORAIRES DE LA BOUTIQUE & VERROUILLAGE ─────────────── */}
+          {isAdmin && (
+            <div style={s.card}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px' }}>
+                <h3 style={{ ...s.cardTitle, borderBottom: 'none', paddingBottom: 0 }}>
+                  <Shield size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+                  Horaires d'Ouverture & Verrouillage
+                </h3>
+              </div>
+
+              <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', marginTop: '10px', marginBottom: '16px', lineHeight: 1.5 }}>
+                Définissez les heures d'ouverture. En dehors de ces heures, les employés seront automatiquement bloqués. Vous seul (Administrateur) aurez toujours accès.
+              </p>
+
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Heure d'ouverture</label>
+                  <input
+                    type="time"
+                    style={s.inputField}
+                    value={shopHours.open}
+                    onChange={(e) => setShopHours({ ...shopHours, open: e.target.value })}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Heure de fermeture</label>
+                  <input
+                    type="time"
+                    style={s.inputField}
+                    value={shopHours.close}
+                    onChange={(e) => setShopHours({ ...shopHours, close: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div style={{ 
+                backgroundColor: shopHours.forceOpen ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.02)', 
+                border: \`1px solid \${shopHours.forceOpen ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.05)'}\`,
+                padding: '16px', 
+                borderRadius: '8px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: shopHours.forceOpen ? '#10b981' : '#fff' }}>
+                    Interrupteur d'Urgence (Dérogation)
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>
+                    Si activé, les employés auront accès à l'ERP même en dehors des horaires.
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setShopHours({ ...shopHours, forceOpen: !shopHours.forceOpen })}
+                  style={{
+                    backgroundColor: shopHours.forceOpen ? '#10b981' : 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '20px',
+                    width: '44px',
+                    height: '24px',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    top: '2px',
+                    left: shopHours.forceOpen ? '22px' : '2px',
+                    width: '20px',
+                    height: '20px',
+                    backgroundColor: '#fff',
+                    borderRadius: '50%',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }} />
+                </button>
               </div>
             </div>
           )}
