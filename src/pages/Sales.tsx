@@ -7,6 +7,7 @@ import { db } from '../services/db';
 import { v4 as uuidv4 } from 'uuid';
 import { showAlert, showConfirm } from '../utils/alerts';
 import { decodeAzertyBarcode } from '../utils/barcode';
+import Barcode from 'react-barcode';
 
 interface SaleItem {
   id: string;
@@ -1147,21 +1148,17 @@ export const Sales: React.FC = () => {
                   
                   <div style={s.ticketAsterisks}>******************************</div>
                   
-                  {/* Simulate a Barcode Visually */}
                   <div style={s.barcodeContainer}>
-                    <div style={s.barcodeBars}>
-                      {Array.from({ length: 45 }).map((_, i) => (
-                        <div key={i} style={{ 
-                          width: `${Math.floor(Math.random() * 3) + 1}px`, 
-                          height: '40px', 
-                          backgroundColor: '#000',
-                          marginRight: `${Math.floor(Math.random() * 2)}px`
-                        }}></div>
-                      ))}
-                    </div>
-                    <div style={s.barcodeText}>
-                      REC-{receiptSale.id.substring(0,4).toUpperCase()}-{receiptSale.date.replace(/[^0-9]/g, '')}
-                    </div>
+                    <Barcode 
+                      value={`REC-${receiptSale.id.substring(0,8).toUpperCase()}`}
+                      width={1.5}
+                      height={40}
+                      fontSize={11}
+                      margin={0}
+                      displayValue={true}
+                      background="#ffffff"
+                      lineColor="#000000"
+                    />
                   </div>
 
                   <div style={s.ticketFooter}>
