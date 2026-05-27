@@ -378,9 +378,7 @@ export const Pieces: React.FC = () => {
       categorie: categorie.trim() || null,
       compatibilite: compatibilite.trim() || null,
       oem_number: oemNumber.trim() || null,
-      description: description.trim() || null,
-      prix_achat: parseNum(prixAchat),
-      prix_vente: parseNum(prixVente)
+      description: description.trim() || null
     };
 
     try {
@@ -453,6 +451,15 @@ export const Pieces: React.FC = () => {
               emplacement: emplacement.trim() || null
             });
           }
+        }
+        
+        // Update piece_fournisseurs
+        if (selectedFournisseur && parseNum(prixAchat) > 0) {
+          await supabase.from('piece_fournisseurs').upsert({
+            piece_id: editId,
+            fournisseur_id: selectedFournisseur,
+            prix_achat: parseNum(prixAchat)
+          }, { onConflict: 'piece_id,fournisseur_id' });
         }
       } else {
         // Insert new piece
