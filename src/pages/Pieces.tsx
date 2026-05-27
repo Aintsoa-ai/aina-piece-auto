@@ -330,7 +330,7 @@ export const Pieces: React.FC = () => {
     setStockMinimum('');
     setPrixAchat('');
     setPrixVente('');
-    setSelectedBoutique(boutiques[0]?.id || '');
+    setSelectedBoutique('GLOBAL');
     setSelectedFournisseur(fournisseurs[0]?.id || '');
     setDescription('');
     setErrorMsg(null);
@@ -352,7 +352,7 @@ export const Pieces: React.FC = () => {
     setStockMinimum(piece.stock_minimum ? formatNum(piece.stock_minimum) : '');
     setPrixAchat(piece.achat ? formatNum(piece.achat) : '');
     setPrixVente(piece.vente ? formatNum(piece.vente) : '');
-    setSelectedBoutique(boutiques[0]?.id || '');
+    setSelectedBoutique('GLOBAL');
     setSelectedFournisseur(fournisseurs[0]?.id || '');
     setDescription(piece.description || '');
     setErrorMsg(null);
@@ -427,7 +427,33 @@ export const Pieces: React.FC = () => {
         if (error) throw error;
 
         // Update stock
-        if (selectedBoutique) {
+        if (selectedBoutique === 'GLOBAL') {
+          for (const b of boutiques) {
+            const { data: existStock } = await supabase
+              .from('stock')
+              .select('id')
+              .eq('piece_id', editId)
+              .eq('boutique_id', b.id)
+              .maybeSingle();
+
+            if (existStock) {
+              await supabase.from('stock').update({
+                quantity_disponible: parseNum(quantite),
+                stock_minimum: parseNum(stockMinimum) || 5,
+                emplacement: emplacement.trim() || null
+              }).eq('id', existStock.id);
+            } else {
+              await supabase.from('stock').insert({
+                piece_id: editId,
+                boutique_id: b.id,
+                quantity_disponible: parseNum(quantite),
+                quantity_achetee: parseNum(quantite),
+                stock_minimum: parseNum(stockMinimum) || 5,
+                emplacement: emplacement.trim() || null
+              });
+            }
+          }
+        } else if (selectedBoutique) {
           const { data: existStock } = await supabase
             .from('stock')
             .select('id')
@@ -472,7 +498,17 @@ export const Pieces: React.FC = () => {
         if (pieceErr) throw pieceErr;
 
         // Insert stock entry
-        if (selectedBoutique) {
+        if (selectedBoutique === 'GLOBAL') {
+          const stockInserts = boutiques.map(b => ({
+            piece_id: newPiece.id,
+            boutique_id: b.id,
+            quantity_disponible: parseNum(quantite),
+            quantity_achetee: parseNum(quantite),
+            stock_minimum: parseNum(stockMinimum) || 5,
+            emplacement: emplacement.trim() || null
+          }));
+          await supabase.from('stock').insert(stockInserts);
+        } else if (selectedBoutique) {
           await supabase.from('stock').insert({
             piece_id: newPiece.id,
             boutique_id: selectedBoutique,
@@ -838,6 +874,7 @@ export const Pieces: React.FC = () => {
                       value={selectedBoutique}
                       onChange={(e) => setSelectedBoutique(e.target.value)}
                     >
+                      <option value="GLOBAL">GLOBAL (Toutes les boutiques)</option>
                       {boutiques.map((b) => (
                         <option key={b.id} value={b.id}>{b.name}</option>
                       ))}
