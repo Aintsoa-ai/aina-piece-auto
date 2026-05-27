@@ -281,13 +281,6 @@ export const Pieces: React.FC = () => {
     let lastKeyTime = Date.now();
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Ignorer si on tape déjà dans un autre champ (sauf la barre de recherche elle-même)
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        if (e.target.placeholder !== "Rechercher par référence, pièce, marque...") {
-          return;
-        }
-      }
-      
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       
       const currentTime = Date.now();

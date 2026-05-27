@@ -285,10 +285,6 @@ export const Purchases: React.FC = () => {
     let lastKeyTime = Date.now();
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Ignorer si on est en train d'écrire dans un input manuellement
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       
       const currentTime = Date.now();

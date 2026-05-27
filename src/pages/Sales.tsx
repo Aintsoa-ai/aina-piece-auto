@@ -360,13 +360,6 @@ export const Sales: React.FC = () => {
       // Bloquer le scan si la fenêtre d'encaissement est ouverte pour éviter les conflits
       if (isCheckoutModalOpen) return;
 
-      // Ignorer si on est en train d'écrire dans un input manuellement
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        // Sauf si c'est la barre de recherche globale
-        if (e.target.placeholder !== "Rechercher une vente...") {
-          return;
-        }
-      }
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       
       const currentTime = Date.now();
