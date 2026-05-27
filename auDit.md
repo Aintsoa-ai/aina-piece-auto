@@ -267,3 +267,9 @@ Historique et suivi des audits de sÃ©curitÃ©, de performance et de stabilitÃ© de
 - **Action 3 (Création Catalogue) :** Correction du bug où les prix et les quantités étaient ignorés lors de l'édition. Intégration de l'option "GLOBAL" par défaut pour approvisionner toutes les boutiques d'un coup.
 - **Action 4 (Caisse) :** Suppression de l'autofocus pour éviter la saisie involontaire de la douchette. Mise en place d'un sous-modal "Encaissement" exigeant le montant en "Espèces" et calculant le "Reste à rendre". Impression automatique du ticket thermique mis à jour avec ces valeurs.
 - **Impact Mobile/Desktop :** Les modales restent 100% responsives, le design Glassmorphism est préservé.
+
+## Audit #9 - Optimisation Ultra-Rapide (Scan-to-Open) (27/05/2026 13:21)
+**Statut : Validé ?**
+- **Action 1 (Ventes) :** Il n'est plus nécessaire de cliquer sur "Nouvelle Vente". Scanner directement un article sur la page Ventes ouvre automatiquement la fenêtre et l'ajoute au panier.
+- **Action 2 (Achats) :** Même comportement, un scan sur la page Achats ouvre directement la fenêtre d'approvisionnement avec l'article sélectionné.
+- **Action 3 (Catalogue de Pièces) :** Si on scanne un code-barres inconnu dans l'inventaire, le système comprend que c'est une nouvelle pièce et ouvre automatiquement le formulaire "Nouvelle pièce" avec le code-barres pré-rempli.

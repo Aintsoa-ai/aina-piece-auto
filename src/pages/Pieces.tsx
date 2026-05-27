@@ -277,8 +277,6 @@ export const Pieces: React.FC = () => {
 
   // Barcode Scanner Listener pour la recherche rapide dans le catalogue
   useEffect(() => {
-    if (isModalOpen) return; // Désactivé si une modale (Création/Édition) est ouverte
-
     let barcodeBuffer = '';
     let lastKeyTime = Date.now();
 
@@ -302,8 +300,46 @@ export const Pieces: React.FC = () => {
         if (barcodeBuffer.length >= 3) {
            e.preventDefault();
            e.stopPropagation();
-           setSearchQuery(decodeAzertyBarcode(barcodeBuffer)); // Remplit la barre de recherche avec le code scanné
+           const scannedCode = decodeAzertyBarcode(barcodeBuffer);
            barcodeBuffer = '';
+           
+           const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
+           if (piece) {
+             if (!isModalOpen) {
+               setSearchQuery(scannedCode);
+             } else {
+               // Si on édite/crée déjà, et qu'on scanne une pièce existante, on pré-remplit juste le champ si on est dessus
+               // Mais en global, mieux vaut laisser le champ ciblé faire son job.
+             }
+           } else {
+             if (!isModalOpen) {
+               // Pièce introuvable : on ouvre "Nouvelle pièce" et on pré-remplit
+               setEditId(null);
+               setReference('');
+               setDesignation('');
+               setMarque('');
+               setCategorie('');
+               setCompatibilite('');
+               setOemNumber('');
+               setEmplacement('');
+               setQuantite('');
+               setStockMinimum('');
+               setPrixAchat('');
+               setPrixVente('');
+               setSelectedBoutique('GLOBAL');
+               setSelectedFournisseur(fournisseurs[0]?.id || '');
+               setDescription('');
+               setErrorMsg(null);
+               setSuccessMsg(null);
+               setIsModalOpen(true);
+               
+               // Pré-remplir le code barres
+               setCodeBarre(scannedCode);
+             } else {
+               // Modale déjà ouverte : remplir le code barres
+               setCodeBarre(scannedCode);
+             }
+           }
         }
       } else if (e.key.length === 1) {
         barcodeBuffer += e.key;

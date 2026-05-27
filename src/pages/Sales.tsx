@@ -353,12 +353,14 @@ export const Sales: React.FC = () => {
 
   // Barcode Scanner Listener
   useEffect(() => {
-    if (!isModalOpen) return;
-
     let barcodeBuffer = '';
     let lastKeyTime = Date.now();
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Ignorer si on est en train d'écrire dans un input manuellement
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       
       const currentTime = Date.now();
@@ -377,10 +379,26 @@ export const Sales: React.FC = () => {
            
            const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
            if (piece) {
-             handleAddToCart(piece);
-             setSearchQuery('');
+             if (!isModalOpen) {
+               // Ouvrir la modale et initialiser le panier avec la pièce scannée
+               setCart([{ piece, quantity: 1 }]);
+               setSearchQuery('');
+               setVendeurName(profile?.full_name || 'Vendeur Inconnu');
+               setIsCredit(false);
+               setSelectedClient('');
+               setErrorMsg(null);
+               setSuccessMsg(null);
+               setIsModalOpen(true);
+             } else {
+               // Déjà ouverte, on ajoute simplement au panier
+               handleAddToCart(piece);
+               setSearchQuery('');
+             }
            } else {
              setErrorMsg(`Code-barres introuvable : ${scannedCode}`);
+             if (!isModalOpen) {
+               setIsModalOpen(true);
+             }
              setSearchQuery('');
            }
         }
@@ -393,7 +411,7 @@ export const Sales: React.FC = () => {
 
     window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
-  }, [isModalOpen, pieces]);
+  }, [isModalOpen, pieces, profile]);
 
   // Filter pieces based on search inside modal
   const filteredPieces = pieces.filter(p => 

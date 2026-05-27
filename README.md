@@ -102,3 +102,9 @@ Application web (ERP) sur-mesure pour la gestion complÃ¨te des boutiques Aina Pi
 - **Caisse Intelligente :** Fenêtre d'encaissement intermédiaire avec calcul automatique du reste à rendre, et impression sur le ticket thermique de l'espèce reçue et de la monnaie rendue.
 - **Gestion Multi-boutiques (Catalogue) :** Possibilité d'assigner une nouvelle pièce à TOUTES les boutiques (option GLOBAL) dès la création ou modification.
 - **Compatibilité Scanner Universelle :** Plug & play complet pour les douchettes paramétrées en AZERTY ou QWERTY, avec algorithme anti-micro-coupures (tolérance 500ms).
+
+### Scan Intelligent & Rapide (Scan-to-Open)
+L'ERP devient 100% centré sur la vitesse :
+- Prenez la douchette à n'importe quel moment sur les pages (Ventes, Achats, Catalogue) et scannez.
+- Le système devine votre intention et ouvre la bonne fenêtre automatiquement ! 
+- Gain de temps massif : plus besoin de toucher la souris pour démarrer une opération.

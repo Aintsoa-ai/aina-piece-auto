@@ -281,12 +281,14 @@ export const Purchases: React.FC = () => {
 
   // Barcode Scanner Listener
   useEffect(() => {
-    if (!isModalOpen) return;
-
     let barcodeBuffer = '';
     let lastKeyTime = Date.now();
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Ignorer si on est en train d'écrire dans un input manuellement
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       
       const currentTime = Date.now();
@@ -304,13 +306,30 @@ export const Purchases: React.FC = () => {
            
            const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
            if (piece) {
-             handlePieceChange(piece.id);
-             setPieceSearch('');
-             setSuccessMsg(`Pièce sélectionnée via Scan : ${piece.designation}`);
-             setErrorMsg(null);
+             if (!isModalOpen) {
+               // Ouvrir la modale et pré-sélectionner
+               setSelectedSupplierId('');
+               setFournisseurSearch('');
+               setQuantity('');
+               setUnitPrice('');
+               setRemiseVal('');
+               setErrorMsg(null);
+               setSuccessMsg(`Pièce sélectionnée via Scan : ${piece.designation}`);
+               handlePieceChange(piece.id);
+               setPieceSearch('');
+               setIsModalOpen(true);
+             } else {
+               handlePieceChange(piece.id);
+               setPieceSearch('');
+               setSuccessMsg(`Pièce sélectionnée via Scan : ${piece.designation}`);
+               setErrorMsg(null);
+             }
            } else {
              setErrorMsg(`Code-barres introuvable : ${scannedCode}`);
              setSuccessMsg(null);
+             if (!isModalOpen) {
+               setIsModalOpen(true);
+             }
              setPieceSearch('');
            }
         }
