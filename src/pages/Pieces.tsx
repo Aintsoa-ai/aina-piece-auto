@@ -350,7 +350,7 @@ export const Pieces: React.FC = () => {
 
     window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
-  }, [isModalOpen]);
+  }, [isModalOpen, pieces, fournisseurs]);
 
   const handleOpenAddModal = () => {
     setEditId(null);

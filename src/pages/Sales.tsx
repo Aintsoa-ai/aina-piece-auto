@@ -357,9 +357,15 @@ export const Sales: React.FC = () => {
     let lastKeyTime = Date.now();
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Bloquer le scan si la fenêtre d'encaissement est ouverte pour éviter les conflits
+      if (isCheckoutModalOpen) return;
+
       // Ignorer si on est en train d'écrire dans un input manuellement
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
+        // Sauf si c'est la barre de recherche globale
+        if (e.target.placeholder !== "Rechercher une vente...") {
+          return;
+        }
       }
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       
@@ -380,8 +386,7 @@ export const Sales: React.FC = () => {
            const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
            if (piece) {
              if (!isModalOpen) {
-               // Ouvrir la modale et initialiser le panier avec la pièce scannée
-               setCart([{ piece, quantity: 1 }]);
+               // Ouvrir la modale et préparer le terrain
                setSearchQuery('');
                setVendeurName(profile?.full_name || 'Vendeur Inconnu');
                setIsCredit(false);
@@ -389,6 +394,14 @@ export const Sales: React.FC = () => {
                setErrorMsg(null);
                setSuccessMsg(null);
                setIsModalOpen(true);
+               // On utilise l'ancienne valeur du cart (qui peut être vide) pour éviter d'écraser s'il y a une micro-latence
+               setCart(prev => {
+                 if (piece.quantity_disponible <= 0) {
+                   setErrorMsg("Cette pièce est en rupture de stock.");
+                   return prev;
+                 }
+                 return [{ piece, quantity: 1 }];
+               });
              } else {
                // Déjà ouverte, on ajoute simplement au panier
                handleAddToCart(piece);
@@ -398,6 +411,7 @@ export const Sales: React.FC = () => {
              setErrorMsg(`Code-barres introuvable : ${scannedCode}`);
              if (!isModalOpen) {
                setIsModalOpen(true);
+               setCart([]);
              }
              setSearchQuery('');
            }
@@ -411,7 +425,7 @@ export const Sales: React.FC = () => {
 
     window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleGlobalKeyDown, { capture: true });
-  }, [isModalOpen, pieces, profile]);
+  }, [isModalOpen, isCheckoutModalOpen, pieces, profile]);
 
   // Filter pieces based on search inside modal
   const filteredPieces = pieces.filter(p => 
