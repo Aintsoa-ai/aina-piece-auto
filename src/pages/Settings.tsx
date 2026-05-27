@@ -23,6 +23,7 @@ export const Settings: React.FC = () => {
   const { role } = useAuth();
 
   const [boutiques, setBoutiques] = useState<Boutique[]>([]);
+  const [activeSettingsTab, setActiveSettingsTab] = useState<'acces' | 'systeme' | 'personnalisation'>('acces');
   interface UserProfile {
     id: string;
     full_name: string;
@@ -1337,6 +1338,47 @@ export const Settings: React.FC = () => {
         </div>
       </div>
 
+      {/* ── TABS HEADER ─────────────── */}
+      <div style={{ display: 'flex', gap: '32px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '24px', paddingBottom: '0', overflowX: 'auto' }}>
+        <button
+          onClick={() => setActiveSettingsTab('acces')}
+          style={{
+            ...s.tabBtn,
+            borderBottom: activeSettingsTab === 'acces' ? '2px solid #0066fe' : '2px solid transparent',
+            color: activeSettingsTab === 'acces' ? '#fff' : 'rgba(255,255,255,0.45)',
+            fontWeight: activeSettingsTab === 'acces' ? '700' : '500'
+          }}
+        >
+          <Shield size={16} />
+          Accès & Boutiques
+        </button>
+        <button
+          onClick={() => setActiveSettingsTab('systeme')}
+          style={{
+            ...s.tabBtn,
+            borderBottom: activeSettingsTab === 'systeme' ? '2px solid #10b981' : '2px solid transparent',
+            color: activeSettingsTab === 'systeme' ? '#fff' : 'rgba(255,255,255,0.45)',
+            fontWeight: activeSettingsTab === 'systeme' ? '700' : '500'
+          }}
+        >
+          <Database size={16} />
+          Système & Sécurité
+        </button>
+        <button
+          onClick={() => setActiveSettingsTab('personnalisation')}
+          style={{
+            ...s.tabBtn,
+            borderBottom: activeSettingsTab === 'personnalisation' ? '2px solid #c084fc' : '2px solid transparent',
+            color: activeSettingsTab === 'personnalisation' ? '#fff' : 'rgba(255,255,255,0.45)',
+            fontWeight: activeSettingsTab === 'personnalisation' ? '700' : '500'
+          }}
+        >
+          <SettingsIcon size={16} />
+          Personnalisation
+        </button>
+      </div>
+
+      <div style={{ display: activeSettingsTab === 'acces' ? 'block' : 'none' }}>
       {/* ── CONTRÔLE D'ACCÈS MATRICIEL ─────────────── */}
       {isAdmin && (
         <div style={{ ...s.card, marginBottom: '20px', overflowX: 'auto', padding: '16px' }}>
@@ -1494,12 +1536,13 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
 
       {/* THREE-COLUMN GRID */}
       <div style={s.settingsGrid}>
 
         {/* Mode Offline PWA */}
-        <div style={s.card}>
+        <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
           <h3 style={s.cardTitle}>
             <Wifi size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
             {t('offlineTitle')}
@@ -1554,7 +1597,7 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Boutiques actives */}
-          <div style={s.card}>
+          <div style={{ ...s.card, display: activeSettingsTab === 'acces' ? 'block' : 'none' }}>
             <h3 style={s.cardTitle}>
               <Store size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               Boutiques & Points de Vente Actifs
@@ -1697,7 +1740,7 @@ export const Settings: React.FC = () => {
 
           {/* ── HORAIRES DE LA BOUTIQUE & VERROUILLAGE ─────────────── */}
           {isAdmin && (
-            <div style={s.card}>
+            <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px' }}>
                 <h3 style={{ ...s.cardTitle, borderBottom: 'none', paddingBottom: 0 }}>
                   <Shield size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
@@ -1781,7 +1824,7 @@ export const Settings: React.FC = () => {
       </div>
 
       {/* ── PERSONNALISATION DE L'APPLICATION ────────────────────────── */}
-      <div style={s.card}>
+      <div style={{ ...s.card, display: activeSettingsTab === 'personnalisation' ? 'block' : 'none' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff', display: 'flex', alignItems: 'center', margin: 0 }}>
             <SettingsIcon size={18} style={{ marginRight: '10px', color: '#0066fe' }} />
@@ -1854,6 +1897,7 @@ export const Settings: React.FC = () => {
       </div>
 
       {/* ── INTELLIGENCE HORS NORME : SÉCURITÉ & SAUVEGARDES ─────────────── */}
+      <div style={{ display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
       {isAdmin && (
         <div style={{ ...s.card, borderColor: 'rgba(16, 185, 129, 0.2)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '16px' }}>
@@ -2519,7 +2563,7 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       )}
-
+      </div>
     </div>
   );
 };
