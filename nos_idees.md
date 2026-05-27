@@ -63,3 +63,8 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - Permettre à l'administrateur de définir des horaires différents par jour de la semaine (ex: Samedi 08:00 - 12:00).
 - Ajouter un message personnalisé sur l'écran de verrouillage que l'admin peut modifier (ex: "Fermeture pour inventaire annuel").
 
+
+### Ides d'Amelioration Future (Interface & UI)
+- **Thme Dynamique Avanc :** Permettre de modifier non seulement la couleur, mais la disposition complte du dashboard (Vue Liste vs Vue Grille).
+- **Tutorial Intgr :** Ajouter un mode onboarding (des bulles d'aide) pour les nouveaux administrateurs qui dcouvrent la page de paramtres dsormais plus structure.
+- **Drag & Drop pour la grille :** Donner  l'administrateur le pouvoir de rarranger l'ordre des cartes (Personnalisation, Horaires, etc.) via un glisser-dposer, et sauvegarder cet ordre.

@@ -13,6 +13,7 @@ import {
   X,
   Plus
 } from 'lucide-react';
+import { decodeAzertyBarcode } from '../utils/barcode';
 
 interface StockRow {
   id: string;
@@ -266,40 +267,36 @@ export const Stock: React.FC = () => {
   // SCANNER DE CODE-BARRES GLOBAL (Stock)
   // ==========================================
   useEffect(() => {
-    let barcode = '';
-    let lastKeyTime = 0;
+    let barcodeBuffer = '';
+    let lastKeyTime = Date.now();
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       // Ignorer si l'utilisateur est dans une modale
       if (isAdjustModalOpen || isTransferModalOpen) return;
 
-      const currentTime = new Date().getTime();
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      
+      const currentTime = Date.now();
       
       // Tolérance de 500ms entre les touches pour la douchette
       if (currentTime - lastKeyTime > 500) {
-        barcode = '';
+        barcodeBuffer = '';
       }
-      lastKeyTime = currentTime;
-
+      
       if (e.key === 'Enter') {
-        if (barcode.length > 2) {
+        if (barcodeBuffer.length >= 3) {
           e.preventDefault();
           e.stopPropagation();
           
-          // Conversion de certaines douchettes mal paramétrées (AZERTY)
-          const azertyToQwerty: Record<string, string> = {
-            '&': '1', 'é': '2', '"': '3', "'": '4', '(': '5',
-            '-': '6', 'è': '7', '_': '8', 'ç': '9', 'à': '0',
-            'a': 'q', 'q': 'a', 'z': 'w', 'w': 'z', 'm': ',', ',': 'm'
-          };
-          const translatedBarcode = barcode.split('').map(char => azertyToQwerty[char] || char).join('');
-          
-          setSearchQuery(translatedBarcode.toUpperCase());
-          barcode = '';
+          const scannedCode = decodeAzertyBarcode(barcodeBuffer);
+          setSearchQuery(scannedCode.toUpperCase());
+          barcodeBuffer = '';
         }
-      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        barcode += e.key;
+      } else if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt') {
+        barcodeBuffer += e.key;
       }
+      
+      lastKeyTime = currentTime;
     };
 
     window.addEventListener('keydown', handleGlobalKeyDown, { capture: true });
