@@ -26,7 +26,8 @@ import {
   Cloud,
   CloudOff,
   RefreshCw,
-  Lock
+  Lock,
+  Clock
 } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../services/db';
@@ -144,6 +145,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
   const displaySubtitle = isBoutique ? (profile?.full_name?.replace(/AINA PIECE /i, '') || appSubtitle) : appSubtitle;
 
   const [isStoreClosed, setIsStoreClosed] = useState(false);
+  const [closingWarningMinutes, setClosingWarningMinutes] = useState<number | null>(null);
 
   useEffect(() => {
     if (isAdmin) {
@@ -172,8 +174,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
 
       if (currentTotal < openM || currentTotal >= closeM) {
         setIsStoreClosed(true);
+        setClosingWarningMinutes(null);
       } else {
         setIsStoreClosed(false);
+        const diff = closeM - currentTotal;
+        if (diff > 0 && diff <= 15) {
+          setClosingWarningMinutes(diff);
+        } else {
+          setClosingWarningMinutes(null);
+        }
       }
     };
 
@@ -327,6 +336,38 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
             <LogOut size={16} />
             Se déconnecter
           </button>
+        </div>
+      )}
+
+      {/* ── CLOSING WARNING TOAST ──────────────── */}
+      {closingWarningMinutes !== null && closingWarningMinutes > 0 && !isStoreClosed && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          backgroundColor: '#f59e0b',
+          color: '#000',
+          padding: '16px 20px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px rgba(245, 158, 11, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          zIndex: 8000,
+          animation: 'slideUp 0.5s ease'
+        }}>
+          <div style={{ backgroundColor: 'rgba(0,0,0,0.1)', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'pulseWarning 2s infinite' }}>
+            <Clock size={24} color="#000" />
+          </div>
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: '800' }}>Attention !</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', marginTop: '2px', opacity: 0.9 }}>
+              Fermeture de la boutique dans {closingWarningMinutes} minute{closingWarningMinutes > 1 ? 's' : ''}.
+            </div>
+            <div style={{ fontSize: '11px', marginTop: '4px', opacity: 0.75 }}>
+              Préparez-vous à clôturer vos ventes.
+            </div>
+          </div>
         </div>
       )}
 
