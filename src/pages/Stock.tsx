@@ -191,7 +191,7 @@ export const Stock: React.FC = () => {
 
     const queryPromise = (async () => {
       const { data: piecesData, error: piecesErr } = await supabase.from('pieces').select('*');
-      const { data: stockData } = await supabase.from('stock').select('*, boutiques(name)');
+      const { data: stockData } = await supabase.from('stock').select('*, boutiques(name), pieces(*)');
       const { data: suppliersData } = await supabase.from('piece_fournisseurs').select('*');
       const { data: listBoutiques } = await supabase.from('boutiques').select('id, name');
 
@@ -207,7 +207,7 @@ export const Stock: React.FC = () => {
         const { piecesData, stockData, suppliersData } = result;
 
         const parsed: StockRow[] = (stockData || []).map((item: any) => {
-          const piece = piecesData.find((p: any) => p.id === item.piece_id);
+          const piece = item.pieces || piecesData.find((p: any) => p.id === item.piece_id);
           const refStr = piece?.reference || 'INCONNU';
           const nameStr = piece?.designation || 'Inconnu';
           
@@ -311,11 +311,8 @@ export const Stock: React.FC = () => {
   const filteredStocks = stockRows.filter(row => {
     // 1. Search Query
     const normalizedSearch = searchQuery.trim().toLowerCase();
-    const matchesSearch = normalizedSearch === '' || 
-      row.reference.toLowerCase().includes(normalizedSearch) ||
-      (row.code_barre && row.code_barre.toLowerCase().includes(normalizedSearch)) ||
-      row.designation.toLowerCase().includes(normalizedSearch) ||
-      row.emplacement.toLowerCase().includes(normalizedSearch);
+    const searchString = `${row.reference} ${row.designation} ${row.emplacement} ${row.code_barre || ''}`.toLowerCase();
+    const matchesSearch = normalizedSearch === '' || searchString.includes(normalizedSearch);
 
     // 2. Boutique filter
     const matchesBoutique = selectedBoutique === 'all' || 
