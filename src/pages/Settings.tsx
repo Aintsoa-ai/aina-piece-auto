@@ -1339,42 +1339,58 @@ export const Settings: React.FC = () => {
       </div>
 
       {/* ── TABS HEADER ─────────────── */}
-      <div style={{ display: 'flex', gap: '32px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '24px', paddingBottom: '0', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid #1f2937', marginBottom: '24px', paddingLeft: '8px' }}>
         <button
           onClick={() => setActiveSettingsTab('acces')}
           style={{
-            ...s.tabBtn,
-            borderBottom: activeSettingsTab === 'acces' ? '2px solid #0066fe' : '2px solid transparent',
-            color: activeSettingsTab === 'acces' ? '#fff' : 'rgba(255,255,255,0.45)',
-            fontWeight: activeSettingsTab === 'acces' ? '700' : '500'
+            background: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            transition: 'all 0.2s ease',
+            backgroundColor: activeSettingsTab === 'acces' ? '#1f2937' : 'transparent',
+            color: activeSettingsTab === 'acces' ? '#fff' : 'rgba(255,255,255,0.5)',
+            borderTopLeftRadius: '10px',
+            borderTopRightRadius: '10px',
+            border: activeSettingsTab === 'acces' ? '1px solid #374151' : '1px solid transparent',
+            borderBottom: 'none',
+            padding: '12px 24px',
+            position: 'relative',
+            top: '1px',
+            zIndex: activeSettingsTab === 'acces' ? 1 : 0,
+            marginBottom: '-1px'
           }}
         >
-          <Shield size={16} />
+          <Shield size={16} style={{ color: activeSettingsTab === 'acces' ? '#0066fe' : 'inherit' }} />
           Accès & Boutiques
         </button>
         <button
           onClick={() => setActiveSettingsTab('systeme')}
           style={{
-            ...s.tabBtn,
-            borderBottom: activeSettingsTab === 'systeme' ? '2px solid #10b981' : '2px solid transparent',
-            color: activeSettingsTab === 'systeme' ? '#fff' : 'rgba(255,255,255,0.45)',
-            fontWeight: activeSettingsTab === 'systeme' ? '700' : '500'
+            background: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            transition: 'all 0.2s ease',
+            backgroundColor: activeSettingsTab === 'systeme' ? '#1f2937' : 'transparent',
+            color: activeSettingsTab === 'systeme' ? '#fff' : 'rgba(255,255,255,0.5)',
+            borderTopLeftRadius: '10px',
+            borderTopRightRadius: '10px',
+            border: activeSettingsTab === 'systeme' ? '1px solid #374151' : '1px solid transparent',
+            borderBottom: 'none',
+            padding: '12px 24px',
+            position: 'relative',
+            top: '1px',
+            zIndex: activeSettingsTab === 'systeme' ? 1 : 0,
+            marginBottom: '-1px'
           }}
         >
-          <Database size={16} />
-          Système & Sécurité
-        </button>
-        <button
-          onClick={() => setActiveSettingsTab('personnalisation')}
-          style={{
-            ...s.tabBtn,
-            borderBottom: activeSettingsTab === 'personnalisation' ? '2px solid #c084fc' : '2px solid transparent',
-            color: activeSettingsTab === 'personnalisation' ? '#fff' : 'rgba(255,255,255,0.45)',
-            fontWeight: activeSettingsTab === 'personnalisation' ? '700' : '500'
-          }}
-        >
-          <SettingsIcon size={16} />
-          Personnalisation
+          <Database size={16} style={{ color: activeSettingsTab === 'systeme' ? '#10b981' : 'inherit' }} />
+          Système, Sécurité & Personnalisation
         </button>
       </div>
 
@@ -1632,7 +1648,7 @@ export const Settings: React.FC = () => {
 
           {/* ── STATUT EN LIGNE DES BOUTIQUES ─────────────── */}
           {isAdmin && (
-            <div style={s.card}>
+            <div style={{ ...s.card, display: activeSettingsTab === 'acces' ? 'block' : 'none' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px' }}>
                 <h3 style={{ ...s.cardTitle, borderBottom: 'none', paddingBottom: 0 }}>
                   <Activity size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
@@ -1824,7 +1840,7 @@ export const Settings: React.FC = () => {
       </div>
 
       {/* ── PERSONNALISATION DE L'APPLICATION ────────────────────────── */}
-      <div style={{ ...s.card, display: activeSettingsTab === 'personnalisation' ? 'block' : 'none' }}>
+      <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff', display: 'flex', alignItems: 'center', margin: 0 }}>
             <SettingsIcon size={18} style={{ marginRight: '10px', color: '#0066fe' }} />
