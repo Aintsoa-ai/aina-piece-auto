@@ -68,3 +68,10 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - **Thme Dynamique Avanc :** Permettre de modifier non seulement la couleur, mais la disposition complte du dashboard (Vue Liste vs Vue Grille).
 - **Tutorial Intgr :** Ajouter un mode onboarding (des bulles d'aide) pour les nouveaux administrateurs qui dcouvrent la page de paramtres dsormais plus structure.
 - **Drag & Drop pour la grille :** Donner  l'administrateur le pouvoir de rarranger l'ordre des cartes (Personnalisation, Horaires, etc.) via un glisser-dposer, et sauvegarder cet ordre.
+
+
+## 5. Qualité et Maintenance Code
+- **Tests automatisés E2E :** Mettre en place des tests d'interface utilisateur (ex: Cypress ou Playwright) pour prévenir la régression des affichages d'onglets et de l'ergonomie mobile après chaque mise à jour.
+- **Nettoyage automatique des scripts :** Supprimer les scripts de correction temporaires (comme reapply.cjs) une fois que les modifications ont été validées en production.
+
+- **Sécurité et DB** : En cas de futurs besoins d'effacement de comptes liés à Supabase Auth, toujours privilégier l'usage d'Edge Functions ou de scripts RPC SQL (SECURITY DEFINER) plutôt que des API Frontend pour éviter les failles de sécurité.

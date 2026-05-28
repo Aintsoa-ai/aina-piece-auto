@@ -290,3 +290,10 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Action ralise :** Fusion des sections, implmentation des onglets (Accs & Boutiques / Systme, Scurit & Personnalisation), rparation de l'architecture CSS Grid (settingsGrid).
 - **Vrification Mobile/PC :** La responsabilit est maintenue (grid auto-fit avec minmax de 300px-400px garantissant que les lments s'empilent sur mobile et se mettent cte  cte sur PC). Le bug des balises div causant une erreur de compilation a t corrig sans avaler aucune fonctionnalit existante.
 - **Impact :** Les fonctionnalits (matrices, cration de profil, horodatage) sont toutes intactes, l'interface est nettement moins lourde.
+
+
+## Audit #11 - Validation de la Réinitialisation et Section Offline (28/05/2026)
+**Statut : Validé ✅**
+- **Action 1 (Réinitialisation) :** Ajout de la case à cocher pour supprimer les utilisateurs et caissiers de la base de données. Création d'une fonction RPC SQL (delete_non_admin_users) pour contourner les limitations de sécurité de Supabase.
+- **Action 2 (Correction Ergonomique) :** Restauration de l'interface « Ventes en attente de synchronisation » (Mode Offline PWA) qui avait été momentanément masquée par une erreur de placement de la nouvelle case à cocher. 
+- **Impact :** La fonctionnalité Offline PWA est parfaitement intacte. Le Hard Reset est 100% fonctionnel sur PC et Mobile. Aucune régression.
