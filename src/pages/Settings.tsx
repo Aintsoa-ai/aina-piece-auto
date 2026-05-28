@@ -166,7 +166,8 @@ export const Settings: React.FC = () => {
     fournisseurs: false, 
     catalogue: false, 
     transactions: false,
-    numerotation: false
+    numerotation: false,
+    utilisateurs: false
   });
   const [isHardResetting, setIsHardResetting] = useState(false);
   const [isPurging, setIsPurging] = useState(false);
@@ -1187,6 +1188,13 @@ export const Settings: React.FC = () => {
       if (resetOptions.fournisseurs) {
         await supabase.from('fournisseurs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       }
+      if (resetOptions.utilisateurs) {
+        // Appelle une fonction RPC si elle existe, sinon supprime au moins les profils
+        const { error } = await supabase.rpc('delete_non_admin_users');
+        if (error) {
+          await supabase.from('profiles').delete().neq('role_id', 'administrateur');
+        }
+      }
       if (resetOptions.boutiques) {
         await supabase.from('boutiques').delete().neq('name', 'AINA PIECE BEHORIRIKA');
       }
@@ -1588,10 +1596,20 @@ export const Settings: React.FC = () => {
             )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#fff', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={resetOptions.utilisateurs} 
+                  onChange={e => setResetOptions({...resetOptions, utilisateurs: e.target.checked})}
+                  style={{ width: '16px', height: '16px', accentColor: '#ef4444' }}
+                />
+                Utilisateurs & Caissiers (Conserver uniquement l'Admin)
+              </label>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#fff', cursor: 'pointer' }}>
                 <Database size={14} />
                 <span>Ventes en attente de synchronisation :</span>
-              </div>
+              </label>
               <span style={{ fontSize: '18px', fontWeight: '800', color: pendingSalesCount > 0 ? '#f59e0b' : 'rgba(255,255,255,0.35)' }}>
                 {pendingSalesCount}
               </span>
