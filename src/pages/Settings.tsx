@@ -1596,20 +1596,10 @@ export const Settings: React.FC = () => {
             )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#fff', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={resetOptions.utilisateurs} 
-                  onChange={e => setResetOptions({...resetOptions, utilisateurs: e.target.checked})}
-                  style={{ width: '16px', height: '16px', accentColor: '#ef4444' }}
-                />
-                Utilisateurs & Caissiers (Conserver uniquement l'Admin)
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#fff', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
                 <Database size={14} />
                 <span>Ventes en attente de synchronisation :</span>
-              </label>
+              </div>
               <span style={{ fontSize: '18px', fontWeight: '800', color: pendingSalesCount > 0 ? '#f59e0b' : 'rgba(255,255,255,0.35)' }}>
                 {pendingSalesCount}
               </span>
@@ -2565,9 +2555,14 @@ export const Settings: React.FC = () => {
                   <span>Numérotation des factures et tickets à zéro</span>
                 </label>
                 
-                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#fff', cursor: 'pointer' }}>
                   <input type="checkbox" checked={resetOptions.boutiques} onChange={(e) => setResetOptions({...resetOptions, boutiques: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
                   <span>Supprimer les autres Boutiques (Conserver 'AINA PIECE BEHORIRIKA')</span>
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#fff', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={resetOptions.utilisateurs} onChange={(e) => setResetOptions({...resetOptions, utilisateurs: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
+                  <span>Effacer Utilisateurs & Caissiers (Conserver Admin)</span>
                 </label>
 
               </div>
