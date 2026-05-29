@@ -1179,6 +1179,8 @@ export const Settings: React.FC = () => {
         await supabase.from('details_achats').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         await supabase.from('achats').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         await supabase.from('depenses').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('caisse').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('clients').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         await supabase.from('mouvements_stock').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         await supabase.from('import_logs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       }
