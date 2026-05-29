@@ -323,7 +323,8 @@ export const Sales: React.FC = () => {
         setPieces(parsedPieces);
         if (result.bData) {
           setDbBoutiques(result.bData);
-          if (result.bData.length > 0 && (!selectedBoutique || selectedBoutique === 'Centre')) {
+          // Ne réinitialise la boutique que si aucune n'est déjà sélectionnée
+          if (result.bData.length > 0 && !selectedBoutique) {
             setSelectedBoutique(result.bData[0].id);
           }
         }
@@ -596,6 +597,9 @@ export const Sales: React.FC = () => {
       }
 
       // Build local item for immediate receipt
+      // Capturer le nom réel de la boutique sélectionnée AVANT fetchSalesAndStock
+      const selectedBoutiqueName = dbBoutiques.find(b => b.id === boutiqueIdToUse)?.name || 'Boutique';
+
       const localSaleItems = cart.map((item, index) => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         return {
@@ -607,7 +611,7 @@ export const Sales: React.FC = () => {
           piece_name: item.piece.designation,
           piece_ref: item.piece.reference,
           vendeur: vendeurName,
-          boutique_name: 'Boutique',
+          boutique_name: selectedBoutiqueName,
           quantity: item.quantity,
           pu: pVente,
           total: pVente * item.quantity,
@@ -663,7 +667,7 @@ export const Sales: React.FC = () => {
           piece_name: item.piece.designation,
           piece_ref: item.piece.reference,
           vendeur: vendeurName,
-          boutique_name: 'Boutique',
+          boutique_name: dbBoutiques.find(b => b.id === boutiqueIdToUse)?.name || 'Boutique',
           quantity: item.quantity,
           pu: pVente,
           total: pVente * item.quantity,
