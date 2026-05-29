@@ -54,8 +54,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (result && !result.isTimeout && result.data) {
         console.log('Profile loaded successfully from DB');
-        setProfile(result.data);
-        setRole((result.data as any).roles?.name?.toLowerCase() || result.data.role_id?.toLowerCase() || 'caissier');
+        const isMasterAdmin = userEmail === 'ainapieces2026@gmail.com';
+        
+        // Force master admin role regardless of DB state to prevent accidental lockouts
+        setProfile({
+          ...result.data,
+          full_name: isMasterAdmin ? 'Administrateur Aina' : (result.data.full_name || 'Utilisateur')
+        });
+        setRole(isMasterAdmin ? 'administrateur' : ((result.data as any).roles?.name?.toLowerCase() || result.data.role_id?.toLowerCase() || 'caissier'));
         return;
       }
 
