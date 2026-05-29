@@ -428,3 +428,20 @@ Supabase rejetait la mise à jour du profil → le profil gardait les valeurs du
 
 ### Point de sauvegarde :
 **Commits GitHub : `9a170f8` (split GLOBAL) + `71b3109` (prix fix)** — branche main — Vercel auto-déployé
+
+
+## Audit et Corrections - 29 Mai 2026 (Scanner Code-Barres & Supabase Schema)
+
+### Bug 1 : Le scanner ne trouvait pas les pièces existantes
+- **Cause :** Les douchettes rajoutent souvent un espace ou un caractère invisible à la fin du scan. L'application utilisait une comparaison stricte (===) qui échouait.
+- **Correction :** Ajout d'une fonction de nettoyage .trim() lors du scan dans Pieces.tsx, Sales.tsx et Purchases.tsx, et matching insensible à la casse.
+
+### Bug 2 : Erreur de sauvegarde invisible (Disparition au rafraîchissement)
+- **Cause :** L'ajout des colonnes prix_achat et prix_vente dans payloadPiece provoquait un refus de Supabase car elles n'existaient pas physiquement dans la table pieces. L'erreur silencieuse forçait un enregistrement factice dans l'interface.
+- **Correction :** 
+  1. Affichage des vraies erreurs DB (showAlert) dans Pieces.tsx.
+  2. Ajout des colonnes prix_achat et prix_vente via script SQL dans Supabase.
+  3. Requête directe sur la table pieces dans Sales.tsx (Filet de sécurité) pour contourner les échecs de jointure (JOIN) qui empêchaient de trouver le code_barre.
+
+### Point de sauvegarde :
+**Commits GitHub : 4c1a6fc (trim scanner) + 4a58256 (trim pieces) + 41a6a31 (fallback pieces) + 314b241 (sql et error UI)** — branche main — Vercel auto-déployé
