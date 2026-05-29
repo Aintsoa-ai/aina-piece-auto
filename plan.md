@@ -113,3 +113,10 @@
 - [ ] Remise des clés au propriétaire : email admin ainapieces2026@gmail.com
 - [ ] Formation du propriétaire via GUIDE.md
 - [ ] Première réinitialisation officielle + création des boutiques et caissiers en production
+
+
+### Mises à jour Phase 7 (29/05/2026 15:00)
+- [x] Correction quantité doublée en mode GLOBAL (division équitable entre boutiques)
+- [x] Correction multiplicateur prix × 1.4 → × 1.5 dans Sales.tsx
+- [x] Sauvegarde de prix_vente et prix_achat directement dans la table pieces
+- [x] Vérification cohérence Catalogue ↔ Ventes (prix identiques dans les deux interfaces)

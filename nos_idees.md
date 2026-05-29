@@ -98,3 +98,16 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - **Formation obligatoire avant livraison :** Insister auprès du propriétaire sur l'importance de TOUJOURS sélectionner la boutique lors de la création d'un caissier, même si la liste semble pré-remplie.
 - **Idée future :** Ajouter une confirmation visuelle (un bandeau vert avec le nom de la boutique sélectionnée) dans le formulaire de création de caissier, pour rendre la sélection encore plus explicite.
 - **Idée future :** Créer un script automatique de vérification de cohérence (cron ou Edge Function Supabase) qui détecte les profils sans boutique_id valide et envoie une alerte à l'administrateur.
+
+
+## 8. Idées issues des corrections Prix & Quantité (29/05/2026)
+- **Idée future :** Afficher dans le formulaire d'édition GLOBAL une ligne "Détail par boutique"
+  qui montre en temps réel combien chaque boutique va recevoir (ex: 20 pour BEHORIRIKA, 20 pour
+  ANDRAVOAHANGY) AVANT de cliquer Enregistrer. Cela évite toute confusion.
+- **Idée future :** Ajouter une page "Inventaire Global" qui montre la répartition du stock par
+  boutique pour chaque pièce, avec la possibilité de transférer des unités d'une boutique à l'autre.
+- **Idée future :** Ajouter une alerte visuelle si le prix de vente saisi est inférieur au prix
+  d'achat (marge négative). Exemple: "⚠️ Attention : Prix de vente (8 000) < Prix d'achat (10 000)".
+- **Règle de développement :** Toujours inclure `prix_vente` ET `prix_achat` dans tout payload
+  d'insertion/mise à jour de la table `pieces`. Ne jamais se fier aux calculs de fallback pour des
+  données financières.

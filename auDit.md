@@ -394,3 +394,37 @@ Supabase rejetait la mise à jour du profil → le profil gardait les valeurs du
 
 ### Point de sauvegarde :
 **Commit GitHub : `909ede6`** — branche main — Vercel auto-déployé
+
+## Audit #14 — Corrections Quantité × 2, Prix Vente Erroné + Sauvegarde Prix en DB (29/05/2026 15:00)
+**Statut : ✅ Validé — Déployé GitHub & Vercel (commits 9a170f8, 71b3109)**
+
+### Bugs diagnostiqués et corrigés :
+
+#### Bug 1 — Quantité doublée en mode GLOBAL (Pieces.tsx)
+- **Cause :** En mode édition GLOBAL, le code appliquait la quantité saisie à CHAQUE boutique
+  séparément. Avec 2 boutiques, 40 unités devenaient 40+40=80 (total affiché doublé).
+- **Correction :** Implémentation d'une logique de division équitable :
+  - Quantité 40 / 2 boutiques = 20 par boutique (total affiché = 40) ✅
+  - Si quantité impaire (ex: 41) → 1ère boutique reçoit le reste (21+20=41) ✅
+- **Mode création :** Même logique appliquée pour les nouvelles pièces en GLOBAL.
+- **Mode édition :** GLOBAL réactivé avec la division automatique.
+
+#### Bug 2 — Mauvais multiplicateur de prix dans Sales.tsx
+- **Cause :** Sales.tsx utilisait un multiplicateur `× 1.4` pour le calcul du prix de vente
+  lorsque le prix de vente n'était pas trouvé en base (10 000 × 1.4 = 14 000 au lieu de 15 000).
+- **Correction :** Multiplier corrigé → `× 1.5` (10 000 × 1.5 = 15 000) ✅
+
+#### Bug 3 — Prix de vente jamais sauvegardé dans la table `pieces` (Pieces.tsx)
+- **Cause :** Le `payloadPiece` n'incluait pas `prix_vente` ni `prix_achat`. Du coup,
+  Sales.tsx ne trouvait jamais le vrai prix en base et utilisait toujours le calcul approximatif.
+- **Correction :** Ajout de `prix_vente` et `prix_achat` dans `payloadPiece` → les prix
+  sont maintenant persistés en base. Sales.tsx lit directement le vrai prix, plus de calcul flottant.
+
+### Impact vérifié Mobile/Desktop :
+- ✅ Catalogue Pièces : quantités correctes après édition GLOBAL
+- ✅ Nouvelle vente : prix de vente exact affiché dans le panier
+- ✅ Total à payer correct (15 000 au lieu de 14 000 pour l'exemple testé)
+- ✅ Aucune régression sur les autres modules (ventes, achats, scanner, hors-ligne)
+
+### Point de sauvegarde :
+**Commits GitHub : `9a170f8` (split GLOBAL) + `71b3109` (prix fix)** — branche main — Vercel auto-déployé

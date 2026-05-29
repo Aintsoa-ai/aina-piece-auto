@@ -146,3 +146,16 @@ L'ERP devient 100% centr� sur la vitesse :
 - **Suppression Auth complète :** La fonction SQL `delete_non_admin_users` est corrigée. Après un Hard Reset, les anciens emails ne sont plus "fantômes" — ils peuvent être recréés sans erreur "User already registered".
 - **Projet Nettoyé :** Tous les scripts temporaires (.cjs) ont été supprimés. Le dépôt GitHub est livrable tel quel.
 - **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles sur Téléphone et Ordinateur. Aucune régression.
+
+
+### Corrections Catalogue & Prix de Vente (29/05/2026 15:00 — Final)
+- **Stock GLOBAL Réel :** En mode "GLOBAL (Toutes les boutiques)", la quantité saisie est maintenant
+  divisée équitablement entre les boutiques (ex: 40 unités / 2 boutiques = 20 chaque). Total = 40. Les
+  prix (achat/vente) sont identiques pour toutes les boutiques.
+- **Prix de Vente Persisté :** Le prix de vente saisi dans le catalogue est maintenant sauvegardé
+  directement dans la table `pieces` de Supabase. Il n'y a plus de risque d'afficher un prix
+  approximatif basé sur un calcul.
+- **Cohérence Catalogue → Ventes :** Le prix affiché dans "Nouvelle Vente" correspond exactement au prix
+  de vente enregistré dans le catalogue. Plus aucun écart entre les deux interfaces.
+- **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles. Le mode hors-ligne,
+  le scanner, la matrice des autorisations et les autres modules sont intacts.

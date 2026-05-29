@@ -45,3 +45,32 @@ Si vous devez nettoyer la base de données (par exemple après des tests) :
 
 ## 6. Surveillance en Temps Réel
 Dans le **Tableau de bord** ou dans les **Paramètres**, vous pouvez voir l'état des boutiques (En Ligne, Récemment Actif, Hors Ligne). L'état s'actualise toutes les 60 secondes pour vous indiquer qui est actuellement devant sa caisse.
+
+## 7. Gestion du Catalogue de Pièces
+
+### Créer une nouvelle pièce
+1. Allez dans **Pièces** > cliquez sur **+ Nouvelle pièce**.
+2. Remplissez : Référence, Nom de la pièce, Prix d'achat, Prix de vente.
+3. Pour la **Boutique** :
+   - Choisissez **GLOBAL (Toutes les boutiques)** → la quantité sera divisée équitablement.
+     *Exemple : 40 unités / 2 boutiques = 20 par boutique. Total affiché = 40.*
+   - Ou choisissez une boutique spécifique → la quantité totale va à cette boutique uniquement.
+4. Le **Prix de vente** saisi sera exactement le prix affiché lors d'une nouvelle vente.
+
+### Modifier une pièce existante
+1. Cliquez sur le bouton **✏️ crayon** en face de la pièce.
+2. La boutique est pré-sélectionnée sur **GLOBAL** par défaut.
+3. Si vous changez la quantité en mode GLOBAL, elle sera redistribuée entre les boutiques.
+4. Cliquez **Enregistrer** — les prix sont sauvegardés immédiatement en base de données.
+
+> **Important :** Le prix affiché dans "Nouvelle Vente" = le prix saisi dans le catalogue.
+> Ne modifiez pas le prix achat/vente après une vente, sinon les bénéfices historiques seront incorrects.
+
+## 8. Procédure de Livraison au Nouveau Propriétaire
+
+1. **Réinitialisation totale :** Paramètres > Réinitialiser (toutes les cases cochées).
+2. **Recréer les boutiques :** Nom exact, adresse, téléphone.
+3. **Recréer les comptes Caissiers :** Sélectionner OBLIGATOIREMENT la bonne boutique.
+4. **Importer le catalogue** via Import Excel.
+5. **Remettre le GUIDE.md** au propriétaire.
+6. **Credentials Admin** à transmettre en sécurité : `ainapieces2026@gmail.com`.
