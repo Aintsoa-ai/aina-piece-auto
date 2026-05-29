@@ -179,8 +179,7 @@ export const Settings: React.FC = () => {
     catalogue: false, 
     transactions: false,
     numerotation: false,
-    utilisateurs: false,
-    clients: false
+    utilisateurs: false
   });
   const [isHardResetting, setIsHardResetting] = useState(false);
   const [isPurging, setIsPurging] = useState(false);
@@ -1192,12 +1191,10 @@ export const Settings: React.FC = () => {
         await supabase.from('achats').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         await supabase.from('depenses').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         await supabase.from('caisse').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        await supabase.from('mouvements_stock').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        await supabase.from('import_logs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-      }
-      if (resetOptions.clients) {
         await supabase.from('reglements_credits').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         await supabase.from('clients').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('mouvements_stock').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await supabase.from('import_logs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       }
       if (resetOptions.catalogue) {
         await supabase.from('stock').delete().neq('id', '00000000-0000-0000-0000-000000000000');
@@ -2560,7 +2557,7 @@ export const Settings: React.FC = () => {
                 
                 <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
                   <input type="checkbox" checked={resetOptions.transactions} onChange={(e) => setResetOptions({...resetOptions, transactions: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
-                  <span>Ventes, Achats, Dépenses et Mouvements (Historique)</span>
+                  <span>Ventes, Achats, Dépenses, Mouvements et Clients/Crédits</span>
                 </label>
 
                 <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#fff' }}>
@@ -2587,11 +2584,6 @@ export const Settings: React.FC = () => {
                   <input type="checkbox" checked={resetOptions.utilisateurs} onChange={(e) => setResetOptions({...resetOptions, utilisateurs: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#ef4444' }} />
                   <span>Effacer Utilisateurs & Caissiers (Conserver Admin)</span>
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#fbbf24', cursor: 'pointer', padding: '8px', backgroundColor: 'rgba(251,191,36,0.06)', borderRadius: '6px', border: '1px solid rgba(251,191,36,0.18)' }}>
-                  <input type="checkbox" checked={resetOptions.clients} onChange={(e) => setResetOptions({...resetOptions, clients: e.target.checked})} style={{ width: '16px', height: '16px', accentColor: '#f59e0b' }} />
-                  <span>Clients &amp; Cr&#233;dits (Supprimer tous les clients et leurs dettes)</span>
-                </label>
-
 
               </div>
             </div>
@@ -2603,7 +2595,7 @@ export const Settings: React.FC = () => {
               <button 
                 style={{ ...s.btnValider, backgroundColor: '#dc2626', borderColor: '#dc2626' }} 
                 onClick={executeHardReset}
-                disabled={isHardResetting || (!resetOptions.transactions && !resetOptions.catalogue && !resetOptions.fournisseurs && !resetOptions.numerotation && !resetOptions.boutiques && !resetOptions.utilisateurs && !resetOptions.clients)}
+                disabled={isHardResetting || (!resetOptions.transactions && !resetOptions.catalogue && !resetOptions.fournisseurs && !resetOptions.numerotation && !resetOptions.boutiques)}
               >
                 {isHardResetting ? 'Réinitialisation...' : 'Confirmer la suppression'}
               </button>
