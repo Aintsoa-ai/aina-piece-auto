@@ -99,8 +99,25 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
         });
       }
     });
+
+    // Heartbeat toutes les 5 minutes pour maintenir le témoin "En ligne"
+    // Sans ce heartbeat, le caissier inactif apparaît "Hors ligne" même avec l'onglet ouvert
+    const heartbeatInterval = setInterval(() => {
+      supabase.from('profiles')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', profile.id)
+        .then();
+      // Renouveler aussi la présence WebSocket
+      room.track({
+        user_id: profile.id,
+        boutique_id: profile?.boutique_id || 'admin',
+        full_name: profile.full_name,
+        online_at: new Date().toISOString(),
+      });
+    }, 5 * 60 * 1000); // 5 minutes
     
     return () => {
+      clearInterval(heartbeatInterval);
       supabase.removeChannel(room);
     };
   }, [profile?.id, profile?.boutique_id, profile?.full_name]);
