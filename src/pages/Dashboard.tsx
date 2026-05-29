@@ -205,9 +205,15 @@ export const Dashboard: React.FC = () => {
     const solde = totalVentes - totalAchats - totalDepenses;
     
     // Filter for selected date
-    const ventesJourArr = rawData.ventes?.filter((v: any) => v.created_at.startsWith(selectedDate)) || [];
-    const achatsJourArr = rawData.achats?.filter((a: any) => a.created_at.startsWith(selectedDate)) || [];
-    const depensesJourArr = rawData.depenses?.filter((d: any) => d.created_at.startsWith(selectedDate)) || [];
+    // Convertir created_at UTC en date locale pour le filtrage
+    const toLocalDateStr = (isoStr: string) => {
+      const d = new Date(isoStr);
+      return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
+    };
+
+    const ventesJourArr = rawData.ventes?.filter((v: any) => toLocalDateStr(v.created_at) === selectedDate) || [];
+    const achatsJourArr = rawData.achats?.filter((a: any) => toLocalDateStr(a.created_at) === selectedDate) || [];
+    const depensesJourArr = rawData.depenses?.filter((d: any) => toLocalDateStr(d.created_at) === selectedDate) || [];
 
     const vJour = ventesJourArr.reduce((acc: number, curr: any) => acc + Number(curr.total || 0), 0);
     const aJour = achatsJourArr.reduce((acc: number, curr: any) => acc + Number(curr.total || 0), 0);
