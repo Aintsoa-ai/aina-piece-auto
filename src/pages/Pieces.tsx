@@ -583,32 +583,9 @@ export const Pieces: React.FC = () => {
       fetchData();
       setTimeout(() => setIsModalOpen(false), 800);
     } catch (err: any) {
-      console.warn("DB save failed, simulating local update:", err);
-      const simulatedItem: PieceItem = {
-        id: editId || Math.random().toString(36).substring(7),
-        reference: reference.toUpperCase().trim(),
-        designation: designation.trim(),
-        marque: marque.trim() || '—',
-        categorie: categorie.trim() || '—',
-        qte: parseNum(quantite),
-        achat: parseNum(prixAchat),
-        vente: parseNum(prixVente),
-        stockStatus: 'OK',
-        code_barre: codeBarre.trim(),
-        compatibilite: compatibilite.trim(),
-        oem_number: oemNumber.trim(),
-        emplacement: emplacement.trim(),
-        stock_minimum: parseNum(stockMinimum) || 5,
-        description: description.trim()
-      };
-
-      if (editId) {
-        setPieces(pieces.map(p => p.id === editId ? simulatedItem : p));
-      } else {
-        setPieces([simulatedItem, ...pieces]);
-      }
-      setSuccessMsg("Pièce enregistrée localement.");
-      setTimeout(() => setIsModalOpen(false), 800);
+      console.error("DB save error:", err);
+      showAlert(`Erreur d'enregistrement : ${err.message || 'Erreur inconnue'}`, 'error');
+      // On ne simule plus localement pour forcer à corriger l'erreur DB
     } finally {
       setIsSubmitting(false);
     }
