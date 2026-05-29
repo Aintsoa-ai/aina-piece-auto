@@ -80,3 +80,21 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - **Validation intelligente des formulaires :** Pour les futures fonctionnalités, toujours s'assurer que les listes déroulantes (comme le choix de la boutique lors de la création d'un utilisateur) se réinitialisent ou demandent une confirmation pour éviter les doublons ou erreurs d'assignation.
 - **Blindage ("Hardcoding") des accès super-admin :** L'approche utilisée pour ainapieces2026@gmail.com (garantie des droits administrateur absolue via l'email) devrait être documentée comme "best practice" pour tout futur ERP nécessitant un compte maître indestructible.
 - **Amélioration du fallback réseau :** Affiner encore plus les délais de "timeout" (passés de 3s à 5s) selon la qualité du réseau détectée sur l'appareil (Mobile vs Desktop) pour ne déclencher les modes hors-ligne qu'en cas de réelle nécessité.
+
+
+## 7. Leçons de la Session de Livraison (29/05/2026)
+- **Toujours tester la création de compte avec un UUID dynamique :** Ne jamais mettre de valeurs "en dur" comme des noms de rôles textuels dans des champs UUID. Utiliser une requête SELECT pour récupérer l'ID réel.
+- **Le Hard Reset doit tout vider :** Penser à inclure TOUTES les tables liées lors de l'extension du système (caisse, clients, tickets, permissions...).
+- **Bouton "fantôme" après sync hors-ligne :** Quand une vente hors-ligne échoue à se synchroniser (car le profil avait un mauvais boutique_id), le badge orange du bouton Cloud reste affiché. La solution = corriger le profil ET demander une déconnexion/reconnexion sur le téléphone concerné.
+- **Formation obligatoire avant livraison :** Insister auprès du propriétaire sur l'importance de TOUJOURS sélectionner la boutique lors de la création d'un caissier, même si la liste semble pré-remplie.
+- **Idée future :** Ajouter une confirmation visuelle (un bandeau vert avec le nom de la boutique sélectionnée) dans le formulaire de création de caissier, pour rendre la sélection encore plus explicite.
+- **Idée future :** Créer un script automatique de vérification de cohérence (cron ou Edge Function Supabase) qui détecte les profils sans boutique_id valide et envoie une alerte à l'administrateur.
+
+
+## 7. Leçons de la Session de Livraison (29/05/2026)
+- **Toujours tester la création de compte avec un UUID dynamique :** Ne jamais mettre de valeurs "en dur" comme des noms de rôles textuels dans des champs UUID. Utiliser une requête SELECT pour récupérer l'ID réel.
+- **Le Hard Reset doit tout vider :** Penser à inclure TOUTES les tables liées lors de l'extension du système (caisse, clients, tickets, permissions...).
+- **Bouton "fantôme" après sync hors-ligne :** Quand une vente hors-ligne échoue à se synchroniser (car le profil avait un mauvais boutique_id), le badge orange du bouton Cloud reste affiché. La solution = corriger le profil ET demander une déconnexion/reconnexion sur le téléphone concerné.
+- **Formation obligatoire avant livraison :** Insister auprès du propriétaire sur l'importance de TOUJOURS sélectionner la boutique lors de la création d'un caissier, même si la liste semble pré-remplie.
+- **Idée future :** Ajouter une confirmation visuelle (un bandeau vert avec le nom de la boutique sélectionnée) dans le formulaire de création de caissier, pour rendre la sélection encore plus explicite.
+- **Idée future :** Créer un script automatique de vérification de cohérence (cron ou Edge Function Supabase) qui détecte les profils sans boutique_id valide et envoie une alerte à l'administrateur.

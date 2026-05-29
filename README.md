@@ -128,3 +128,21 @@ L'ERP devient 100% centr� sur la vitesse :
 - **Réinitialisation Ultra-Robuste (Hard Reset) :** La fonction d'effacement total est consolidée avec un traitement parfait des UUID de rôles en fallback. Elle supprime et nettoie l'intégralité du système sans échec.
 - **Matrice des Autorisations Avancée :** Affichage optimisé et persistant des boutiques dans la matrice pour un paramétrage centralisé et précis.
 - **Vérification Mobile/Desktop :** Toutes les modifications ont été auditées pour ne causer aucune perte de fonctionnalité sur la vue Téléphone et Ordinateur. L'application reste 100% responsive et fonctionnelle.
+
+
+### Correction Critique Création Caissiers & Ticket Thermique (29/05/2026 — Final)
+- **Bug UUID Rôle Caissier Corrigé :** La création d'un compte Caissier assigne désormais correctement la boutique choisie. L'erreur silencieuse qui forçait toujours la première boutique a été définitivement éliminée.
+- **Ticket Thermique Dynamique :** L'en-tête du ticket imprimé correspond maintenant exactement à la boutique qui a effectué la vente (PIECE BEHORIRIKA → entête BEHORIRIKA, PIECE ANDRAVOAHANGY → entête ANDRAVOAHANGY). Plus aucun mélange possible.
+- **Hard Reset Ultra-Complet :** La réinitialisation supprime désormais aussi les données de Caisse (historique d'ouverture/fermeture) et les Clients, garantissant une base 100% vierge pour la livraison au futur propriétaire.
+- **Suppression Auth complète :** La fonction SQL `delete_non_admin_users` est corrigée. Après un Hard Reset, les anciens emails ne sont plus "fantômes" — ils peuvent être recréés sans erreur "User already registered".
+- **Projet Nettoyé :** Tous les scripts temporaires (.cjs) ont été supprimés. Le dépôt GitHub est livrable tel quel.
+- **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles sur Téléphone et Ordinateur. Aucune régression.
+
+
+### Correction Critique Création Caissiers & Ticket Thermique (29/05/2026 — Final)
+- **Bug UUID Rôle Caissier Corrigé :** La création d'un compte Caissier assigne désormais correctement la boutique choisie. L'erreur silencieuse qui forçait toujours la première boutique a été définitivement éliminée.
+- **Ticket Thermique Dynamique :** L'en-tête du ticket imprimé correspond maintenant exactement à la boutique qui a effectué la vente (PIECE BEHORIRIKA → entête BEHORIRIKA, PIECE ANDRAVOAHANGY → entête ANDRAVOAHANGY). Plus aucun mélange possible.
+- **Hard Reset Ultra-Complet :** La réinitialisation supprime désormais aussi les données de Caisse (historique d'ouverture/fermeture) et les Clients, garantissant une base 100% vierge pour la livraison au futur propriétaire.
+- **Suppression Auth complète :** La fonction SQL `delete_non_admin_users` est corrigée. Après un Hard Reset, les anciens emails ne sont plus "fantômes" — ils peuvent être recréés sans erreur "User already registered".
+- **Projet Nettoyé :** Tous les scripts temporaires (.cjs) ont été supprimés. Le dépôt GitHub est livrable tel quel.
+- **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles sur Téléphone et Ordinateur. Aucune régression.

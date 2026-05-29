@@ -304,3 +304,93 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Action 3 (Création Caissiers) :** Résolution d'un défaut ergonomique : le sélecteur de boutique est désormais remis à zéro (vide) après la création d'un utilisateur, évitant d'assigner par erreur deux caissiers à la même boutique.
 - **Action 4 (Stabilité AuthContext) :** Correction d'un bug majeur où une perte de connexion (timeout Supabase > 3s) transformait l'Administrateur en simple Caissier. Ajout d'un système de protection invariant ('blindage') pour l'e-mail ainapieces2026@gmail.com, garantissant les pleins droits peu importe l'état du réseau ou de la base de données.
 - **Impact :** La séparation des rôles et l'isolation des données sont 100% robustes sur Téléphone et Ordinateur. L'administrateur ne peut plus être rétrogradé. La matrice est correcte. Les erreurs de création sont évitées.
+
+## Audit #13 — Correction Critique UUID Caissier + Nettoyage Final (29/05/2026 14:30)
+**Statut : ✅ Validé — Déployé sur GitHub & Vercel (commit 909ede6)**
+
+### Problème diagnostiqué :
+La création de comptes Caissiers depuis l'interface Administrateur était **silencieusement défaillante**.
+La ligne `role_id: 'caissier'` envoyait le texte brut au lieu d'un UUID valide.
+Supabase rejetait la mise à jour du profil → le profil gardait les valeurs du TRIGGER par défaut → la boutique assignée était toujours la première de la liste (BEHORIRIKA) quelle que soit la sélection dans l'interface.
+**C'était LA cause racine de tous les bugs de boutique observés depuis des jours.**
+
+### Corrections apportées :
+
+#### 1. FIX CRITIQUE — `Settings.tsx` (ligne 77)
+- **Avant :** `role_id: 'caissier'` → chaîne texte rejetée par Supabase
+- **Après :** Requête dynamique vers la table `roles` pour récupérer le vrai UUID du rôle 'caissier'
+- **Impact :** La mise à jour du profil (boutique_id + role_id + full_name) s'applique maintenant correctement dès la création
+
+#### 2. Ticket Thermique — `Sales.tsx`
+- L'entête du ticket utilisait le filtre global administrateur au lieu des données propres à chaque vente
+- Corrigé : le ticket cherche la boutique par le nom de la vente (`receiptSale.boutique_name`) → chaque ticket affiche maintenant la bonne boutique
+
+#### 3. Hard Reset étendu — `Settings.tsx`
+- Ajout de la suppression des tables `caisse` et `clients` lors de la réinitialisation totale
+- Résultat : la base de données est 100% vierge après un Hard Reset (aucune donnée orpheline)
+
+#### 4. Sécurisation de la liste déroulante boutique
+- L'option par défaut du sélecteur devient "⚠️ SÉLECTIONNEZ LA BOUTIQUE OBLIGATOIRE ⚠️"
+- Réduit les risques d'erreur d'inattention lors de la création de comptes
+
+#### 5. Correction RPC SQL (`delete_non_admin_users`)
+- Ancien code : comparaison texte/UUID causait une erreur 22P02 en silence
+- Nouveau code : récupération de l'UUID admin_role_id en DECLARE avant la suppression
+
+#### 6. Nettoyage Projet
+- Suppression de 23 fichiers temporaires (.cjs) utilisés pour les corrections de données
+- Projet livré sans aucun script de débogage résiduel
+
+### Vérification Mobile/Desktop :
+- ✅ La création de caissier est testée et fonctionnelle
+- ✅ Le ticket thermique affiche la bonne boutique sur téléphone et PC
+- ✅ Le Hard Reset supprime toutes les données y compris caisse et clients
+- ✅ Aucune régression observée sur les fonctionnalités existantes (scanner, hors-ligne, matrice)
+
+### Point de sauvegarde :
+**Commit GitHub : `909ede6`** — branche main — Vercel auto-déployé
+
+## Audit #13 — Correction Critique UUID Caissier + Nettoyage Final (29/05/2026 14:30)
+**Statut : ✅ Validé — Déployé sur GitHub & Vercel (commit 909ede6)**
+
+### Problème diagnostiqué :
+La création de comptes Caissiers depuis l'interface Administrateur était **silencieusement défaillante**.
+La ligne `role_id: 'caissier'` envoyait le texte brut au lieu d'un UUID valide.
+Supabase rejetait la mise à jour du profil → le profil gardait les valeurs du TRIGGER par défaut → la boutique assignée était toujours la première de la liste (BEHORIRIKA) quelle que soit la sélection dans l'interface.
+**C'était LA cause racine de tous les bugs de boutique observés depuis des jours.**
+
+### Corrections apportées :
+
+#### 1. FIX CRITIQUE — `Settings.tsx` (ligne 77)
+- **Avant :** `role_id: 'caissier'` → chaîne texte rejetée par Supabase
+- **Après :** Requête dynamique vers la table `roles` pour récupérer le vrai UUID du rôle 'caissier'
+- **Impact :** La mise à jour du profil (boutique_id + role_id + full_name) s'applique maintenant correctement dès la création
+
+#### 2. Ticket Thermique — `Sales.tsx`
+- L'entête du ticket utilisait le filtre global administrateur au lieu des données propres à chaque vente
+- Corrigé : le ticket cherche la boutique par le nom de la vente (`receiptSale.boutique_name`) → chaque ticket affiche maintenant la bonne boutique
+
+#### 3. Hard Reset étendu — `Settings.tsx`
+- Ajout de la suppression des tables `caisse` et `clients` lors de la réinitialisation totale
+- Résultat : la base de données est 100% vierge après un Hard Reset (aucune donnée orpheline)
+
+#### 4. Sécurisation de la liste déroulante boutique
+- L'option par défaut du sélecteur devient "⚠️ SÉLECTIONNEZ LA BOUTIQUE OBLIGATOIRE ⚠️"
+- Réduit les risques d'erreur d'inattention lors de la création de comptes
+
+#### 5. Correction RPC SQL (`delete_non_admin_users`)
+- Ancien code : comparaison texte/UUID causait une erreur 22P02 en silence
+- Nouveau code : récupération de l'UUID admin_role_id en DECLARE avant la suppression
+
+#### 6. Nettoyage Projet
+- Suppression de 23 fichiers temporaires (.cjs) utilisés pour les corrections de données
+- Projet livré sans aucun script de débogage résiduel
+
+### Vérification Mobile/Desktop :
+- ✅ La création de caissier est testée et fonctionnelle
+- ✅ Le ticket thermique affiche la bonne boutique sur téléphone et PC
+- ✅ Le Hard Reset supprime toutes les données y compris caisse et clients
+- ✅ Aucune régression observée sur les fonctionnalités existantes (scanner, hors-ligne, matrice)
+
+### Point de sauvegarde :
+**Commit GitHub : `909ede6`** — branche main — Vercel auto-déployé
