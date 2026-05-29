@@ -1194,9 +1194,11 @@ export const Settings: React.FC = () => {
         if (error) {
           await supabase.from('profiles').delete().neq('role_id', 'administrateur');
         }
+        localStorage.removeItem('boutique_accounts');
+        setCreatedAccounts([]);
       }
       if (resetOptions.boutiques) {
-        await supabase.from('boutiques').delete().neq('name', 'AINA PIECE BEHORIRIKA');
+        await supabase.from('boutiques').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       }
       showAlert("Réinitialisation effectuée avec succès.");
       setHardResetModalOpen(false);

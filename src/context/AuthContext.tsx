@@ -55,37 +55,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (result && !result.isTimeout && result.data) {
         console.log('Profile loaded successfully from DB');
         setProfile(result.data);
-        setRole((result.data as any).roles?.name || null);
+        setRole((result.data as any).roles?.name?.toLowerCase() || result.data.role_id?.toLowerCase() || 'caissier');
         return;
       }
 
       if (result && result.isTimeout) {
-        console.warn('Profile fetch timed out after 3s. Activating admin fallback.');
+        console.warn('Profile fetch timed out after 3s. Activating fallback.');
       } else {
-        console.warn('Profile fetch returned no data. Activating admin fallback.', result?.error);
+        console.warn('Profile fetch returned no data. Activating fallback.', result?.error);
       }
 
-      // Admin fallback
+      // Guest/Caissier fallback instead of blind admin
       setProfile({
         id: userId,
-        full_name: 'Administrateur Aina',
-        role_id: 'admin_role_id',
+        full_name: 'Utilisateur',
+        role_id: 'caissier',
         boutique_id: '',
         created_at: new Date().toISOString(),
         last_login: null
       });
-      setRole('administrateur');
+      setRole('caissier');
     } catch (err) {
-      console.error('Error fetching profile, using admin fallback:', err);
+      console.error('Error fetching profile, using fallback:', err);
       setProfile({
         id: userId,
-        full_name: 'Administrateur Aina',
-        role_id: 'admin_role_id',
+        full_name: 'Utilisateur',
+        role_id: 'caissier',
         boutique_id: '',
         created_at: new Date().toISOString(),
         last_login: null
       });
-      setRole('administrateur');
+      setRole('caissier');
     }
   };
 
