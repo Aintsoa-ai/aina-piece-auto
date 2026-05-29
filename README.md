@@ -172,3 +172,16 @@ L'ERP devient 100% centr� sur la vitesse :
 - **Nom Boutique figé sur Ticket :** Correction de la résolution d'en-tête du ticket. Il affiche et fige le nom réel de la boutique (ex: "B TANANARIVO") au lieu de "Boutique" ou de basculer de manière aléatoire en cas de réinitialisation du dropdown.
 - **Heartbeat Automatique (Online Status) :** Mise en place d'un intervalle de synchronisation toutes les 5 minutes dans `Layout.tsx` pour forcer le ping de connexion et renouveler l'état de la boutique sur le canal de présence Supabase. Les témoins verts clignotants en temps réel reflètent désormais parfaitement le statut actif des caissiers connectés sans passer à "Hors ligne" par inactivité.
 
+### Correction Rapport de Ventes & Schéma SQL (30/05/2026 — Point de Sauvegarde v2)
+- **Correction Rapport vide (0 Ar) :** Le module d'export de rapports (PDF, Word, Excel) souffrait du même bug de fuseau horaire que le Dashboard. Les filtres de date utilisaient maintenant `new Date('YYYY-MM-DDT00:00:00').toISOString()` pour convertir minuit heure locale Madagascar (UTC+3) en UTC avant d'interroger Supabase.
+- **Schéma SQL mis à jour (v2.0) :** Le fichier `01_initial_schema.sql` est désormais complet et synchronisé avec la base de production. Il inclut toutes les tables et colonnes ajoutées depuis le lancement : `clients`, `reglements_credits`, `boutique_settings`, `page_permissions`, `pieces.code_barre`, `pieces.prix_vente`, `pieces.prix_achat`, `ventes.statut_paiement`, `ventes.boutique_name`, `ventes.vendeur`, `ventes.espece_recue`, `ventes.monnaie_rendue`.
+- **Base Supabase synchronisée :** Les colonnes manquantes ont été ajoutées via des scripts `ALTER TABLE ADD COLUMN IF NOT EXISTS` sécurisés.
+
+---
+
+## 📍 POINT DE SAUVEGARDE CERTIFIÉ v2 — 30/05/2026 02:32 (Madagascar)
+**Git Tag :** `sauvegarde-30052026-v2` | **Hash :** `492cd0f`
+**URL Production :** https://aina-piece-auto.vercel.app
+
+*Toutes les fonctionnalités sont testées et opérationnelles sur Mobile et Desktop : Scanner douchette (100ms), Ticket boutique correct, Dashboard date locale, Rapport date locale, Présence temps réel (heartbeat 5min), Clients & Crédits, Hard Reset complet, Schéma SQL v2 synchronisé.*
+
