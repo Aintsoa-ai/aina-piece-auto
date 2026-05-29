@@ -297,10 +297,13 @@ export const Purchases: React.FC = () => {
         if (barcodeBuffer.length >= 3) {
            e.preventDefault();
            e.stopPropagation();
-           const scannedCode = decodeAzertyBarcode(barcodeBuffer);
+           const scannedCode = decodeAzertyBarcode(barcodeBuffer).trim();
            barcodeBuffer = '';
            
-           const piece = pieces.find(p => p.code_barre === scannedCode || p.reference === scannedCode);
+           const piece = pieces.find(p => 
+             (p.code_barre && p.code_barre.trim() === scannedCode) || 
+             (p.reference && p.reference.trim().toUpperCase() === scannedCode.toUpperCase())
+           );
            if (piece) {
              if (!isModalOpen) {
                // Ouvrir la modale et pré-sélectionner
