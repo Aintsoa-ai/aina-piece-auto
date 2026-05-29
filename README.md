@@ -165,3 +165,10 @@ L'ERP devient 100% centr� sur la vitesse :
 - **Correction du Ticket Thermique :** L'en-tête du ticket capture et fige le véritable nom de la boutique qui a effectué la vente. La réinitialisation intempestive de la liste déroulante après une transaction a été corrigée.
 - **Réinitialisation Clients & Crédits :** Le module de Factory Reset intègre une option distincte et sécurisée (Avertisseur Jaune) permettant la purge complète et propre (respect des clés étrangères) de l'historique des clients et de leurs dettes.
 - **Compatibilité Totale (Mobile/Desktop) :** L'impact de chaque modification a été revérifié sur les deux formats pour garantir que l'expérience tactile (téléphone) et bureau (ordinateur) reste fluide et sans bug visuel ou technique.
+
+### Mises à jour finales et corrections majeures (30/05/2026)
+- **Correction Date/Heure Locale Dashboard :** Remplacement de la comparaison UTC directe des dates par une conversion locale (`toLocalDateStr`). Toutes les ventes faites à Madagascar (+3h) s'affichent maintenant instantanément le bon jour au tableau de bord, même après minuit local.
+- **Réduction du Délai Douchette :** Le délai de détection de la douchette a été optimisé à **100ms** (au lieu de 500ms), évitant la fragmentation des codes-barres lors de scans rapides ou sur des machines moins performantes.
+- **Nom Boutique figé sur Ticket :** Correction de la résolution d'en-tête du ticket. Il affiche et fige le nom réel de la boutique (ex: "B TANANARIVO") au lieu de "Boutique" ou de basculer de manière aléatoire en cas de réinitialisation du dropdown.
+- **Heartbeat Automatique (Online Status) :** Mise en place d'un intervalle de synchronisation toutes les 5 minutes dans `Layout.tsx` pour forcer le ping de connexion et renouveler l'état de la boutique sur le canal de présence Supabase. Les témoins verts clignotants en temps réel reflètent désormais parfaitement le statut actif des caissiers connectés sans passer à "Hors ligne" par inactivité.
+
