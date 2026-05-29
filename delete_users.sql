@@ -5,11 +5,14 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  -- Supprime de la table auth.users tous les utilisateurs dont l'ID ne correspond pas
-  -- à un profil avec le rôle 'administrateur'
+  -- Supprime de la table auth.users tous les utilisateurs dont le rôle n'est pas 'administrateur'
+  -- On joint la table roles car role_id est un UUID
   DELETE FROM auth.users 
-  WHERE id NOT IN (
-    SELECT id FROM public.profiles WHERE role_id = 'administrateur' OR role_id = 'Administrateur'
+  WHERE id IN (
+    SELECT p.id 
+    FROM public.profiles p
+    LEFT JOIN public.roles r ON p.role_id = r.id
+    WHERE r.name != 'administrateur' OR r.name IS NULL
   );
 END;
 $$;
