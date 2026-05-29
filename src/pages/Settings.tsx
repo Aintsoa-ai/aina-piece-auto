@@ -91,6 +91,7 @@ export const Settings: React.FC = () => {
         setCaissierMessage({ type: 'success', text: `Compte boutique créé avec succès ! Connectez-vous avec cet email sur la caisse.` });
         setNewCaissierEmail('');
         setNewCaissierPassword('');
+        setNewCaissierBoutique('');
       }
     } catch (err: any) {
       console.error(err);
