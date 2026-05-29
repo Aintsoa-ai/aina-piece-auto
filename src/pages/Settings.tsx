@@ -1192,7 +1192,10 @@ export const Settings: React.FC = () => {
         // Appelle une fonction RPC si elle existe, sinon supprime au moins les profils
         const { error } = await supabase.rpc('delete_non_admin_users');
         if (error) {
-          await supabase.from('profiles').delete().neq('role_id', 'administrateur');
+          const { data: adminRole } = await supabase.from('roles').select('id').eq('name', 'administrateur').single();
+          if (adminRole) {
+            await supabase.from('profiles').delete().neq('role_id', adminRole.id);
+          }
         }
         localStorage.removeItem('boutique_accounts');
         setCreatedAccounts([]);
