@@ -1189,10 +1189,12 @@ export const Settings: React.FC = () => {
         await supabase.from('fournisseurs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       }
       if (resetOptions.utilisateurs) {
-        // Appelle une fonction RPC si elle existe, sinon supprime au moins les profils
         const { error } = await supabase.rpc('delete_non_admin_users');
         if (error) {
-          await supabase.from('profiles').delete().neq('role_id', 'administrateur');
+          const { data: adminRole } = await supabase.from('roles').select('id').eq('name', 'administrateur').single();
+          if (adminRole) {
+            await supabase.from('profiles').delete().neq('role_id', adminRole.id);
+          }
         }
         localStorage.removeItem('boutique_accounts');
         setCreatedAccounts([]);
@@ -1411,7 +1413,7 @@ export const Settings: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#ffffff', display: 'flex', alignItems: 'center', margin: 0, whiteSpace: 'nowrap' }}>
               <Shield size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
-              Matrice des Autorisations (Utilisateurs & Boutiques)
+              Matrice des Autorisations (Utilisateurs)
             </h3>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, padding: '0 40px', maxWidth: '400px' }}>
@@ -1487,7 +1489,7 @@ export const Settings: React.FC = () => {
           )}
 
           <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', marginTop: '8px', marginBottom: '16px', lineHeight: 1.5 }}>
-            Cliquez sur les icônes (œil) pour définir quelles pages sont visibles par chaque profil ou boutique.
+            Cliquez sur les icônes (œil) pour définir quelles pages sont visibles par chaque utilisateur.
           </p>
 
           <div style={{ maxHeight: '400px', overflowY: 'auto', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', marginTop: '8px' }}>
@@ -1501,7 +1503,7 @@ export const Settings: React.FC = () => {
                   <th colSpan={4} style={{ ...s.th, textAlign: 'center', backgroundColor: '#1e293b', color: '#c084fc', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>ADMINISTRATION</th>
                 </tr>
                 <tr>
-                  <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}>Profils / Boutiques</th>
+                  <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}>Utilisateurs</th>
                   <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.2)' }}><div title="Tableau de bord" style={{ display: 'flex', justifyContent: 'center' }}><LayoutDashboard size={16} /></div></th>
                   
                   <th style={{ ...s.th, backgroundColor: '#161b22', borderBottom: '2px solid rgba(255,255,255,0.1)' }}><div title="Ventes" style={{ display: 'flex', justifyContent: 'center' }}><ShoppingCart size={16} /></div></th>
@@ -1530,25 +1532,6 @@ export const Settings: React.FC = () => {
                     const isDivider = ['dashboard', 'clients', 'fournisseurs'].includes(page);
                     return (
                       <td key={page} style={{ ...s.tdCenter, borderRight: isDivider ? '1px solid rgba(255,255,255,0.2)' : s.tdCenter.borderRight }} onClick={() => toggleMatrixPerm(p.id, page)}>
-                        <div style={{ ...s.eyeToggle, backgroundColor: enabled ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255, 255, 255, 0.05)' }}>
-                          {enabled ? <Eye size={16} color="#22c55e" /> : <EyeOff size={16} color="rgba(255,255,255,0.2)" />}
-                        </div>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-              {/* Spacer row */}
-              <tr style={{ backgroundColor: '#0d1117', height: '8px' }}><td colSpan={13}></td></tr>
-              {/* Boutiques */}
-              {boutiques.map((b, i) => (
-                <tr key={b.id} style={{ ...s.tr, backgroundColor: i % 2 === 0 ? '#161b22' : '#0d1117' }}>
-                  <td style={{ ...s.tdName, borderRight: '1px solid rgba(255,255,255,0.2)' }}>{b.name}</td>
-                  {['dashboard', 'sales', 'purchases', 'caisse', 'depenses', 'clients', 'pieces', 'stock', 'fournisseurs', 'users', 'boutiques', 'excel', 'settings'].map(page => {
-                    const enabled = getMatrixPerm(b.id, page);
-                    const isDivider = ['dashboard', 'clients', 'fournisseurs'].includes(page);
-                    return (
-                      <td key={page} style={{ ...s.tdCenter, borderRight: isDivider ? '1px solid rgba(255,255,255,0.2)' : s.tdCenter.borderRight }} onClick={() => toggleMatrixPerm(b.id, page)}>
                         <div style={{ ...s.eyeToggle, backgroundColor: enabled ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255, 255, 255, 0.05)' }}>
                           {enabled ? <Eye size={16} color="#22c55e" /> : <EyeOff size={16} color="rgba(255,255,255,0.2)" />}
                         </div>
