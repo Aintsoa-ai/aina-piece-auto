@@ -22,6 +22,7 @@ interface SaleItem {
   benefice: number;
   espece?: number;
   reste?: number;
+  statut_paiement?: string; // 'PAYE' | 'CREDIT'
 }
 
 interface CartItem {
@@ -185,6 +186,7 @@ export const Sales: React.FC = () => {
           profiles(full_name),
           boutiques(name)
         `)
+        .or('statut_paiement.neq.CREDIT,statut_paiement.is.null')
         .order('created_at', { ascending: false });
 
       if (role !== 'administrateur' && profile?.boutique_id) {
@@ -267,7 +269,8 @@ export const Sales: React.FC = () => {
                   quantity: qty,
                   pu: detail?.prix_vente || (totalVal / qty),
                   total: totalVal,
-                  benefice: benef > 0 ? benef : totalVal * 0.35
+                  benefice: benef > 0 ? benef : totalVal * 0.35,
+                  statut_paiement: s.statut_paiement || 'PAYE'
                 });
               });
             } else if (s.total > 0) {
