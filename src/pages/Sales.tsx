@@ -596,8 +596,6 @@ export const Sales: React.FC = () => {
       }
 
       // Build local item for immediate receipt
-      const realBoutiqueName = dbBoutiques.find(b => b.id === boutiqueIdToUse)?.name || 'Boutique';
-
       const localSaleItems = cart.map((item, index) => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         return {
@@ -609,7 +607,7 @@ export const Sales: React.FC = () => {
           piece_name: item.piece.designation,
           piece_ref: item.piece.reference,
           vendeur: vendeurName,
-          boutique_name: realBoutiqueName,
+          boutique_name: 'Boutique',
           quantity: item.quantity,
           pu: pVente,
           total: pVente * item.quantity,
@@ -654,8 +652,6 @@ export const Sales: React.FC = () => {
       });
 
       // Mettre à jour visuellement le stock local dans l'état (simulation locale)
-      const realBoutiqueNameOffline = dbBoutiques.find(b => b.id === boutiqueIdToUse)?.name || 'Boutique';
-
       const simulatedSales = cart.map((item, index) => {
         const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
         return {
@@ -667,7 +663,7 @@ export const Sales: React.FC = () => {
           piece_name: item.piece.designation,
           piece_ref: item.piece.reference,
           vendeur: vendeurName,
-          boutique_name: realBoutiqueNameOffline,
+          boutique_name: 'Boutique',
           quantity: item.quantity,
           pu: pVente,
           total: pVente * item.quantity,
