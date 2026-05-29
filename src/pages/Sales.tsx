@@ -293,7 +293,7 @@ export const Sales: React.FC = () => {
               code_barre: st.pieces?.code_barre || null,
               designation: st.pieces?.designation || 'Pièce',
               marque: st.pieces?.marque || 'Origine',
-              prix_vente: st.pieces?.prix_vente || pAchat * 1.4,
+              prix_vente: st.pieces?.prix_vente || (pAchat > 0 ? pAchat * 1.5 : 0),
               quantity_disponible: st.quantity_disponible || 0,
               prix_achat: pAchat
             });

@@ -409,7 +409,11 @@ export const Pieces: React.FC = () => {
       categorie: categorie.trim() || null,
       compatibilite: compatibilite.trim() || null,
       oem_number: oemNumber.trim() || null,
-      description: description.trim() || null
+      description: description.trim() || null,
+      // ✅ FIX : sauvegarde les prix directement dans la table pieces
+      // pour que Sales.tsx lise le bon prix sans dépendre d'un calcul approximatif
+      prix_vente: parseNum(prixVente) || null,
+      prix_achat: parseNum(prixAchat) || null,
     };
 
     try {
