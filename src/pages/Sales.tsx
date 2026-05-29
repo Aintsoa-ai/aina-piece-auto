@@ -1112,7 +1112,7 @@ export const Sales: React.FC = () => {
 
       {/* ─── RECEIPT MODAL PRINT ─────────────────────────── */}
       {receiptSale && (() => {
-        const matchingDbBoutique = dbBoutiques.find(b => b.id === selectedBoutique) || dbBoutiques[0];
+        const matchingDbBoutique = dbBoutiques.find(b => b.name === receiptSale.boutique_name) || dbBoutiques.find(b => b.id === selectedBoutique) || dbBoutiques[0];
 
         const currentInfo = matchingDbBoutique ? boutiqueInfos[matchingDbBoutique.id] || {} : {};
 

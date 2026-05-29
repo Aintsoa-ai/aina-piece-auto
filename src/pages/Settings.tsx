@@ -1992,7 +1992,7 @@ export const Settings: React.FC = () => {
                 value={newCaissierBoutique}
                 onChange={(e) => setNewCaissierBoutique(e.target.value)}
               >
-                <option value="">-- Choisir une boutique --</option>
+                <option value="">⚠️ SÉLECTIONNEZ LA BOUTIQUE OBLIGATOIRE ⚠️</option>
                 {boutiques.map(b => (
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
