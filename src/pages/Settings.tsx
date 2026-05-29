@@ -70,12 +70,23 @@ export const Settings: React.FC = () => {
       if (data.user) {
         // Attendre 2s que le trigger Supabase crée la ligne de profil par défaut
         await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // ✅ FIX CRITIQUE : Récupérer le vrai UUID du rôle 'caissier' depuis la DB
+        // (on ne peut PAS utiliser la chaîne de texte 'caissier' directement)
+        const { data: roleData } = await supabase
+          .from('roles')
+          .select('id')
+          .eq('name', 'caissier')
+          .single();
         
-        // Mettre à jour le profil pour l'assigner à la boutique
+        const caissierRoleId = roleData?.id || null;
+        const boutiqueName = boutiques.find(b => b.id === newCaissierBoutique)?.name || '';
+        
+        // Mettre à jour le profil pour l'assigner à la boutique avec l'UUID correct du rôle
         const { error: profileError } = await supabase.from('profiles').update({
           boutique_id: newCaissierBoutique,
-          role_id: 'caissier',
-          full_name: 'Caissier ' + (boutiques.find(b => b.id === newCaissierBoutique)?.name || '')
+          role_id: caissierRoleId,
+          full_name: boutiqueName
         }).eq('id', data.user.id);
         
         if (profileError) {
@@ -83,8 +94,8 @@ export const Settings: React.FC = () => {
           await supabase.from('profiles').insert({
             id: data.user.id,
             boutique_id: newCaissierBoutique,
-            role_id: 'caissier',
-            full_name: 'Caissier ' + (boutiques.find(b => b.id === newCaissierBoutique)?.name || '')
+            role_id: caissierRoleId,
+            full_name: boutiqueName
           });
         }
         
