@@ -166,7 +166,7 @@ export const Settings: React.FC = () => {
   const [reportStart, setReportStart] = useState(initialTodayStr);
   const [reportEnd, setReportEnd] = useState(initialTodayStr);
   const [reportBoutiqueId, setReportBoutiqueId] = useState('all');
-  const [reportOpts, setReportOpts] = useState({ ventes: true, achats: true, stock: true, depenses: true, credits: true });
+  const [reportOpts, setReportOpts] = useState({ ventes: true, achats: true, stock: true, depenses: true });
   const [isExporting, setIsExporting] = useState(false);
   const [purgeModalOpen, setPurgeModalOpen] = useState(false);
   const [purgeStart, setPurgeStart] = useState(initialTodayStr);
@@ -595,9 +595,12 @@ export const Settings: React.FC = () => {
       let achats: any[] = [];
       let stock: any[] = [];
       let depenses: any[] = [];
-      let credits: any[] = [];
 
-      const endDateFilter = reportEnd + 'T23:59:59.999Z';
+      // Conversion heure locale → UTC pour les filtres de date
+      // new Date('YYYY-MM-DDT00:00:00') sans 'Z' = minuit heure locale (Madagascar UTC+3)
+      // .toISOString() le convertit automatiquement en UTC correct
+      const startDateFilter = new Date(reportStart + 'T00:00:00').toISOString();
+      const endDateFilter = new Date(reportEnd + 'T23:59:59.999').toISOString();
       
       const formatToDDMMYYYY = (isoStr: string) => {
         if (!isoStr) return '';
@@ -609,7 +612,7 @@ export const Settings: React.FC = () => {
       if (reportOpts.ventes) {
         let q = supabase.from('ventes')
           .select('id, total, created_at, boutique_id, details_ventes(quantite, prix_vente, total, pieces(designation))')
-          .gte('created_at', reportStart)
+          .gte('created_at', startDateFilter)
           .lte('created_at', endDateFilter);
         
         if (reportBoutiqueId !== 'all') {
@@ -635,7 +638,7 @@ export const Settings: React.FC = () => {
       if (reportOpts.achats) {
         let q = supabase.from('achats')
           .select('id, total, created_at, boutique_id, details_achats(quantite, prix_unitaire, total, pieces(designation))')
-          .gte('created_at', reportStart)
+          .gte('created_at', startDateFilter)
           .lte('created_at', endDateFilter);
         
         if (reportBoutiqueId !== 'all') {
@@ -660,7 +663,7 @@ export const Settings: React.FC = () => {
       if (reportOpts.depenses) {
         let q = supabase.from('depenses')
           .select('*')
-          .gte('created_at', reportStart)
+          .gte('created_at', startDateFilter)
           .lte('created_at', endDateFilter);
 
         if (reportBoutiqueId !== 'all') {
@@ -687,36 +690,6 @@ export const Settings: React.FC = () => {
             stock_minimum: s.stock_minimum || 5,
             reference: s.reference || ''
           }));
-        }
-      }
-      if (reportOpts.credits) {
-        const { data: clientsData } = await supabase.from('clients').select('*').order('nom');
-        if (clientsData) {
-          let ventesQuery = supabase.from('ventes').select('client_id, total, montant_paye, boutique_id').eq('statut_paiement', 'CREDIT');
-          if (reportBoutiqueId !== 'all') {
-            ventesQuery = ventesQuery.eq('boutique_id', reportBoutiqueId);
-          }
-          const { data: ventesData } = await ventesQuery;
-          const { data: reglementsData } = await supabase.from('reglements_credits').select('client_id, montant');
-
-          credits = clientsData.map((c: any) => {
-            const clientVentes = ventesData?.filter((v: any) => v.client_id === c.id) || [];
-            const clientReglements = reglementsData?.filter((r: any) => r.client_id === c.id) || [];
-            
-            const totalAchat = clientVentes.reduce((sum: number, v: any) => sum + Number(v.total), 0);
-            const totalPayeLorsVente = clientVentes.reduce((sum: number, v: any) => sum + Number(v.montant_paye || 0), 0);
-            const totalRembourse = clientReglements.reduce((sum: number, r: any) => sum + Number(r.montant), 0);
-            const totalDu = totalAchat - totalPayeLorsVente - totalRembourse;
-
-            return {
-              nom: c.nom || 'Inconnu',
-              contact: c.contact || '',
-              type_client: c.type_client || 'GARAGE',
-              total_credit: totalAchat,
-              total_paye: totalPayeLorsVente + totalRembourse,
-              total_du: totalDu
-            };
-          }).filter((c: any) => c.total_credit > 0 || c.total_paye > 0 || c.total_du > 0);
         }
       }
 
@@ -880,28 +853,6 @@ export const Settings: React.FC = () => {
           wsStock['!cols'] = [ {wch: 20}, {wch: 45}, {wch: 20}, {wch: 20} ];
           applyExcelStyles(wsStock);
           XLSX.utils.book_append_sheet(wb, wsStock, "Stock Actuel");
-        }
-        if (reportOpts.credits && credits.length > 0) {
-          const totalCreditsDu = credits.reduce((sum, c) => sum + Number(c.total_du || 0), 0);
-          const excelCredits = [...credits.map(c => ({
-            "Nom du Garage / Client": c.nom,
-            "Contact": c.contact,
-            "Type": c.type_client,
-            "Total Crédits Accordés": c.total_credit,
-            "Total Remboursé / Payé": c.total_paye,
-            "Reste à Payer (Dette)": c.total_du
-          })), {
-            "Nom du Garage / Client": 'TOTAL GÉNÉRAL',
-            "Contact": '---',
-            "Type": '---',
-            "Total Crédits Accordés": '',
-            "Total Remboursé / Payé": '',
-            "Reste à Payer (Dette)": totalCreditsDu
-          }];
-          const wsCredits = XLSX.utils.json_to_sheet(excelCredits);
-          wsCredits['!cols'] = [ {wch: 30}, {wch: 20}, {wch: 15}, {wch: 20}, {wch: 20}, {wch: 20} ];
-          applyExcelStyles(wsCredits);
-          XLSX.utils.book_append_sheet(wb, wsCredits, "Dettes & Crédits");
         }
         const fileName = `Rapport_${appName}_${reportStart}_au_${reportEnd}.xlsx`;
         
@@ -1107,43 +1058,6 @@ export const Settings: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              ${reportOpts.credits && credits.length > 0 ? `
-              <!-- CLIENTS & CREDITS TABLE -->
-              <h3 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin: 30px 0 15px 0; border-bottom: 2px solid #0F755E; padding-bottom: 5px; display: inline-block; color: #0F755E;">Dettes & Crédits Clients (Garages)</h3>
-              <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; margin-bottom: 30px;">
-                <thead>
-                  <tr style="background-color: #333333; color: #fff;">
-                    <th style="padding: 12px 10px; font-weight: 700; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.1); width: 35%;">Client / Garage</th>
-                    <th style="padding: 12px 10px; font-weight: 700; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.1);">Contact</th>
-                    <th style="padding: 12px 10px; font-weight: 700; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.1); text-align:right;">Total Crédits</th>
-                    <th style="padding: 12px 10px; font-weight: 700; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.1); text-align:right;">Total Remboursé</th>
-                    <th style="padding: 12px 10px; font-weight: 700; text-transform: uppercase; text-align:right;">Dette Restante</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${credits.map((c, idx) => {
-                    const rowBg = idx % 2 === 0 ? '#F9F9F9' : '#FFF';
-                    return `
-                    <tr style="background-color: ${rowBg};">
-                      <td style="padding: 10px; border-right: 1px solid #eee; border-bottom: 1px solid #eee; font-weight: bold; color: #333;">${c.nom}</td>
-                      <td style="padding: 10px; border-right: 1px solid #eee; border-bottom: 1px solid #eee; color: #666;">${c.contact}</td>
-                      <td style="padding: 10px; border-right: 1px solid #eee; border-bottom: 1px solid #eee; text-align:right; color: #333;">${new Intl.NumberFormat('fr-FR').format(c.total_credit)} Ar</td>
-                      <td style="padding: 10px; border-right: 1px solid #eee; border-bottom: 1px solid #eee; text-align:right; color: #0F755E;">${new Intl.NumberFormat('fr-FR').format(c.total_paye)} Ar</td>
-                      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align:right; font-weight: bold; color: #ef4444;">${new Intl.NumberFormat('fr-FR').format(c.total_du)} Ar</td>
-                    </tr>
-                    `;
-                  }).join('')}
-                  <tr style="background-color: #eee; font-weight: bold;">
-                    <td style="padding: 10px; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc;">TOTAL GÉNÉRAL</td>
-                    <td style="padding: 10px; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc;">---</td>
-                    <td style="padding: 10px; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align:right;">${new Intl.NumberFormat('fr-FR').format(credits.reduce((sum, c) => sum + Number(c.total_credit || 0), 0))} Ar</td>
-                    <td style="padding: 10px; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align:right; color: #0F755E;">${new Intl.NumberFormat('fr-FR').format(credits.reduce((sum, c) => sum + Number(c.total_paye || 0), 0))} Ar</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ccc; text-align:right; color: #ef4444;">${new Intl.NumberFormat('fr-FR').format(credits.reduce((sum, c) => sum + Number(c.total_du || 0), 0))} Ar</td>
-                  </tr>
-                </tbody>
-              </table>
-              ` : ''}
 
               <!-- FOOTER -->
               <div style="background: #333333; color: #fff; padding: 20px 40px; display: flex; justify-content: space-between; font-size: 11px; margin-top: 40px; border-radius: 4px;">
@@ -2497,8 +2411,7 @@ export const Settings: React.FC = () => {
                     { key: 'ventes', label: 'Ventes réalisées' },
                     { key: 'achats', label: 'Achats / Approvisionnements' },
                     { key: 'depenses', label: 'Dépenses enregistrées' },
-                    { key: 'stock', label: 'État du Stock actuel' },
-                    { key: 'credits', label: 'Dettes & Crédits Clients' }
+                    { key: 'stock', label: 'État du Stock actuel' }
                   ].map(opt => (
                     <label key={opt.key} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '13px', cursor: 'pointer' }}>
                       <input 
