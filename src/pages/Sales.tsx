@@ -198,6 +198,12 @@ export const Sales: React.FC = () => {
         .from('stock')
         .select('*, pieces(*)');
 
+      // 2b. ✅ Requête directe sur pieces pour garantir code_barre même si le JOIN échoue
+      // (RLS ou FK non configurée peuvent rendre st.pieces null)
+      const { data: piecesDirectData } = await supabase
+        .from('pieces')
+        .select('id, reference, code_barre, designation, marque, prix_vente, prix_achat');
+
       // 3. Fetch purchase prices to compute exact benefit
       const { data: pfData } = await supabase
         .from('piece_fournisseurs')
@@ -210,7 +216,7 @@ export const Sales: React.FC = () => {
       const { data: cData } = await supabase.from('clients').select('id, nom').order('nom');
       const clientsData = cData || [];
 
-      return { salesData, stockData, pfData, bData, clientsData };
+      return { salesData, stockData, pfData, bData, clientsData, piecesDirectData };
     })();
 
     try {
@@ -282,18 +288,28 @@ export const Sales: React.FC = () => {
           });
         }
 
+        // ✅ Carte directe piece_id → données pièce (filet de sécurité si le JOIN échoue)
+        const piecesDirectMap: Record<string, any> = {};
+        if (result.piecesDirectData) {
+          result.piecesDirectData.forEach((p: any) => {
+            piecesDirectMap[p.id] = p;
+          });
+        }
+
         const parsedPieces: PieceItem[] = [];
         if (result.stockData) {
           result.stockData.forEach((st: any) => {
-            const pAchat = st.pieces?.prix_achat || pMap[st.piece_id] || 10000;
+            // Priorité : données du JOIN, sinon carte directe
+            const pieceData = st.pieces || piecesDirectMap[st.piece_id] || {};
+            const pAchat = pieceData.prix_achat || pMap[st.piece_id] || 0;
             parsedPieces.push({
               id: st.id, // stock id
               piece_id: st.piece_id, // actual piece id
-              reference: st.pieces?.reference || 'REF-UNK',
-              code_barre: st.pieces?.code_barre || null,
-              designation: st.pieces?.designation || 'Pièce',
-              marque: st.pieces?.marque || 'Origine',
-              prix_vente: st.pieces?.prix_vente || (pAchat > 0 ? pAchat * 1.5 : 0),
+              reference: pieceData.reference || 'REF-UNK',
+              code_barre: pieceData.code_barre || null,
+              designation: pieceData.designation || 'Pièce',
+              marque: pieceData.marque || 'Origine',
+              prix_vente: pieceData.prix_vente || (pAchat > 0 ? pAchat * 1.5 : 0),
               quantity_disponible: st.quantity_disponible || 0,
               prix_achat: pAchat
             });
