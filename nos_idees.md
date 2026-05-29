@@ -111,3 +111,7 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - **Règle de développement :** Toujours inclure `prix_vente` ET `prix_achat` dans tout payload
   d'insertion/mise à jour de la table `pieces`. Ne jamais se fier aux calculs de fallback pour des
   données financières.
+
+### Idées d'amélioration suite aux correctifs (29/05/2026)
+- Ajouter une notification automatique (ex: SMS ou Email) pour la relance des factures à crédit auprès des garages partenaires.
+- Proposer une fonctionnalité pour consolider (regrouper) plusieurs factures à crédit d'un même client sur un seul ticket récapitulatif pour faciliter son paiement de fin de mois.

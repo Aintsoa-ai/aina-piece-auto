@@ -74,3 +74,13 @@ Dans le **Tableau de bord** ou dans les **Paramètres**, vous pouvez voir l'éta
 4. **Importer le catalogue** via Import Excel.
 5. **Remettre le GUIDE.md** au propriétaire.
 6. **Credentials Admin** à transmettre en sécurité : `ainapieces2026@gmail.com`.
+
+## 5. Gestion Spécifique : Crédits et Réinitialisation
+### Les Ventes à Crédit (Garages)
+- Lorsque vous sélectionnez "VENTE À CRÉDIT", la transaction **n'apparaîtra pas** dans la liste principale de la page "Ventes".
+- C'est normal : les crédits sont isolés. Pour les consulter, encaissez des paiements partiels ou voir la dette totale d'un garage, rendez-vous exclusivement dans l'onglet **Clients & Crédits**.
+
+### Réinitialisation Globale (Factory Reset)
+- Si vous souhaitez vider complètement le système pour recommencer à zéro (effacer l'historique de test), allez dans **Paramètres** > **Système**.
+- Cliquez sur "Purger et Réinitialiser".
+- Vous pouvez cocher spécifiquement "Clients & Crédits" (en jaune) pour effacer les garagistes et leurs dettes, séparément des autres options. **Attention : action irréversible.**

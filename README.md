@@ -159,3 +159,9 @@ L'ERP devient 100% centr� sur la vitesse :
   de vente enregistré dans le catalogue. Plus aucun écart entre les deux interfaces.
 - **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles. Le mode hors-ligne,
   le scanner, la matrice des autorisations et les autres modules sont intacts.
+
+### Finalisations de Ventes, Caisse et Réinitialisation (29/05/2026 Nuit)
+- **Séparation Ventes / Crédits :** Le tableau principal des ventes filtre désormais correctement les transactions à crédit. Celles-ci sont exclusivement gérées dans le module Clients & Crédits, offrant une lecture parfaite des encaissements réels.
+- **Correction du Ticket Thermique :** L'en-tête du ticket capture et fige le véritable nom de la boutique qui a effectué la vente. La réinitialisation intempestive de la liste déroulante après une transaction a été corrigée.
+- **Réinitialisation Clients & Crédits :** Le module de Factory Reset intègre une option distincte et sécurisée (Avertisseur Jaune) permettant la purge complète et propre (respect des clés étrangères) de l'historique des clients et de leurs dettes.
+- **Compatibilité Totale (Mobile/Desktop) :** L'impact de chaque modification a été revérifié sur les deux formats pour garantir que l'expérience tactile (téléphone) et bureau (ordinateur) reste fluide et sans bug visuel ou technique.

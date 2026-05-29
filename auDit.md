@@ -445,3 +445,14 @@ Supabase rejetait la mise à jour du profil → le profil gardait les valeurs du
 
 ### Point de sauvegarde :
 **Commits GitHub : 4c1a6fc (trim scanner) + 4a58256 (trim pieces) + 41a6a31 (fallback pieces) + 314b241 (sql et error UI)** — branche main — Vercel auto-déployé
+
+### Audit des fonctionnalités de vente et réinitialisation (29/05/2026)
+- **Séparation des flux (Ventes vs Crédits) :** 
+  - *Constat:* Les ventes à crédit s'affichaient dans la caisse classique. 
+  - *Résultat après correctif:* Succès. Le filtre Supabase (statut_paiement.neq.CREDIT) fonctionne. Vérifié sur Mobile (cartes) et Desktop (tableau).
+- **Affichage sur Ticket Thermique :**
+  - *Constat:* L'en-tête affichait "Boutique" ou basculait sur "B TOAMASINA".
+  - *Résultat après correctif:* Succès. Le nom est capturé dynamiquement au clic d'encaissement et la sélection utilisateur est maintenue.
+- **Factory Reset (Clients & Crédits) :**
+  - *Constat:* La remise à zéro ne vidait pas la table clients.
+  - *Résultat après correctif:* Succès. Option ajoutée, et l'ordre de suppression (eglements_credits PUIS clients) évite les erreurs SQL de contraintes.

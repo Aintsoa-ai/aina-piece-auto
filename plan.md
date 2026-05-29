@@ -120,3 +120,9 @@
 - [x] Correction multiplicateur prix × 1.4 → × 1.5 dans Sales.tsx
 - [x] Sauvegarde de prix_vente et prix_achat directement dans la table pieces
 - [x] Vérification cohérence Catalogue ↔ Ventes (prix identiques dans les deux interfaces)
+
+### Nouvelles étapes ajoutées le 29/05/2026 (Nuit)
+- [x] Corriger l'affichage mélangé des ventes au comptant et à crédit.
+- [x] Empêcher la réinitialisation de la boutique sélectionnée après une vente.
+- [x] Afficher le vrai nom de la boutique sur le ticket thermique.
+- [x] Étendre le Factory Reset pour inclure l'effacement des Clients et Crédits.
