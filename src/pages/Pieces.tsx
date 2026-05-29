@@ -381,10 +381,9 @@ export const Pieces: React.FC = () => {
     setStockMinimum(piece.stock_minimum ? formatNum(piece.stock_minimum) : '');
     setPrixAchat(piece.achat ? formatNum(piece.achat) : '');
     setPrixVente(piece.vente ? formatNum(piece.vente) : '');
-    // ✅ FIX: En mode édition, on NE met pas GLOBAL car la quantité serait appliquée
-    // à chaque boutique séparément → total affiché = quantité × nombre de boutiques.
-    // On sélectionne la boutique qui possède déjà du stock pour cette pièce, ou la première.
-    setSelectedBoutique(boutiques[0]?.id || '');
+    // Quantité totale = somme de toutes les boutiques. On pré-sélectionne GLOBAL
+    // pour que l'utilisateur voie la quantité totale et puisse la modifier globalement.
+    setSelectedBoutique('GLOBAL');
     setSelectedFournisseur(fournisseurs[0]?.id || '');
     setDescription(piece.description || '');
     setErrorMsg(null);
@@ -458,10 +457,42 @@ export const Pieces: React.FC = () => {
           .eq('id', editId);
         if (error) throw error;
 
-        // Update stock
-        // ✅ FIX: On n'utilise JAMAIS GLOBAL en édition pour éviter de doubler la quantité.
-        // La quantité est mise à jour uniquement sur la boutique sélectionnée.
-        if (selectedBoutique && selectedBoutique !== 'GLOBAL') {
+        // ✅ GLOBAL SPLIT : la quantité totale est divisée équitablement entre les boutiques.
+        // Exemple : 40 unités avec 2 boutiques = 20 + 20 (total affiché = 40).
+        // Les prix (achat/vente) restent identiques pour toutes les boutiques.
+        if (selectedBoutique === 'GLOBAL' && boutiques.length > 0) {
+          const totalQty = parseNum(quantite);
+          const qtyPerBoutique = Math.floor(totalQty / boutiques.length);
+          const remainder = totalQty % boutiques.length; // le reste va à la 1ère boutique
+
+          for (let i = 0; i < boutiques.length; i++) {
+            const b = boutiques[i];
+            const qtyForThisBoutique = qtyPerBoutique + (i === 0 ? remainder : 0);
+            const { data: existStock } = await supabase
+              .from('stock')
+              .select('id')
+              .eq('piece_id', editId)
+              .eq('boutique_id', b.id)
+              .maybeSingle();
+
+            if (existStock) {
+              await supabase.from('stock').update({
+                quantity_disponible: qtyForThisBoutique,
+                stock_minimum: parseNum(stockMinimum) || 5,
+                emplacement: emplacement.trim() || null
+              }).eq('id', existStock.id);
+            } else {
+              await supabase.from('stock').insert({
+                piece_id: editId,
+                boutique_id: b.id,
+                quantity_disponible: qtyForThisBoutique,
+                quantity_achetee: qtyForThisBoutique,
+                stock_minimum: parseNum(stockMinimum) || 5,
+                emplacement: emplacement.trim() || null
+              });
+            }
+          }
+        } else if (selectedBoutique && selectedBoutique !== 'GLOBAL') {
           const { data: existStock } = await supabase
             .from('stock')
             .select('id')
@@ -505,13 +536,17 @@ export const Pieces: React.FC = () => {
 
         if (pieceErr) throw pieceErr;
 
-        // Insert stock entry
+        // ✅ GLOBAL SPLIT en création : quantité divisée entre les boutiques.
+        // Exemple : 40 avec 2 boutiques = 20 pour chaque. Total affiché = 40.
         if (selectedBoutique === 'GLOBAL') {
-          const stockInserts = boutiques.map(b => ({
+          const totalQty = parseNum(quantite);
+          const qtyPerBoutique = Math.floor(totalQty / boutiques.length);
+          const remainder = totalQty % boutiques.length;
+          const stockInserts = boutiques.map((b, i) => ({
             piece_id: newPiece.id,
             boutique_id: b.id,
-            quantity_disponible: parseNum(quantite),
-            quantity_achetee: parseNum(quantite),
+            quantity_disponible: qtyPerBoutique + (i === 0 ? remainder : 0),
+            quantity_achetee: qtyPerBoutique + (i === 0 ? remainder : 0),
             stock_minimum: parseNum(stockMinimum) || 5,
             emplacement: emplacement.trim() || null
           }));
