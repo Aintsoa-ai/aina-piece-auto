@@ -82,3 +82,10 @@
 - [x] Déployer l'écran de verrouillage avec dérogation admin.
 - [x] Créer l'avertisseur "Fermeture dans 15 min".
 
+
+## Phase 6 : Optimisation, Robustesse et Prévention des Erreurs (Actuelle)
+- [x] Sécurisation du "Hard Reset" (base de données) pour prendre en charge correctement les identifiants UUID et éviter tout blocage.
+- [x] Création d'un système de "Blindage" dans le contexte d'authentification pour garantir que l'administrateur principal (ainapieces2026@gmail.com) ne perde jamais ses privilèges, même en cas de mauvaise connexion (timeout).
+- [x] Optimisation de l'ergonomie de création des utilisateurs : réinitialisation automatique du sélecteur de boutique pour prévenir l'assignation de plusieurs caissiers à une même boutique par erreur.
+- [x] Restauration des paramètres de matrice d'autorisations pour inclure la gestion granulaire au niveau des boutiques physiques.
+- [ ] Formation finale et remise des clés du projet au client avec le fichier GUIDE.md.

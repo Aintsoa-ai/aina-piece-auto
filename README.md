@@ -121,3 +121,10 @@ L'ERP devient 100% centr� sur la vitesse :
 ### 6. Paramétrages Avancés (Settings)
 - **Interface multi-onglets :** Navigation fluide et réactive entre Accès, Système et Personnalisation.
 - **Compatibilité Mobile/Desktop :** Les boutons d'action des paramètres (Purger, Sauvegarder, Réinitialiser) sont 100% fonctionnels et accessibles depuis n'importe quel onglet.
+
+### Finalisation Utilisateurs, Autorisations et Sécurité (29/05/2026)
+- **Stabilité Totale de l'Admin (Blindage) :** L'email administrateur est désormais sécurisé "en dur". Une perte de connexion ou un timeout de base de données ne pourra plus jamais rétrograder l'Administrateur en Caissier.
+- **Création Intuitive des Caissiers :** Le formulaire de création de caissiers réinitialise intelligemment la sélection de boutique pour prévenir toute assignation multiple erronée.
+- **Réinitialisation Ultra-Robuste (Hard Reset) :** La fonction d'effacement total est consolidée avec un traitement parfait des UUID de rôles en fallback. Elle supprime et nettoie l'intégralité du système sans échec.
+- **Matrice des Autorisations Avancée :** Affichage optimisé et persistant des boutiques dans la matrice pour un paramétrage centralisé et précis.
+- **Vérification Mobile/Desktop :** Toutes les modifications ont été auditées pour ne causer aucune perte de fonctionnalité sur la vue Téléphone et Ordinateur. L'application reste 100% responsive et fonctionnelle.

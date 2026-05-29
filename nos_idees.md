@@ -75,3 +75,8 @@ Ce fichier rassemble toutes les idées d'amélioration et d'évolution pour le f
 - **Nettoyage automatique des scripts :** Supprimer les scripts de correction temporaires (comme reapply.cjs) une fois que les modifications ont été validées en production.
 
 - **Sécurité et DB** : En cas de futurs besoins d'effacement de comptes liés à Supabase Auth, toujours privilégier l'usage d'Edge Functions ou de scripts RPC SQL (SECURITY DEFINER) plutôt que des API Frontend pour éviter les failles de sécurité.
+
+## 6. Améliorations de l'Ergonomie et de la Prévention (29/05/2026)
+- **Validation intelligente des formulaires :** Pour les futures fonctionnalités, toujours s'assurer que les listes déroulantes (comme le choix de la boutique lors de la création d'un utilisateur) se réinitialisent ou demandent une confirmation pour éviter les doublons ou erreurs d'assignation.
+- **Blindage ("Hardcoding") des accès super-admin :** L'approche utilisée pour ainapieces2026@gmail.com (garantie des droits administrateur absolue via l'email) devrait être documentée comme "best practice" pour tout futur ERP nécessitant un compte maître indestructible.
+- **Amélioration du fallback réseau :** Affiner encore plus les délais de "timeout" (passés de 3s à 5s) selon la qualité du réseau détectée sur l'appareil (Mobile vs Desktop) pour ne déclencher les modes hors-ligne qu'en cas de réelle nécessité.

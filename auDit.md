@@ -297,3 +297,10 @@ Historique et suivi des audits de sécurité, de performance et de stabilité de
 - **Action 1 (Réinitialisation) :** Ajout de la case à cocher pour supprimer les utilisateurs et caissiers de la base de données. Création d'une fonction RPC SQL (delete_non_admin_users) pour contourner les limitations de sécurité de Supabase.
 - **Action 2 (Correction Ergonomique) :** Restauration de l'interface « Ventes en attente de synchronisation » (Mode Offline PWA) qui avait été momentanément masquée par une erreur de placement de la nouvelle case à cocher. 
 - **Impact :** La fonctionnalité Offline PWA est parfaitement intacte. Le Hard Reset est 100% fonctionnel sur PC et Mobile. Aucune régression.
+## Audit #12 - Finalisation Logique Utilisateurs et Autorisations (29/05/2026)
+**Statut : Validé.**
+- **Action 1 (Hard Reset & Fallback) :** Sécurisation ultime du bouton 'Réinitialiser' avec prise en charge stricte de l'UUID du rôle Administrateur côté client, garantissant que la suppression n'échoue jamais.
+- **Action 2 (Matrice des Autorisations) :** Remise en place de l'affichage des boutiques dans la matrice (demandé par le client), permettant de gérer les accès au niveau de la boutique de façon granulaire.
+- **Action 3 (Création Caissiers) :** Résolution d'un défaut ergonomique : le sélecteur de boutique est désormais remis à zéro (vide) après la création d'un utilisateur, évitant d'assigner par erreur deux caissiers à la même boutique.
+- **Action 4 (Stabilité AuthContext) :** Correction d'un bug majeur où une perte de connexion (timeout Supabase > 3s) transformait l'Administrateur en simple Caissier. Ajout d'un système de protection invariant ('blindage') pour l'e-mail ainapieces2026@gmail.com, garantissant les pleins droits peu importe l'état du réseau ou de la base de données.
+- **Impact :** La séparation des rôles et l'isolation des données sont 100% robustes sur Téléphone et Ordinateur. L'administrateur ne peut plus être rétrogradé. La matrice est correcte. Les erreurs de création sont évitées.
