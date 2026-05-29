@@ -34,12 +34,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   const [loading, setLoading] = useState(true);
 
-  const fetchProfileAndRole = async (userId: string) => {
+  const fetchProfileAndRole = async (userId: string, userEmail?: string) => {
     console.log('fetchProfileAndRole initiated for:', userId);
     
-    // Create a strict 3-second timeout promise
+    // Create a slightly longer timeout promise
     const timeoutPromise = new Promise<any>((resolve) => 
-      setTimeout(() => resolve({ isTimeout: true }), 3000)
+      setTimeout(() => resolve({ isTimeout: true }), 5000)
     );
 
     try {
@@ -60,38 +60,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (result && result.isTimeout) {
-        console.warn('Profile fetch timed out after 3s. Activating fallback.');
+        console.warn('Profile fetch timed out after 5s. Activating fallback.');
+        if (profileRef.current && profileRef.current.id === userId) {
+            console.log('Keeping existing profile during timeout.');
+            return;
+        }
       } else {
         console.warn('Profile fetch returned no data. Activating fallback.', result?.error);
       }
 
-      // Guest/Caissier fallback instead of blind admin
+      const isAdmin = userEmail === 'ainapieces2026@gmail.com';
+      
       setProfile({
         id: userId,
-        full_name: 'Utilisateur',
-        role_id: 'caissier',
+        full_name: isAdmin ? 'Administrateur Aina' : 'Utilisateur',
+        role_id: isAdmin ? 'administrateur' : 'caissier',
         boutique_id: '',
         created_at: new Date().toISOString(),
         last_login: null
       });
-      setRole('caissier');
+      setRole(isAdmin ? 'administrateur' : 'caissier');
     } catch (err) {
       console.error('Error fetching profile, using fallback:', err);
+      const isAdmin = userEmail === 'ainapieces2026@gmail.com';
       setProfile({
         id: userId,
-        full_name: 'Utilisateur',
-        role_id: 'caissier',
+        full_name: isAdmin ? 'Administrateur Aina' : 'Utilisateur',
+        role_id: isAdmin ? 'administrateur' : 'caissier',
         boutique_id: '',
         created_at: new Date().toISOString(),
         last_login: null
       });
-      setRole('caissier');
+      setRole(isAdmin ? 'administrateur' : 'caissier');
     }
   };
 
   const refreshProfile = async () => {
     if (user) {
-      await fetchProfileAndRole(user.id);
+      await fetchProfileAndRole(user.id, user.email);
     }
   };
 
@@ -114,7 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (result && !result.isTimeout && result.data?.session) {
           const session = result.data.session;
           setUser(session.user);
-          await fetchProfileAndRole(session.user.id);
+          await fetchProfileAndRole(session.user.id, session.user.email);
         } else {
           if (result?.isTimeout) {
             console.warn('Auth session check timed out.');
@@ -147,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         try {
-          await fetchProfileAndRole(session.user.id);
+          await fetchProfileAndRole(session.user.id, session.user.email);
         } catch (err) {
           console.error('Auth change profile fetch error:', err);
         } finally {
