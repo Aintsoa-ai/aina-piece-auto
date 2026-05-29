@@ -383,8 +383,8 @@ export const Sales: React.FC = () => {
       
       const currentTime = Date.now();
       
-      // If time between keystrokes is more than 500ms, it's human typing (reset buffer)
-      if (currentTime - lastKeyTime > 500) {
+      // If time between keystrokes is more than 100ms, it's human typing (reset buffer)
+      if (currentTime - lastKeyTime > 100) {
         barcodeBuffer = '';
       }
       
@@ -528,7 +528,9 @@ export const Sales: React.FC = () => {
     const especeNum = Number(especeRecue) || calculatedTotal;
     const resteARendre = especeNum > calculatedTotal ? especeNum - calculatedTotal : 0;
 
-    const boutiqueIdToUse = profile?.boutique_id || selectedBoutique || null;
+    // L'administrateur peut choisir la boutique via le dropdown — priorité à selectedBoutique
+    const boutiqueIdToUse = selectedBoutique || profile?.boutique_id || null;
+    const boutiqueNameToUse = dbBoutiques.find(b => b.id === boutiqueIdToUse)?.name || 'Boutique';
 
     try {
       if (!navigator.onLine) {
@@ -607,7 +609,7 @@ export const Sales: React.FC = () => {
           piece_name: item.piece.designation,
           piece_ref: item.piece.reference,
           vendeur: vendeurName,
-          boutique_name: 'Boutique',
+          boutique_name: boutiqueNameToUse,
           quantity: item.quantity,
           pu: pVente,
           total: pVente * item.quantity,
@@ -663,7 +665,7 @@ export const Sales: React.FC = () => {
           piece_name: item.piece.designation,
           piece_ref: item.piece.reference,
           vendeur: vendeurName,
-          boutique_name: 'Boutique',
+          boutique_name: boutiqueNameToUse,
           quantity: item.quantity,
           pu: pVente,
           total: pVente * item.quantity,
@@ -1134,7 +1136,7 @@ export const Sales: React.FC = () => {
 
       {/* ─── RECEIPT MODAL PRINT ─────────────────────────── */}
       {receiptSale && (() => {
-        const matchingDbBoutique = dbBoutiques.find(b => b.name === receiptSale.boutique_name) || dbBoutiques.find(b => b.id === selectedBoutique) || dbBoutiques[0];
+        const matchingDbBoutique = dbBoutiques.find(b => b.name === receiptSale.boutique_name) || dbBoutiques.find(b => b.id === receiptSale.id?.split('-')?.[0]) || dbBoutiques[0];
 
         const currentInfo = matchingDbBoutique ? boutiqueInfos[matchingDbBoutique.id] || {} : {};
 
