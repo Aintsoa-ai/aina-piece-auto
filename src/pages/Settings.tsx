@@ -795,8 +795,16 @@ export const Settings: React.FC = () => {
             acc[v.piece_name].ca  += Number(v.total);
             return acc;
           }, {})
-        ).map(([n, d]) => ({ nom: n, qty: d.qty, ca: d.ca, marge: Math.round(d.ca * 0.35), pct: totalVentesAll > 0 ? Math.round((d.ca / totalVentesAll) * 100) : 0 }))
-         .sort((a, b) => b.ca - a.ca).slice(0, 10);
+        ).map(([n, d]) => {
+          const item = d as { qty: number; ca: number };
+          return {
+            nom: n,
+            qty: item.qty,
+            ca: item.ca,
+            marge: Math.round(item.ca * 0.35),
+            pct: totalVentesAll > 0 ? Math.round((item.ca / totalVentesAll) * 100) : 0
+          };
+        }).sort((a, b) => b.ca - a.ca).slice(0, 10);
 
         const analyseData: any[][] = [
           // ── En-tête entreprise ─────────────────────────────────────────────
