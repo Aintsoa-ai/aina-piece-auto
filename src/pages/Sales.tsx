@@ -1078,54 +1078,61 @@ export const Sales: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Sélection client si crédit */}
-                  {paymentMode === 'credit' && (
-                    <div style={s.inputContainer}>
-                      <label style={s.inputLabel}>Client / Garage (Crédit)</label>
-                      <select
-                        style={s.selectField}
-                        value={selectedClient}
-                        onChange={(e) => setSelectedClient(e.target.value)}
-                      >
-                        <option value="">-- Choisir un client --</option>
-                        {clients.map(c => (
-                          <option key={c.id} value={c.id}>{c.nom}</option>
-                        ))}
-                      </select>
+                  {/* Panel d'informations client et véhicule */}
+                  <div style={s.clientInfoContainer}>
+                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#0066fe', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '6px', marginBottom: '4px' }}>
+                      📋 Informations Client & Véhicule
                     </div>
-                  )}
 
-                  {/* Informations client */}
-                  <div style={s.inputContainer}>
-                    <label style={s.inputLabel}>Nom du Client</label>
-                    <input
-                      type="text"
-                      placeholder="Ex: Rakoto Jean"
-                      style={s.inputField}
-                      value={clientNom}
-                      onChange={(e) => setClientNom(e.target.value)}
-                    />
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <div style={{ ...s.inputContainer, flex: 1 }}>
-                      <label style={s.inputLabel}>Immatriculation</label>
+                    {/* Sélection client si crédit */}
+                    {paymentMode === 'credit' && (
+                      <div style={s.inputContainer}>
+                        <label style={s.inputLabel}>Client / Garage (Crédit)</label>
+                        <select
+                          style={s.selectField}
+                          value={selectedClient}
+                          onChange={(e) => setSelectedClient(e.target.value)}
+                        >
+                          <option value="">-- Choisir un client --</option>
+                          {clients.map(c => (
+                            <option key={c.id} value={c.id}>{c.nom}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Informations client */}
+                    <div style={s.inputContainer}>
+                      <label style={s.inputLabel}>Nom du Client</label>
                       <input
                         type="text"
-                        placeholder="Ex: 1234 TAN"
+                        placeholder="Ex: Rakoto Jean"
                         style={s.inputField}
-                        value={clientImmatriculation}
-                        onChange={(e) => setClientImmatriculation(e.target.value)}
+                        value={clientNom}
+                        onChange={(e) => setClientNom(e.target.value)}
                       />
                     </div>
-                    <div style={{ ...s.inputContainer, flex: 1 }}>
-                      <label style={s.inputLabel}>Marque Voiture</label>
-                      <input
-                        type="text"
-                        placeholder="Ex: Toyota"
-                        style={s.inputField}
-                        value={clientMarqueVoiture}
-                        onChange={(e) => setClientMarqueVoiture(e.target.value)}
-                      />
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ ...s.inputContainer, flex: 1 }}>
+                        <label style={s.inputLabel}>Immatriculation</label>
+                        <input
+                          type="text"
+                          placeholder="Ex: 1234 TAN"
+                          style={s.inputField}
+                          value={clientImmatriculation}
+                          onChange={(e) => setClientImmatriculation(e.target.value)}
+                        />
+                      </div>
+                      <div style={{ ...s.inputContainer, flex: 1 }}>
+                        <label style={s.inputLabel}>Marque Voiture</label>
+                        <input
+                          type="text"
+                          placeholder="Ex: Toyota"
+                          style={s.inputField}
+                          value={clientMarqueVoiture}
+                          onChange={(e) => setClientMarqueVoiture(e.target.value)}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -1538,6 +1545,7 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: '12px',
     width: '100%',
     maxWidth: '850px',
+    maxHeight: '90vh',
     display: 'flex',
     flexDirection: 'column',
     boxShadow: '0 12px 36px rgba(0, 0, 0, 0.55)',
@@ -1548,7 +1556,8 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '16px 20px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    flexShrink: 0
   },
   modalTitle: {
     fontSize: '16px',
@@ -1566,7 +1575,9 @@ const s: Record<string, React.CSSProperties> = {
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px'
+    gap: '16px',
+    overflowY: 'auto',
+    flex: 1
   },
   inputContainer: {
     display: 'flex',
@@ -1717,6 +1728,43 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: '13.5px',
     outline: 'none'
   },
+  inputField: {
+    width: '100%',
+    backgroundColor: '#0d1117',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '6px',
+    padding: '10px 12px',
+    color: '#ffffff',
+    fontSize: '13.5px',
+    outline: 'none',
+    boxSizing: 'border-box',
+    transition: 'all 0.2s ease',
+    fontFamily: "'Outfit', sans-serif"
+  },
+  selectField: {
+    width: '100%',
+    backgroundColor: '#0d1117',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '6px',
+    padding: '10px 12px',
+    color: '#ffffff',
+    fontSize: '13.5px',
+    outline: 'none',
+    boxSizing: 'border-box',
+    cursor: 'pointer',
+    fontFamily: "'Outfit', sans-serif"
+  },
+  clientInfoContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRadius: '8px',
+    padding: '16px',
+    marginTop: '6px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '14px',
+    boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
+  },
   totalPreviewLine: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -1767,7 +1815,8 @@ const s: Record<string, React.CSSProperties> = {
     gap: '10px',
     padding: '16px 20px',
     borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-    backgroundColor: '#0d1117'
+    backgroundColor: '#0d1117',
+    flexShrink: 0
   },
   btnAnnuler: {
     backgroundColor: 'transparent',
