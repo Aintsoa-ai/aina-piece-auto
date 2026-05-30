@@ -70,6 +70,7 @@ export const Purchases: React.FC = () => {
   const [dbPriceHistory, setDbPriceHistory] = useState<{piece_id: string, sup_name: string, price: number, date: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const isDemoData = false;
+  const [purchasesSearch, setPurchasesSearch] = useState('');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -655,6 +656,19 @@ export const Purchases: React.FC = () => {
 
       {/* PURCHASES LIST TABLE CONTAINER */}
       <div style={s.cardWrapper}>
+        {/* Barre de recherche Achats */}
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ position: 'relative', maxWidth: '380px' }}>
+            <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.35)' }} />
+            <input
+              type="text"
+              placeholder="Rechercher (pièce, fournisseur, réf...)..."
+              value={purchasesSearch}
+              onChange={(e) => setPurchasesSearch(e.target.value)}
+              style={{ width: '100%', padding: '8px 12px 8px 32px', backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', color: '#fff', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+            />
+          </div>
+        </div>
         <div style={s.tableContainer}>
           <table style={s.table}>
             <thead>
@@ -676,12 +690,32 @@ export const Purchases: React.FC = () => {
                     <p style={{ marginTop: '10px', color: 'rgba(255,255,255,0.45)' }}>Chargement des achats...</p>
                   </td>
                 </tr>
-              ) : purchases.length === 0 ? (
+              ) : purchases.filter(p => {
+                  const q = purchasesSearch.toLowerCase();
+                  if (!q) return true;
+                  return (
+                    p.piece_name?.toLowerCase().includes(q) ||
+                    p.fournisseur?.toLowerCase().includes(q) ||
+                    p.piece_ref?.toLowerCase().includes(q) ||
+                    p.date?.toLowerCase().includes(q)
+                  );
+                }).length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={s.emptyCell}>Aucun achat enregistré.</td>
+                  <td colSpan={7} style={s.emptyCell}>
+                    {purchasesSearch ? 'Aucun résultat pour cette recherche.' : 'Aucun achat enregistré.'}
+                  </td>
                 </tr>
               ) : (
-                purchases.map((purchase) => (
+                purchases.filter(p => {
+                  const q = purchasesSearch.toLowerCase();
+                  if (!q) return true;
+                  return (
+                    p.piece_name?.toLowerCase().includes(q) ||
+                    p.fournisseur?.toLowerCase().includes(q) ||
+                    p.piece_ref?.toLowerCase().includes(q) ||
+                    p.date?.toLowerCase().includes(q)
+                  );
+                }).map((purchase) => (
                   <tr key={purchase.id} style={s.tr}>
                     <td style={s.tdDate}>{purchase.date}</td>
                     <td style={s.tdFournisseur}>{purchase.fournisseur}</td>

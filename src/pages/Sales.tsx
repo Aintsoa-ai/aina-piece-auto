@@ -23,6 +23,9 @@ interface SaleItem {
   espece?: number;
   reste?: number;
   statut_paiement?: string; // 'PAYE' | 'CREDIT'
+  client_nom?: string;
+  client_immatriculation?: string;
+  client_marque_voiture?: string;
 }
 
 interface CartItem {
@@ -63,6 +66,7 @@ export const Sales: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [especeRecue, setEspeceRecue] = useState<string>('');
+  const [paymentMode, setPaymentMode] = useState<'espece' | 'credit'>('espece');
 
   // Print Receipt Modal
   const [receiptSale, setReceiptSale] = useState<SaleItem | null>(null);
@@ -73,6 +77,14 @@ export const Sales: React.FC = () => {
   const [clients, setClients] = useState<any[]>([]);
   const [isCredit, setIsCredit] = useState(false);
   const [selectedClient, setSelectedClient] = useState('');
+
+  // Client info for sale
+  const [clientNom, setClientNom] = useState('');
+  const [clientImmatriculation, setClientImmatriculation] = useState('');
+  const [clientMarqueVoiture, setClientMarqueVoiture] = useState('');
+
+  // Search bar for the sales table
+  const [salesSearchQuery, setSalesSearchQuery] = useState('');
 
   // Pixel perfect Mock Sales matching screenshot 1
   const demoSales: SaleItem[] = [
@@ -270,7 +282,10 @@ export const Sales: React.FC = () => {
                   pu: detail?.prix_vente || (totalVal / qty),
                   total: totalVal,
                   benefice: benef > 0 ? benef : totalVal * 0.35,
-                  statut_paiement: s.statut_paiement || 'PAYE'
+                  statut_paiement: s.statut_paiement || 'PAYE',
+                  client_nom: s.client_nom || '',
+                  client_immatriculation: s.client_immatriculation || '',
+                  client_marque_voiture: s.client_marque_voiture || ''
                 });
               });
             } else if (s.total > 0) {
@@ -285,7 +300,10 @@ export const Sales: React.FC = () => {
                 quantity: 1,
                 pu: s.total,
                 total: s.total,
-                benefice: s.total * 0.35
+                benefice: s.total * 0.35,
+                client_nom: s.client_nom || '',
+                client_immatriculation: s.client_immatriculation || '',
+                client_marque_voiture: s.client_marque_voiture || ''
               });
             }
           });
@@ -323,8 +341,12 @@ export const Sales: React.FC = () => {
         setPieces(parsedPieces);
         if (result.bData) {
           setDbBoutiques(result.bData);
-          if (result.bData.length > 0 && (!selectedBoutique || selectedBoutique === 'Centre')) {
-            setSelectedBoutique(result.bData[0].id);
+          // Non-admin: pre-select user's boutique; Admin: first boutique
+          if (!selectedBoutique || selectedBoutique === 'Centre') {
+            const defaultB = profile?.boutique_id
+              ? result.bData.find((b: any) => b.id === profile.boutique_id)
+              : null;
+            setSelectedBoutique(defaultB ? defaultB.id : (result.bData[0]?.id || ''));
           }
         }
         if (result.clientsData) {
@@ -456,6 +478,10 @@ export const Sales: React.FC = () => {
     setVendeurName(profile?.full_name || 'Vendeur Inconnu');
     setIsCredit(false);
     setSelectedClient('');
+    setPaymentMode('espece');
+    setClientNom('');
+    setClientImmatriculation('');
+    setClientMarqueVoiture('');
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsModalOpen(true);
@@ -506,7 +532,7 @@ export const Sales: React.FC = () => {
       setErrorMsg("Le panier est vide.");
       return;
     }
-    if (isCredit && !selectedClient) {
+    if (paymentMode === 'credit' && !selectedClient) {
       setErrorMsg("Veuillez sélectionner un client pour une vente à crédit.");
       return;
     }
@@ -550,14 +576,14 @@ export const Sales: React.FC = () => {
       const payloadVente: any = {
         total: calculatedTotal,
         caissier_id: profile?.id || null,
-        boutique_id: boutiqueIdToUse || null
+        boutique_id: boutiqueIdToUse || null,
+        statut_paiement: paymentMode === 'credit' ? 'CREDIT' : 'PAYE',
+        client_id: paymentMode === 'credit' ? selectedClient : null,
+        montant_paye: paymentMode === 'credit' ? 0 : Math.max(calculatedTotal, especeNum),
+        client_nom: clientNom || null,
+        client_immatriculation: clientImmatriculation || null,
+        client_marque_voiture: clientMarqueVoiture || null
       };
-
-      if (clients.length > 0) {
-        payloadVente.statut_paiement = isCredit ? 'CREDIT' : 'PAYE';
-        payloadVente.client_id = isCredit ? selectedClient : null;
-        payloadVente.montant_paye = isCredit ? 0 : Math.max(calculatedTotal, especeNum);
-      }
 
       const { data: newVente, error: venteErr } = await supabase
         .from('ventes')
@@ -778,6 +804,19 @@ export const Sales: React.FC = () => {
 
       {/* SALES LIST CONTAINER */}
       <div style={s.cardWrapper}>
+        {/* Search bar */}
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ position: 'relative', maxWidth: '380px' }}>
+            <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.35)' }} />
+            <input
+              type="text"
+              placeholder="Rechercher (pièce, vendeur, client, immat...)..."
+              value={salesSearchQuery}
+              onChange={(e) => setSalesSearchQuery(e.target.value)}
+              style={{ width: '100%', padding: '8px 12px 8px 32px', backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', color: '#fff', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+            />
+          </div>
+        </div>
         <div style={s.tableContainer}>
           <table style={s.table}>
             <thead>
@@ -785,6 +824,9 @@ export const Sales: React.FC = () => {
                 <th style={s.th}>DATE</th>
                 {role === 'administrateur' && <th style={s.th}>BOUTIQUE</th>}
                 <th style={s.th}>PIÈCE</th>
+                <th style={s.th}>CLIENT</th>
+                <th style={s.th}>IMMAT.</th>
+                <th style={s.th}>MARQUE V.</th>
                 <th style={s.th}>VENDEUR</th>
                 <th style={{ ...s.th, textAlign: 'center' }}>QTÉ</th>
                 <th style={s.th}>PU</th>
@@ -796,23 +838,52 @@ export const Sales: React.FC = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={role === 'administrateur' ? 9 : 8} style={s.loadingCell}>
+                  <td colSpan={role === 'administrateur' ? 12 : 11} style={s.loadingCell}>
                     <div style={s.spinner}></div>
                     <p style={{ marginTop: '10px', color: 'rgba(255,255,255,0.45)' }}>Chargement des ventes...</p>
                   </td>
                 </tr>
-              ) : sales.length === 0 ? (
+              ) : sales.filter(sale => {
+                  const q = salesSearchQuery.toLowerCase();
+                  if (!q) return true;
+                  return (
+                    sale.piece_name?.toLowerCase().includes(q) ||
+                    sale.vendeur?.toLowerCase().includes(q) ||
+                    sale.client_nom?.toLowerCase().includes(q) ||
+                    sale.client_immatriculation?.toLowerCase().includes(q) ||
+                    sale.client_marque_voiture?.toLowerCase().includes(q) ||
+                    sale.boutique_name?.toLowerCase().includes(q) ||
+                    sale.date?.toLowerCase().includes(q)
+                  );
+                }).length === 0 ? (
                 <tr>
-                  <td colSpan={role === 'administrateur' ? 9 : 8} style={s.emptyCell}>Aucune vente enregistrée.</td>
+                  <td colSpan={role === 'administrateur' ? 12 : 11} style={s.emptyCell}>
+                    {salesSearchQuery ? 'Aucun résultat pour cette recherche.' : 'Aucune vente enregistrée.'}
+                  </td>
                 </tr>
               ) : (
-                sales.map((sale) => (
+                sales.filter(sale => {
+                  const q = salesSearchQuery.toLowerCase();
+                  if (!q) return true;
+                  return (
+                    sale.piece_name?.toLowerCase().includes(q) ||
+                    sale.vendeur?.toLowerCase().includes(q) ||
+                    sale.client_nom?.toLowerCase().includes(q) ||
+                    sale.client_immatriculation?.toLowerCase().includes(q) ||
+                    sale.client_marque_voiture?.toLowerCase().includes(q) ||
+                    sale.boutique_name?.toLowerCase().includes(q) ||
+                    sale.date?.toLowerCase().includes(q)
+                  );
+                }).map((sale) => (
                   <tr key={sale.id} style={s.tr}>
                     <td style={s.tdDate}>{sale.date}</td>
                     {role === 'administrateur' && (
                       <td style={{ ...s.tdPiece, color: '#FCD25B', fontWeight: 'bold' }}>{sale.boutique_name}</td>
                     )}
                     <td style={s.tdPiece}>{sale.piece_name}</td>
+                    <td style={s.tdVendeur}>{sale.client_nom || <span style={{ color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>—</span>}</td>
+                    <td style={s.tdVendeur}>{sale.client_immatriculation || <span style={{ color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>—</span>}</td>
+                    <td style={s.tdVendeur}>{sale.client_marque_voiture || <span style={{ color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>—</span>}</td>
                     <td style={s.tdVendeur}>{sale.vendeur}</td>
                     <td style={s.tdQty}>{sale.quantity}</td>
                     <td style={s.tdPu}>{formatAr(sale.pu)}</td>
@@ -980,28 +1051,37 @@ export const Sales: React.FC = () => {
                     />
                   </div>
 
-                  {/* Vente à crédit */}
-                  {clients.length > 0 && (
-                    <div style={{ ...s.inputContainer, flexDirection: 'row', alignItems: 'center', gap: '8px', marginTop: '5px' }}>
-                      <input 
-                        type="checkbox" 
-                        id="credit-checkbox"
-                        checked={isCredit}
-                        onChange={(e) => {
-                          setIsCredit(e.target.checked);
-                          if (!e.target.checked) setSelectedClient('');
+                  {/* MODE DE PAIEMENT */}
+                  <div style={s.inputContainer}>
+                    <label style={s.inputLabel}>Mode de paiement</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => { setPaymentMode('espece'); setIsCredit(false); setSelectedClient(''); }}
+                        style={{
+                          flex: 1, padding: '8px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                          backgroundColor: paymentMode === 'espece' ? '#0066fe' : 'rgba(255,255,255,0.05)',
+                          color: paymentMode === 'espece' ? '#fff' : 'rgba(255,255,255,0.5)',
+                          border: paymentMode === 'espece' ? '1px solid #0066fe' : '1px solid rgba(255,255,255,0.1)'
                         }}
-                        style={{ width: '16px', height: '16px', accentColor: '#0066fe' }}
-                      />
-                      <label htmlFor="credit-checkbox" style={{ ...s.inputLabel, color: isCredit ? '#0066fe' : 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '13px' }}>
-                        Vente à crédit (Garages)
-                      </label>
+                      >💵 Espèce</button>
+                      <button
+                        type="button"
+                        onClick={() => { setPaymentMode('credit'); setIsCredit(true); }}
+                        style={{
+                          flex: 1, padding: '8px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                          backgroundColor: paymentMode === 'credit' ? '#f59e0b' : 'rgba(255,255,255,0.05)',
+                          color: paymentMode === 'credit' ? '#fff' : 'rgba(255,255,255,0.5)',
+                          border: paymentMode === 'credit' ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)'
+                        }}
+                      >📋 Crédit</button>
                     </div>
-                  )}
-                  
-                  {isCredit && (
+                  </div>
+
+                  {/* Sélection client si crédit */}
+                  {paymentMode === 'credit' && (
                     <div style={s.inputContainer}>
-                      <label style={s.inputLabel}>Sélectionner le Client / Garage</label>
+                      <label style={s.inputLabel}>Client / Garage (Crédit)</label>
                       <select
                         style={s.selectField}
                         value={selectedClient}
@@ -1015,15 +1095,54 @@ export const Sales: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Boutique Config */}
+                  {/* Informations client */}
+                  <div style={s.inputContainer}>
+                    <label style={s.inputLabel}>Nom du Client</label>
+                    <input
+                      type="text"
+                      placeholder="Ex: Rakoto Jean"
+                      style={s.inputField}
+                      value={clientNom}
+                      onChange={(e) => setClientNom(e.target.value)}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ ...s.inputContainer, flex: 1 }}>
+                      <label style={s.inputLabel}>Immatriculation</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: 1234 TAN"
+                        style={s.inputField}
+                        value={clientImmatriculation}
+                        onChange={(e) => setClientImmatriculation(e.target.value)}
+                      />
+                    </div>
+                    <div style={{ ...s.inputContainer, flex: 1 }}>
+                      <label style={s.inputLabel}>Marque Voiture</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Toyota"
+                        style={s.inputField}
+                        value={clientMarqueVoiture}
+                        onChange={(e) => setClientMarqueVoiture(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Boutique Config - Admin sees all, others see only their boutique */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Boutique de départ</label>
                     <select 
-                      style={s.selectInput}
+                      style={{
+                        ...s.selectInput,
+                        opacity: isAdmin ? 1 : 0.75,
+                        cursor: isAdmin ? 'pointer' : 'not-allowed'
+                      }}
                       value={selectedBoutique}
-                      onChange={(e) => setSelectedBoutique(e.target.value)}
+                      onChange={(e) => isAdmin && setSelectedBoutique(e.target.value)}
+                      disabled={!isAdmin}
                     >
-                      {dbBoutiques.map(b => (
+                      {(isAdmin ? dbBoutiques : dbBoutiques.filter(b => b.id === profile?.boutique_id)).map(b => (
                         <option key={b.id} value={b.id}>{b.name}</option>
                       ))}
                     </select>

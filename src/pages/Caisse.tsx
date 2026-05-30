@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import { Wallet, Play, Square, RefreshCw, Plus, ArrowUpRight, ArrowDownRight, Calendar, User, X } from 'lucide-react';
+import { Wallet, Play, Square, RefreshCw, Plus, ArrowUpRight, ArrowDownRight, Calendar, User, X, AlertTriangle } from 'lucide-react';
 
 interface CaisseSession {
   id: string;
@@ -53,6 +53,10 @@ export const Caisse: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
 
   const isAdmin = role === 'administrateur';
+
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
 
   const fetchCaisseState = async () => {
     setLoading(true);
@@ -158,6 +162,39 @@ export const Caisse: React.FC = () => {
     fetchCaisseState();
   }, [profile]);
 
+  const handleResetCaisse = async () => {
+    setIsResetting(true);
+    setResetError(null);
+    try {
+      // Close all open sessions for this boutique
+      let q = supabase
+        .from('caisse')
+        .update({
+          statut: 'FERME',
+          montant_fin: 0,
+          date_fermeture: new Date().toISOString(),
+          ferme_par: profile?.id
+        })
+        .eq('statut', 'OUVERT');
+
+      if (profile?.boutique_id) {
+        q = q.eq('boutique_id', profile.boutique_id) as any;
+      }
+
+      const { error } = await q;
+      if (error) throw error;
+
+      setIsResetModalOpen(false);
+      setActiveSession(null);
+      setTransactions([]);
+      fetchCaisseState();
+    } catch (err: any) {
+      setResetError(err.message || 'Erreur lors de la réinitialisation.');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const handleOpenCaisse = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
@@ -258,13 +295,35 @@ export const Caisse: React.FC = () => {
         </div>
         <div style={styles.statusRight}>
           {activeSession ? (
-            <button style={{ ...styles.actionBtn, backgroundColor: '#ef4444' }} onClick={() => { setClosingBalance(getExpectedBalance().toString()); setIsClosingModalOpen(true); }}>
-              <Square size={16} /> Fermer la Caisse
-            </button>
+            <>
+              <button style={{ ...styles.actionBtn, backgroundColor: '#ef4444' }} onClick={() => { setClosingBalance(getExpectedBalance().toString()); setIsClosingModalOpen(true); }}>
+                <Square size={16} /> Fermer la Caisse
+              </button>
+              {isAdmin && (
+                <button
+                  style={{ ...styles.actionBtn, backgroundColor: '#7c3aed', marginLeft: '8px' }}
+                  onClick={() => { setResetError(null); setIsResetModalOpen(true); }}
+                  title="Réinitialiser la caisse (admin)"
+                >
+                  <RefreshCw size={16} /> Réinitialiser
+                </button>
+              )}
+            </>
           ) : (
-            <button style={{ ...styles.actionBtn, backgroundColor: '#22c55e' }} onClick={() => { setOpeningBalance(''); setIsOpeningModalOpen(true); }}>
-              <Play size={16} /> Ouvrir la Caisse
-            </button>
+            <>
+              <button style={{ ...styles.actionBtn, backgroundColor: '#22c55e' }} onClick={() => { setOpeningBalance(''); setIsOpeningModalOpen(true); }}>
+                <Play size={16} /> Ouvrir la Caisse
+              </button>
+              {isAdmin && (
+                <button
+                  style={{ ...styles.actionBtn, backgroundColor: '#7c3aed', marginLeft: '8px' }}
+                  onClick={() => { setResetError(null); setIsResetModalOpen(true); }}
+                  title="Réinitialiser la caisse (admin)"
+                >
+                  <RefreshCw size={16} /> Réinitialiser
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -473,6 +532,41 @@ export const Caisse: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* RESET MODAL */}
+      {isResetModalOpen && (
+        <div style={styles.overlay}>
+          <div style={styles.modal}>
+            <div style={styles.modalHeader}>
+              <span style={{ ...styles.modalTitle, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertTriangle size={18} /> Réinitialiser la Caisse
+              </span>
+              <button style={styles.closeBtn} onClick={() => setIsResetModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {resetError && <div style={styles.error}>{resetError}</div>}
+              <div style={{ backgroundColor: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', padding: '14px', fontSize: '13px', color: 'rgba(255,255,255,0.75)', lineHeight: '1.6' }}>
+                ⚠️ <strong>Cette action va fermer toutes les sessions ouvertes</strong> pour cette boutique et remettre la caisse à zéro.<br/><br/>
+                Les ventes et dépenses existantes ne seront <strong>pas supprimées</strong>, seule la session active sera clôturée.
+              </div>
+              <div style={styles.formActions}>
+                <button type="button" style={styles.cancelBtn} onClick={() => setIsResetModalOpen(false)} disabled={isResetting}>
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  style={{ ...styles.submitBtn, backgroundColor: '#f59e0b' }}
+                  onClick={handleResetCaisse}
+                  disabled={isResetting}
+                >
+                  {isResetting ? 'En cours...' : 'Confirmer la réinitialisation'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
