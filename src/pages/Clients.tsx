@@ -130,14 +130,28 @@ export const Clients: React.FC = () => {
     setIsSubmitting(true);
     setErrorMsg(null);
     try {
-      const { error } = await supabase.from('reglements_credits').insert({
+      const finalPayAmount = Math.min(mt, selectedClient.total_du || 0);
+
+      // 1. Enregistrer le règlement
+      const { error: regError } = await supabase.from('reglements_credits').insert({
         client_id: selectedClient.id,
-        montant: mt,
+        montant: finalPayAmount,
         caissier_id: profile?.id || null,
         commentaire: `Règlement comptoir par ${profile?.full_name || 'Caissier'}`
       });
-      
-      if (error) throw error;
+      if (regError) throw regError;
+
+      // 2. Envoyer la somme payée au tableau de vente
+      const { error: venteError } = await supabase.from('ventes').insert({
+        total: finalPayAmount,
+        caissier_id: profile?.id || null,
+        boutique_id: profile?.boutique_id || null,
+        statut_paiement: 'REGLEMENT_CREDIT',
+        client_id: selectedClient.id,
+        client_nom: selectedClient.nom,
+        montant_paye: finalPayAmount
+      });
+      if (venteError) throw venteError;
       
       setSuccessMsg("Paiement enregistré avec succès.");
       fetchClients();
@@ -297,6 +311,26 @@ export const Clients: React.FC = () => {
                     onChange={(e) => setMontantPaiement(new Intl.NumberFormat('fr-FR').format(parseInt(e.target.value.replace(/\D/g,'')) || 0))} 
                   />
                 </div>
+
+                {(() => {
+                  const mt = parseInt(montantPaiement.replace(/\D/g, '')) || 0;
+                  const totalDu = selectedClient.total_du || 0;
+                  const resteAPayer = Math.max(0, totalDu - mt);
+                  const resteARendre = Math.max(0, mt - totalDu);
+                  
+                  return (
+                    <div style={{ marginTop: '15px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>Reste à payer :</span>
+                        <span style={{ fontSize: '14px', fontWeight: 'bold', color: resteAPayer > 0 ? '#ef4444' : '#10b981' }}>{formatAr(resteAPayer)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>Reste à rendre :</span>
+                        <span style={{ fontSize: '14px', fontWeight: 'bold', color: resteARendre > 0 ? '#10b981' : 'rgba(255,255,255,0.25)' }}>{formatAr(resteARendre)}</span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               <div style={s.modalFooter}>
                 <button type="button" style={s.btnAnnuler} onClick={() => setIsPayModalOpen(false)}>Annuler</button>

@@ -22,10 +22,12 @@ interface SaleItem {
   benefice: number;
   espece?: number;
   reste?: number;
-  statut_paiement?: string; // 'PAYE' | 'CREDIT'
+  statut_paiement?: string; // 'PAYE' | 'CREDIT' | 'REGLEMENT_CREDIT'
   client_nom?: string;
   client_immatriculation?: string;
   client_marque_voiture?: string;
+  client_id?: string;
+  client_total_du?: number;
 }
 
 interface CartItem {
@@ -189,7 +191,7 @@ export const Sales: React.FC = () => {
     );
 
     const queryPromise = (async () => {
-      // 1. Fetch Sales
+      // 1. Fetch Sales (all of them, including CREDIT and REGLEMENT_CREDIT)
       let salesQuery = supabase
         .from('ventes')
         .select(`
@@ -198,7 +200,6 @@ export const Sales: React.FC = () => {
           profiles(full_name),
           boutiques(name)
         `)
-        .or('statut_paiement.neq.CREDIT,statut_paiement.is.null')
         .order('created_at', { ascending: false });
 
       if (role !== 'administrateur' && profile?.boutique_id) {
@@ -226,11 +227,14 @@ export const Sales: React.FC = () => {
       // 4. Fetch boutiques
       const { data: bData } = await supabase.from('boutiques').select('*');
 
-      // 5. Fetch clients (silencieux si la table n'existe pas encore)
+      // 5. Fetch clients
       const { data: cData } = await supabase.from('clients').select('id, nom').order('nom');
       const clientsData = cData || [];
 
-      return { salesData, stockData, pfData, bData, clientsData, piecesDirectData };
+      // 6. Fetch reglements_credits to compute client debts
+      const { data: rcData } = await supabase.from('reglements_credits').select('client_id, montant');
+
+      return { salesData, stockData, pfData, bData, clientsData, piecesDirectData, rcData };
     })();
 
     try {
@@ -242,6 +246,22 @@ export const Sales: React.FC = () => {
         if (result.pfData) {
           result.pfData.forEach((item: any) => {
             pMap[item.piece_id] = Number(item.prix_achat);
+          });
+        }
+
+        // Map client debts globally
+        const clientDebts: Record<string, number> = {};
+        if (result.clientsData) {
+          result.clientsData.forEach((c: any) => {
+            const clientSales = result.salesData?.filter((s: any) => s.client_id === c.id) || [];
+            const creditSales = clientSales.filter((s: any) => s.statut_paiement === 'CREDIT');
+            const clientReglements = result.rcData?.filter((r: any) => r.client_id === c.id) || [];
+            
+            const totalAchat = creditSales.reduce((sum: number, v: any) => sum + Number(v.total), 0);
+            const totalPayeLorsVente = creditSales.reduce((sum: number, v: any) => sum + Number(v.montant_paye || 0), 0);
+            const totalRembourse = clientReglements.reduce((sum: number, r: any) => sum + Number(r.montant), 0);
+            
+            clientDebts[c.id] = totalAchat - totalPayeLorsVente - totalRembourse;
           });
         }
 
@@ -285,25 +305,31 @@ export const Sales: React.FC = () => {
                   statut_paiement: s.statut_paiement || 'PAYE',
                   client_nom: s.client_nom || '',
                   client_immatriculation: s.client_immatriculation || '',
-                  client_marque_voiture: s.client_marque_voiture || ''
+                  client_marque_voiture: s.client_marque_voiture || '',
+                  client_id: s.client_id || '',
+                  client_total_du: s.client_id ? (clientDebts[s.client_id] || 0) : 0
                 });
               });
             } else if (s.total > 0) {
-              // Fallback for sales that have a total but no details_ventes
+              // Fallback for sales that have a total but no details_ventes (like credit regulations)
+              const isReglement = s.statut_paiement === 'REGLEMENT_CREDIT';
               parsedSales.push({
                 id: s.id,
                 date: dateStr,
-                piece_name: 'Vente (Sans détails)',
+                piece_name: isReglement ? `Règlement Crédit - ${s.client_nom || 'Client'}` : 'Vente (Sans détails)',
                 piece_ref: '---',
                 vendeur: vendeur,
                 boutique_name: boutiqueName,
                 quantity: 1,
                 pu: s.total,
                 total: s.total,
-                benefice: s.total * 0.35,
+                benefice: isReglement ? 0 : s.total * 0.35,
+                statut_paiement: s.statut_paiement || 'PAYE',
                 client_nom: s.client_nom || '',
                 client_immatriculation: s.client_immatriculation || '',
-                client_marque_voiture: s.client_marque_voiture || ''
+                client_marque_voiture: s.client_marque_voiture || '',
+                client_id: s.client_id || '',
+                client_total_du: s.client_id ? (clientDebts[s.client_id] || 0) : 0
               });
             }
           });
@@ -880,8 +906,17 @@ export const Sales: React.FC = () => {
                     sale.boutique_name?.toLowerCase().includes(q) ||
                     sale.date?.toLowerCase().includes(q)
                   );
-                }).map((sale) => (
-                  <tr key={sale.id} style={s.tr}>
+                }).map((sale) => {
+                  const isOutstandingCredit = (sale.statut_paiement === 'CREDIT' || sale.statut_paiement === 'REGLEMENT_CREDIT') && (sale.client_total_du ? sale.client_total_du > 0 : false);
+                  return (
+                    <tr 
+                      key={sale.id} 
+                      style={{ 
+                        ...s.tr, 
+                        backgroundColor: isOutstandingCredit ? 'rgba(239, 68, 68, 0.08)' : undefined,
+                        borderLeft: isOutstandingCredit ? '4px solid #ef4444' : undefined
+                      }}
+                    >
                     <td style={s.tdDate}>{sale.date}</td>
                     {role === 'administrateur' && (
                       <td style={{ ...s.tdPiece, color: '#FCD25B', fontWeight: 'bold' }}>{sale.boutique_name}</td>
@@ -916,7 +951,8 @@ export const Sales: React.FC = () => {
                       </div>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
