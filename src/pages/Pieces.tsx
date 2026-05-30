@@ -1027,9 +1027,9 @@ export const Pieces: React.FC = () => {
                 </div>
                 
                 <img 
-                  src={`https://bwipjs-api.metafloor.com/?bcid=code128&text=${printLabelPiece.code_barre || printLabelPiece.reference}&scale=3&includetext`} 
+                  src={`https://bwipjs-api.metafloor.com/?bcid=code128&text=${printLabelPiece.code_barre || printLabelPiece.reference}&scale=4&height=22&includetext`} 
                   alt="Code Barres" 
-                  style={{ width: '90%', height: '52px', objectFit: 'contain', margin: '2px 0' }}
+                  style={{ width: '100%', height: '78px', objectFit: 'contain', margin: '3px 0' }}
                 />
                 
                 <div style={{ fontSize: '13px', fontWeight: '900', marginTop: '2px', color: '#000000' }}>
