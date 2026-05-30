@@ -641,7 +641,10 @@ export const Sales: React.FC = () => {
           total: pVente * item.quantity,
           benefice: (pVente * item.quantity) - ((item.piece.prix_achat || 0) * item.quantity),
           espece: isCredit ? 0 : especeNum,
-          reste: isCredit ? 0 : resteARendre
+          reste: isCredit ? 0 : resteARendre,
+          client_nom: clientNom || null,
+          client_immatriculation: clientImmatriculation || null,
+          client_marque_voiture: clientMarqueVoiture || null
         } as SaleItem;
       });
 
@@ -697,7 +700,10 @@ export const Sales: React.FC = () => {
           total: pVente * item.quantity,
           benefice: (pVente * item.quantity) - ((item.piece.prix_achat || 0) * item.quantity),
           espece: isCredit ? 0 : especeNum,
-          reste: isCredit ? 0 : resteARendre
+          reste: isCredit ? 0 : resteARendre,
+          client_nom: clientNom || null,
+          client_immatriculation: clientImmatriculation || null,
+          client_marque_voiture: clientMarqueVoiture || null
         } as SaleItem;
       });
 
@@ -1292,13 +1298,25 @@ export const Sales: React.FC = () => {
                 <div style={s.thermalTicket} className="print-area">
                   <div style={s.ticketTitle}>{bName}</div>
                   {bAddress && <div style={s.ticketAddress}>{bAddress}</div>}
-                  {bNifStat && <div style={s.ticketAddress}>NIF : {bNifStat}</div>}
+                  <div style={s.ticketAddress}>NIF : {bNifStat || "00000000000"}</div>
+                  <div style={s.ticketAddress}>STAT : {bRcs || "00000000000000"}</div>
                   {bEmail && <div style={s.ticketAddress}>Email : {bEmail}</div>}
                   {bPhone && <div style={s.ticketAddress}>Téléphone : {bPhone}</div>}
                   <div style={{ margin: '10px 0' }}></div>
                   <div style={s.ticketCenterText}>{receiptSale.date}</div>
                   <div style={{ ...s.ticketCenterText, fontWeight: 'bold' }}>OPÉRATION : VENTE</div>
                   <div style={{ ...s.ticketCenterText, fontWeight: 'bold' }}>Ticket N° {receiptSale.id.substring(0,6).toUpperCase()}</div>
+                  
+                  {/* Détails du client sur la ligne verte */}
+                  {(receiptSale.client_nom || receiptSale.client_immatriculation || receiptSale.client_marque_voiture) ? (
+                    <div style={{ ...s.ticketCenterText, fontSize: '11px', margin: '6px 0 2px 0', borderTop: '2px solid #22c55e', borderBottom: '2px solid #22c55e', padding: '6px 2px', backgroundColor: 'rgba(34, 197, 94, 0.04)', color: '#000000', lineHeight: '1.4' }}>
+                      <strong>CLIENT :</strong> {receiptSale.client_nom || 'Divers'}<br/>
+                      {receiptSale.client_immatriculation && <span><strong>IMMAT :</strong> {receiptSale.client_immatriculation} &nbsp;&nbsp;</span>}
+                      {receiptSale.client_marque_voiture && <span><strong>MARQUE :</strong> {receiptSale.client_marque_voiture}</span>}
+                    </div>
+                  ) : (
+                    <div style={{ borderTop: '2px solid #22c55e', margin: '6px 0 2px 0' }}></div>
+                  )}
                   
                   <div style={s.ticketAsterisks}>******************************</div>
                   
@@ -1357,9 +1375,8 @@ export const Sales: React.FC = () => {
                     />
                   </div>
 
-                  <div style={s.ticketFooter}>
-                    <strong>{bName}</strong> vous remercie de votre visite<br/>
-                    et espère vous revoir bientôt ......
+                  <div style={{ ...s.ticketFooter, border: '2px solid #0066fe', padding: '6px', margin: '14px 4px 4px 4px', fontSize: '11px', fontWeight: 'bold', color: '#000000', lineHeight: '1.4' }}>
+                    Hamarino tsara ny entanao, ny entana efa voamarina sy nivoaka ny magazay dia tsy azo averina na atakalo intsony
                   </div>
                 </div>
               </div>
