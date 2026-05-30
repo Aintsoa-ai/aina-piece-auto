@@ -3,185 +3,127 @@
 ## Description du Projet
 Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pièce Auto. Conçue avec un design sombre, moderne (Glassmorphism), et responsive (Mobile & Desktop).
 
+**URL Production :** https://aina-piece-auto.vercel.app  
+**Repository :** https://github.com/Aintsoa-ai/aina-piece-auto
+
+---
+
 ## Fonctionnalités Actuelles (Validées et Opérationnelles)
 
 ### 1. Authentification & Sécurité
 - Connexion sécurisée via Supabase.
 - Gestion des sessions utilisateurs et permissions basées sur les rôles (Administrateur, Caissier).
+- **Blindage Admin :** L'email administrateur (`ainapieces2026@gmail.com`) est sécurisé en dur — impossible de perdre ses droits.
 
 ### 2. Tableau de Bord (Dashboard)
 - Calcul **en temps réel** basé sur les vraies données de la base.
 - Affichage du Capital Investi, Valeur du Stock, Solde en Caisse, et Ventes du Jour.
 - Graphiques dynamiques des revenus et dépenses.
+- **Correction fuseau horaire :** filtre date locale Madagascar (UTC+3) — plus d'affichage 0 Ar.
 
 ### 3. Gestion des Ventes (Caisse & Panier)
 - **Système de Panier (Vente Multiple) :** Interface à double panneau permettant d'ajouter plusieurs pièces avec calcul dynamique du total.
-- **Intégration Douchette (Scan Rapide) :** Prise en charge native des lecteurs de codes-barres de bout en bout (Caisse, Achats, Catalogue). L'algorithme distingue une saisie humaine d'un scan matériel.
-- **Mode Scan Manuel (Fallback) :** Possibilité de rechercher manuellement un code-barres et d'appuyer sur "Entrée" pour simuler une douchette. Totalement compatible Mobile et Desktop.
-- **Inventaire Éclair :** Sur la liste du catalogue, le scan d'une pièce filtre instantanément la vue pour afficher ses informations de stock et de prix.
-- **Importation de Masse avec Codes-barres :** L'outil d'importation Excel reconnait et intègre automatiquement la colonne `CODE_BARRE`, permettant d'initialiser des centaines de références sans scan manuel.
-- **Sélection Intelligente :** Recherche fluide avec boutons d'ajustement de quantité directement dans le panier.
-- **Impression Thermique Auto-Adaptable :** Formatage natif (CSS @media print) qui s'adapte automatiquement à n'importe quelle imprimante thermique (58mm ou 80mm) générant un véritable ticket de caisse.
-- **Remboursements et Retours Clients :** Fonction exclusive (Réservée Admin) pour annuler une vente. L'opération supprime la transaction, recrédite le stock avec exactitude et trace le mouvement dans l'historique d'inventaire.
-- **Ventes à Crédit (Garages) :** Le module permet d'associer une transaction à un compte "Client/Garage". Le total s'ajoute à la dette du garage sans fausser les encaissements du jour.
+- **Intégration Douchette (Scan Rapide) :** Prise en charge native des lecteurs de codes-barres (AZERTY/QWERTY, délai 100ms). Scan-to-Open : ouvre automatiquement la bonne fenêtre.
+- **Mode Scan Manuel (Fallback) :** Recherche manuelle + Entrée pour simuler la douchette. Compatible Mobile/Desktop.
+- **Inventaire Éclair :** Scan d'une pièce → filtre instantané dans le catalogue.
+- **Sélection Intelligente :** Recherche fluide avec boutons d'ajustement de quantité dans le panier.
+- **Caisse Intelligente :** Fenêtre d'encaissement avec calcul automatique du reste à rendre. Espèces reçues et monnaie rendue imprimées sur le ticket.
+- **Impression Thermique Auto-Adaptable :** CSS `@media print` natif, compatible 58mm et 80mm.
+- **Impression Thermique Automatique :** Option activable dans Paramètres → Système. Quand activée, le ticket s'imprime automatiquement à chaque validation. Si pas d'imprimante, le navigateur propose de sauvegarder en **PDF**.
+- **Remboursements et Retours Clients :** Fonction exclusive Admin — annule la vente, recrédite le stock, trace le mouvement.
+- **Ventes à Crédit (Garages) :** Associe une transaction à un compte Client/Garage. Total ajouté à la dette sans fausser les encaissements.
 - Calcul automatique du bénéfice basé sur le dernier prix d'achat.
 
 ### 4. Gestion des Achats & Fournisseurs
-- Panneau de comparaison des prix fournisseurs en temps réel.
-- **Scan à la Réception :** Utilisation de la douchette pour identifier instantanément la marchandise reçue.
+- Panneau de comparaison des prix fournisseurs en temps réel avec historique d'évolution (+/-%).
+- **Scan à la Réception :** Douchette pour identifier la marchandise reçue.
 - Ajout de stock automatique lors d'un achat.
 
 ### 5. Catalogue & Stock
 - Affichage complet des pièces avec gestion des quantités.
-- **Gestion des Codes-barres :** Ajout ou modification des codes-barres d'une pièce directement via la douchette dans la fenêtre "Nouvelle Pièce".
-- **Génération & Impression d'Étiquettes :** Génération dynamique (API bwip-js) et impression d'autocollants code-barres au format (50x30mm) directement sur imprimante thermique. 
-- **Importation Massive & Intelligente :** Importation depuis un fichier Excel (`.xlsx`). Gestion des doublons (remplacer, mettre à jour, ignorer) et sélecteur de destination avec option de "Déploiement Global" (Toutes les boutiques). Protection d'intégrité (lignes sans REF ignorées).
+- **Gestion des Codes-barres :** Ajout/modification via douchette dans "Nouvelle Pièce".
+- **Génération & Impression d'Étiquettes :** API bwip-js, format 50x30mm thermique.
+- **Importation Massive & Intelligente :** Fichier Excel `.xlsx`, déduplication (remplacer/mettre à jour/ignorer), option GLOBAL (toutes boutiques), colonne `CODE_BARRE` reconnue automatiquement.
+- **Option GLOBAL :** Quantité divisée équitablement entre les boutiques actives.
 
-### 6. Rapports et Exports
-- **Exports Multiformats :** Génération de rapports en Excel, Word, et PDF.
-- **Rapport Exécutif (PDF) :** Template d'entreprise haut de gamme (thème Vert Sarcelle/Gris Charbon) avec graphiques circulaires et barres + courbe d'évolution (100% SVG vectoriel natif). Tous les styles sont en `style="..."` *inline* pour contourner la limitation de `html2canvas` qui ignore les blocs `<style>` — garantissant couleurs, textes et fonds visibles sur Ordinateur et Téléphone.
-- **Filtres Avancés :** Filtrage des rapports par plage de dates et *par boutique spécifique*.
-- **Calendrier & Repères :** Affichage intelligent de l'activité sur le calendrier (Bleu = Aujourd'hui local, Rouge = Activité), avec synchronisation parfaite des fuseaux horaires.
-- **Intelligence :** Top Ventes, alertes de stocks faibles, formatage de dates en JJ-MM-AAAA.
+### 6. Rapports et Exports — UNIFORMISÉS (3 formats identiques)
+- **Exports Multiformats :** Excel, Word et PDF contiennent désormais exactement les mêmes informations :
+  - En-tête entreprise (NIF, STAT, adresse, contacts)
+  - **KPIs financiers** : Chiffre d'affaires, Coût achats, Charges, Bénéfice net, Articles vendus
+  - **Tableau Top 10 Produits** : Qté vendue, CA, Bénéfice estimé, Marge %
+  - **Alertes Stock bas** : Références sous le seuil minimum
+- **Excel** : Feuille "Analyse Globale" (miroir du PDF) + feuilles détaillées (Ventes, Achats, Dépenses, Stock)
+- **PDF** : Template exécutif haut de gamme (vert sarcelle/gris charbon), graphiques SVG vectoriels, styles inline.
+- **Word** : Même template HTML que le PDF, importable dans Microsoft Word.
+- **Filtres Avancés :** Par plage de dates et par boutique spécifique.
 
-### 7. Maintenance & Sécurité (Points de Sauvegarde)
+### 7. Clients & Crédits
+- Module complet de suivi des factures impayées des Garages Partenaires.
+- Vue centralisée des dettes par client.
+- **Encaissement de règlements** avec indicateurs dynamiques en temps réel :
+  - **Reste à payer** (rouge si > 0, vert si soldé)
+  - **Reste à rendre** (vert si excédent à rendre au client)
+- Le paiement borné au montant de la dette (pas de solde négatif).
+- **Enregistrement au tableau de vente :** Chaque règlement apparaît dans la liste des ventes sous "Règlement Crédit - [Nom client]".
+- **Code couleur dans les ventes :** Les lignes crédit/règlement crédit s'affichent en rouge léger (fond + bordure gauche) si la dette est encore ouverte. Deviennent normales une fois tous les dettes soldées.
+
+### 8. Maintenance & Sécurité (Points de Sauvegarde)
 - **Sauvegarde Intelligente :** Création de "Points de Sauvegarde" de l'état complet de l'ERP.
-- **Sauvegarde Cloud Native (Drive) :** Upload silencieux et sécurisé des fichiers de sauvegarde vers un Storage Bucket intégré à Supabase (1 Go d'espace, totalement automatisé pour remplacer l'ancienne méthode par email).
-- **Restauration :** Importation du fichier en cas de vol du matériel.
-- **Purge de base :** Fonction pour nettoyer l'historique d'une période sans altérer le stock.
+- **Sauvegarde Cloud Native (Drive) :** Upload vers un Storage Bucket Supabase (1 Go automatisé).
+- **Restauration :** Importation du fichier de backup.
+- **Purge de base :** Nettoyage de l'historique par période sans altérer le stock.
 
-### 8. Gestion Multi-Boutique et Accès (Matrice Cloud)
-- **Radar de Présence :** Tableau de bord indiquant en temps réel quelle boutique est connectée (voyant vert clignotant, système de "Heartbeat" toutes les 5 min). Corrigé pour détecter précisément chaque boutique sans interférence.
-- **Création de Caissiers Autonomes :** L'administrateur peut créer des identifiants (Email/MDP) exclusifs pour les boutiques avec un système d'assignation robuste (upsert) pour éviter les profils orphelins.
-- **Mode Caissier Restreint :** Dès qu'un compte "Boutique" se connecte, l'accès aux paramètres est bloqué et les ventes sont assignées à la boutique concernée.
-- **Matrice des Autorisations (Cloud) :** Contrôle total et granulaire de l'affichage des menus (Ventes, Achats, Stock, etc.) pour chaque boutique. La configuration est sauvegardée sur Supabase pour s'appliquer instantanément et universellement à tous les téléphones et ordinateurs connectés.
-- **Sécurité Invisible (RLS) :** Cloisonnement physique des données de ventes, caisse et dépenses directement au niveau de la base de données. Il est impossible pour une boutique d'accéder aux données financières d'une autre boutique, même par piratage direct de l'API.
-- **Simulateur de Boutique :** Un mode "Simuler Accès" permettant au patron de se glisser dans la peau d'un caissier spécifique pour vérifier son interface instantanément.
+### 9. Gestion Multi-Boutique et Accès (Matrice Cloud)
+- **Radar de Présence :** Tableau de bord indiquant en temps réel quelle boutique est connectée (heartbeat 5min).
+- **Création de Caissiers Autonomes :** Admin crée des comptes Email/MDP pour les boutiques.
+- **Mode Caissier Restreint :** Accès limité aux modules autorisés pour cette boutique.
+- **Matrice des Autorisations (Cloud) :** Contrôle granulaire par boutique/page. Sauvegardé sur Supabase.
+- **Sécurité Invisible (RLS) :** Cloisonnement physique des données au niveau de la base.
+- **Simulateur de Boutique :** Mode "Simuler Accès" pour l'admin.
+- **Verrouillage Horaire :** Configuration heures d'ouverture/fermeture. Écran rouge en dehors des heures.
+- **Alerte Fermeture :** Popup animée 15 min avant la fermeture.
 
-### 9. Déploiement Production (Cloud)
-- **Hébergement :** Application déployée en continu sur **Vercel** (`aina-piece-auto.vercel.app`).
-- **Synchronisation GitHub :** Chaque mise à jour du code (`git push`) déclenche automatiquement une nouvelle version de production.
+### 10. Déploiement Production (Cloud)
+- **Hébergement :** Vercel (`aina-piece-auto.vercel.app`), déploiement continu.
+- **Synchronisation GitHub :** `git push` → nouvelle version auto.
 - **Gestion des Clés :** Variables d'environnement masquées côté serveur.
 
-### 10. Nettoyage de Base (Hard Reset)
-- **Déploiement Initial :** Avant le lancement, exécution d'un script `reset_db.ts` côté serveur utilisant la clé de service (`SERVICE_ROLE_KEY`) pour supprimer en cascade toutes les boutiques (effaçant instantanément ventes, stock, achats) afin de démarrer sur une base 100% vierge.
-
 ### 11. Fonctionnement Hors-Ligne (PWA & IndexedDB)
-- **Base de Données Locale :** Utilisation de `Dexie.js` pour créer une base de données IndexedDB stockant un cache du catalogue et le stock disponible (syncDown).
-- **Mode Hors-Ligne Total (Ventes, Achats, Dépenses) :** En cas de coupure WiFi, l'ERP sauvegarde l'intégralité des transactions métier dans des files d'attente locales.
-- **Synchronisation Automatique :** Dès le retour de la connexion Internet, un écouteur déclenche automatiquement un `syncUp`, poussant la file d'attente directement sur Supabase, mettant ainsi à jour l'interface de l'Administrateur instantanément.
-- **Statut en Temps Réel :** Le panneau d'administration affiche la pastille (Mode En Ligne / Hors-Ligne) avec le compte des ventes en attente.
+- **Base de Données Locale :** Dexie.js (IndexedDB) pour cache catalogue et stock.
+- **Mode Hors-Ligne Total :** Ventes, Achats, Dépenses en file locale.
+- **Synchronisation Automatique :** Sync au retour de la connexion Internet.
+- **Statut Temps Réel :** Pastille En Ligne/Hors-Ligne avec compteur de ventes en attente.
+
+### 12. Interface & UX
+- **Calendriers Personnalisés :** `react-datepicker` en thème sombre Glassmorphism. Activité passée en rouge, aujourd'hui en bleu.
+- **Boîtes de Dialogue :** `SweetAlert2` en thème sombre (remplace les alerts natifs).
+- **Responsive Total :** Desktop (menu fixe) + Mobile (hamburger). 100dvh pour les claviers virtuels.
+- **Identité Visuelle Adaptative :** Menu latéral personnalisé par boutique connectée.
+
+### 13. Hard Reset (Factory Reset)
+- Purge sélective : Transactions, Catalogue, Fournisseurs, Utilisateurs, Boutiques, Clients/Crédits, Caisse.
+- Admin "blindé" en dur — impossible d'effacer le compte admin.
+
+---
 
 ## Compatibilité Matérielle
 - **Ordinateur (Desktop) :** Interface complète avec menu latéral fixe.
-- **Téléphone (Mobile) :** Interface "Responsive" avec menu hamburger et cartes. Aucune fonctionnalité n'est altérée. (Ex: Le blocage du mode caissier et l'export des rapports fonctionnent parfaitement sur Mobile). L'ergonomie prend en compte les claviers virtuels (`100dvh`, défilement actif) pour ne jamais bloquer la saisie.
-
-### 11. Modernisation de l'Interface (UX/UI)
-- **Calendriers Personnalisés :** Remplacement des entrées natives (`<input type="date">`) par des calendriers `react-datepicker` en thème sombre (Glassmorphism). Affichage dynamique des dates d'activités passées en **rouge** et de la date du jour en **bleu**.
-- **Boîtes de Dialogue :** Remplacement total des `alert()`, `confirm()` et `prompt()` natifs du navigateur par des interfaces professionnelles (`SweetAlert2`) avec intégration parfaite du thème sombre.
-
-## Fonctionnalités Récentes (Mai 2026)
-- **Véritable Mode Hors-Ligne :** L'application fonctionne en tant que Progressive Web App (PWA). Les ventes peuvent être saisies sans internet et sont stockées localement (IndexedDB). Un indicateur visuel (Nuage) permet de suivre la synchronisation au retour du réseau.
-- **Suivi des connexions en Temps Réel :** Le PC administrateur peut voir en moins de 2 secondes si le téléphone d'une boutique s'est déconnecté du réseau, grâce au système WebSocket de Supabase (Presence).
-- **Tableau de bord réactif :** Le Dashboard s'actualise de lui-même dès que des ventes synchronisées arrivent dans la base.
-- **Import Excel Ultra-Rapide & Intelligent :** Refonte du moteur d'importation. Dédoublonnage instantané en mémoire et insertion massive en parallèle. Le système gère intelligemment les bases de données dont les schémas diffèrent (fallback automatique sans plantage).
-- **Maintenance Globale (Factory Reset) :** Outil intégré de purge sécurisée avec sélection précise (Transactions, Catalogue, Fournisseurs, Numérotation).
-- **Monitoring Supabase :** Affichage d'une jauge en temps réel sur le tableau de bord pour contrôler l'espace de stockage de la base de données.
-- **Identité Visuelle Adaptative :** Le menu latéral détecte automatiquement la boutique connectée, personnalisant le nom et l'icône, remplaçant l'affichage générique "OFFICIEL".
-
-## Fonctionnalités Avancées (Mise à jour)
-- **Comparateur Intelligent & Historique d'Évolution :** Lors d'un réapprovisionnement, l'application analyse l'historique complet et calcule la tendance d'inflation (ex: +15% de hausse du prix d'achat) pour vous recommander le "MEILLEUR" prix.
-- **Douchette Code-barres (POS) :** Déploiement d'un écouteur global asynchrone permettant le scan matériel dans toutes les interfaces transactionnelles (Ventes, Achats). Le système est Plug-and-Play (clavier USB émulé).
-- **Gestion des Clients (Avoirs / Crédits) :** Un module complet dédié au suivi des factures impayées des Garages Partenaires. Vue centralisée des dettes et module d'encaissement de règlements partiels (compatibles hors-ligne).
+- **Téléphone (Mobile) :** Interface responsive. Toutes fonctionnalités opérationnelles.
+- **Imprimante Thermique 58mm ou 80mm :** Ticket natif via `window.print()`.
+- **Douchette Code-barres USB :** Plug-and-play, AZERTY/QWERTY, 100ms de tolérance.
 
 ---
 
-**📍 POINT DE SAUVEGARDE : (Mai 2026)**
-*L'application est certifiée stable sur Mobile et Desktop. L'intégration PWA hors-ligne, la synchronisation Supabase temps réel, et la prise en charge des périphériques matériels (Imprimante Thermique, Douchette Code-barres) sont testées, documentées et pleinement opérationnelles.*
-### Nouvelles fonctionnalit�s valid�es (27/05/2026 13:02)
-- **Caisse Intelligente :** Fen�tre d'encaissement interm�diaire avec calcul automatique du reste � rendre, et impression sur le ticket thermique de l'esp�ce re�ue et de la monnaie rendue.
-- **Gestion Multi-boutiques (Catalogue) :** Possibilit� d'assigner une nouvelle pi�ce � TOUTES les boutiques (option GLOBAL) d�s la cr�ation ou modification.
-- **Compatibilit� Scanner Universelle :** Plug & play complet pour les douchettes param�tr�es en AZERTY ou QWERTY, avec algorithme anti-micro-coupures (tol�rance 500ms).
+## 📍 POINT DE SAUVEGARDE v3 — 31/05/2026 01:30 (Madagascar, UTC+3)
 
-### Scan Intelligent & Rapide (Scan-to-Open)
-L'ERP devient 100% centr� sur la vitesse :
-- Prenez la douchette � n'importe quel moment sur les pages (Ventes, Achats, Catalogue) et scannez.
-- Le syst�me devine votre intention et ouvre la bonne fen�tre automatiquement ! 
-- Gain de temps massif : plus besoin de toucher la souris pour d�marrer une op�ration.
-
-
-### Mises à jour de Sécurité et Horaires (27/05/2026)
-- **Scanner sans contrainte :** Suppression totale des vérifications de focus sur les barres de recherche. Le scanner utilise la vélocité (500ms) pour distinguer la douchette d'un humain, rendant le scan-to-open infaillible.
-- **Horaires de Boutique :** Configuration de l'ouverture et fermeture via le panneau Administrateur. 
-- **Verrouillage Automatique :** Écran rouge empêchant toute action des employés en dehors des heures définies, avec bouton de dérogation d'urgence pour l'administrateur.
-- **Alerte de Fermeture :** Affichage d'une fenêtre d'alerte animée 15 minutes avant la fermeture pour préparer la clôture de caisse.
-
-
-
-### 6. Paramétrages Avancés (Settings)
-- **Interface multi-onglets :** Navigation fluide et réactive entre Accès, Système et Personnalisation.
-- **Compatibilité Mobile/Desktop :** Les boutons d'action des paramètres (Purger, Sauvegarder, Réinitialiser) sont 100% fonctionnels et accessibles depuis n'importe quel onglet.
-
-### Finalisation Utilisateurs, Autorisations et Sécurité (29/05/2026)
-- **Stabilité Totale de l'Admin (Blindage) :** L'email administrateur est désormais sécurisé "en dur". Une perte de connexion ou un timeout de base de données ne pourra plus jamais rétrograder l'Administrateur en Caissier.
-- **Création Intuitive des Caissiers :** Le formulaire de création de caissiers réinitialise intelligemment la sélection de boutique pour prévenir toute assignation multiple erronée.
-- **Réinitialisation Ultra-Robuste (Hard Reset) :** La fonction d'effacement total est consolidée avec un traitement parfait des UUID de rôles en fallback. Elle supprime et nettoie l'intégralité du système sans échec.
-- **Matrice des Autorisations Avancée :** Affichage optimisé et persistant des boutiques dans la matrice pour un paramétrage centralisé et précis.
-- **Vérification Mobile/Desktop :** Toutes les modifications ont été auditées pour ne causer aucune perte de fonctionnalité sur la vue Téléphone et Ordinateur. L'application reste 100% responsive et fonctionnelle.
-
-
-### Correction Critique Création Caissiers & Ticket Thermique (29/05/2026 — Final)
-- **Bug UUID Rôle Caissier Corrigé :** La création d'un compte Caissier assigne désormais correctement la boutique choisie. L'erreur silencieuse qui forçait toujours la première boutique a été définitivement éliminée.
-- **Ticket Thermique Dynamique :** L'en-tête du ticket imprimé correspond maintenant exactement à la boutique qui a effectué la vente (PIECE BEHORIRIKA → entête BEHORIRIKA, PIECE ANDRAVOAHANGY → entête ANDRAVOAHANGY). Plus aucun mélange possible.
-- **Hard Reset Ultra-Complet :** La réinitialisation supprime désormais aussi les données de Caisse (historique d'ouverture/fermeture) et les Clients, garantissant une base 100% vierge pour la livraison au futur propriétaire.
-- **Suppression Auth complète :** La fonction SQL `delete_non_admin_users` est corrigée. Après un Hard Reset, les anciens emails ne sont plus "fantômes" — ils peuvent être recréés sans erreur "User already registered".
-- **Projet Nettoyé :** Tous les scripts temporaires (.cjs) ont été supprimés. Le dépôt GitHub est livrable tel quel.
-- **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles sur Téléphone et Ordinateur. Aucune régression.
-
-
-### Correction Critique Création Caissiers & Ticket Thermique (29/05/2026 — Final)
-- **Bug UUID Rôle Caissier Corrigé :** La création d'un compte Caissier assigne désormais correctement la boutique choisie. L'erreur silencieuse qui forçait toujours la première boutique a été définitivement éliminée.
-- **Ticket Thermique Dynamique :** L'en-tête du ticket imprimé correspond maintenant exactement à la boutique qui a effectué la vente (PIECE BEHORIRIKA → entête BEHORIRIKA, PIECE ANDRAVOAHANGY → entête ANDRAVOAHANGY). Plus aucun mélange possible.
-- **Hard Reset Ultra-Complet :** La réinitialisation supprime désormais aussi les données de Caisse (historique d'ouverture/fermeture) et les Clients, garantissant une base 100% vierge pour la livraison au futur propriétaire.
-- **Suppression Auth complète :** La fonction SQL `delete_non_admin_users` est corrigée. Après un Hard Reset, les anciens emails ne sont plus "fantômes" — ils peuvent être recréés sans erreur "User already registered".
-- **Projet Nettoyé :** Tous les scripts temporaires (.cjs) ont été supprimés. Le dépôt GitHub est livrable tel quel.
-- **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles sur Téléphone et Ordinateur. Aucune régression.
-
-
-### Corrections Catalogue & Prix de Vente (29/05/2026 15:00 — Final)
-- **Stock GLOBAL Réel :** En mode "GLOBAL (Toutes les boutiques)", la quantité saisie est maintenant
-  divisée équitablement entre les boutiques (ex: 40 unités / 2 boutiques = 20 chaque). Total = 40. Les
-  prix (achat/vente) sont identiques pour toutes les boutiques.
-- **Prix de Vente Persisté :** Le prix de vente saisi dans le catalogue est maintenant sauvegardé
-  directement dans la table `pieces` de Supabase. Il n'y a plus de risque d'afficher un prix
-  approximatif basé sur un calcul.
-- **Cohérence Catalogue → Ventes :** Le prix affiché dans "Nouvelle Vente" correspond exactement au prix
-  de vente enregistré dans le catalogue. Plus aucun écart entre les deux interfaces.
-- **Vérification Mobile/Desktop :** Toutes les corrections sont opérationnelles. Le mode hors-ligne,
-  le scanner, la matrice des autorisations et les autres modules sont intacts.
-
-### Finalisations de Ventes, Caisse et Réinitialisation (29/05/2026 Nuit)
-- **Séparation Ventes / Crédits :** Le tableau principal des ventes filtre désormais correctement les transactions à crédit. Celles-ci sont exclusivement gérées dans le module Clients & Crédits, offrant une lecture parfaite des encaissements réels.
-- **Correction du Ticket Thermique :** L'en-tête du ticket capture et fige le véritable nom de la boutique qui a effectué la vente. La réinitialisation intempestive de la liste déroulante après une transaction a été corrigée.
-- **Réinitialisation Clients & Crédits :** Le module de Factory Reset intègre une option distincte et sécurisée (Avertisseur Jaune) permettant la purge complète et propre (respect des clés étrangères) de l'historique des clients et de leurs dettes.
-- **Compatibilité Totale (Mobile/Desktop) :** L'impact de chaque modification a été revérifié sur les deux formats pour garantir que l'expérience tactile (téléphone) et bureau (ordinateur) reste fluide et sans bug visuel ou technique.
-
-### Mises à jour finales et corrections majeures (30/05/2026)
-- **Correction Date/Heure Locale Dashboard :** Remplacement de la comparaison UTC directe des dates par une conversion locale (`toLocalDateStr`). Toutes les ventes faites à Madagascar (+3h) s'affichent maintenant instantanément le bon jour au tableau de bord, même après minuit local.
-- **Réduction du Délai Douchette :** Le délai de détection de la douchette a été optimisé à **100ms** (au lieu de 500ms), évitant la fragmentation des codes-barres lors de scans rapides ou sur des machines moins performantes.
-- **Nom Boutique figé sur Ticket :** Correction de la résolution d'en-tête du ticket. Il affiche et fige le nom réel de la boutique (ex: "B TANANARIVO") au lieu de "Boutique" ou de basculer de manière aléatoire en cas de réinitialisation du dropdown.
-- **Heartbeat Automatique (Online Status) :** Mise en place d'un intervalle de synchronisation toutes les 5 minutes dans `Layout.tsx` pour forcer le ping de connexion et renouveler l'état de la boutique sur le canal de présence Supabase. Les témoins verts clignotants en temps réel reflètent désormais parfaitement le statut actif des caissiers connectés sans passer à "Hors ligne" par inactivité.
-
-### Correction Rapport de Ventes & Schéma SQL (30/05/2026 — Point de Sauvegarde v2)
-- **Correction Rapport vide (0 Ar) :** Le module d'export de rapports (PDF, Word, Excel) souffrait du même bug de fuseau horaire que le Dashboard. Les filtres de date utilisaient maintenant `new Date('YYYY-MM-DDT00:00:00').toISOString()` pour convertir minuit heure locale Madagascar (UTC+3) en UTC avant d'interroger Supabase.
-- **Schéma SQL mis à jour (v2.0) :** Le fichier `01_initial_schema.sql` est désormais complet et synchronisé avec la base de production. Il inclut toutes les tables et colonnes ajoutées depuis le lancement : `clients`, `reglements_credits`, `boutique_settings`, `page_permissions`, `pieces.code_barre`, `pieces.prix_vente`, `pieces.prix_achat`, `ventes.statut_paiement`, `ventes.boutique_name`, `ventes.vendeur`, `ventes.espece_recue`, `ventes.monnaie_rendue`.
-- **Base Supabase synchronisée :** Les colonnes manquantes ont été ajoutées via des scripts `ALTER TABLE ADD COLUMN IF NOT EXISTS` sécurisés.
-
----
-
-## 📍 POINT DE SAUVEGARDE CERTIFIÉ v2 — 30/05/2026 02:32 (Madagascar)
-**Git Tag :** `sauvegarde-30052026-v2` | **Hash :** `492cd0f`
+**Hash Git :** `bf31ff8` (avant) → en cours de déploiement  
 **URL Production :** https://aina-piece-auto.vercel.app
 
-*Toutes les fonctionnalités sont testées et opérationnelles sur Mobile et Desktop : Scanner douchette (100ms), Ticket boutique correct, Dashboard date locale, Rapport date locale, Présence temps réel (heartbeat 5min), Clients & Crédits, Hard Reset complet, Schéma SQL v2 synchronisé.*
+### Nouvelles fonctionnalités ajoutées (31/05/2026)
+- ✅ **Uniformisation exports (PDF = Word = Excel)** : L'Excel contient maintenant une feuille "Analyse Globale" avec exactement les mêmes KPIs, top produits et alertes stock que le PDF/Word.
+- ✅ **Impression thermique automatique** : Option dans Paramètres → Système. Quand activée, le ticket s'imprime dès validation. Fallback PDF automatique si pas d'imprimante.
+- ✅ **Règlements crédit → Tableau de vente** : Chaque encaissement client est maintenant envoyé dans la liste des ventes avec statut `REGLEMENT_CREDIT`.
+- ✅ **Code couleur crédits en attente** : Lignes rouges dans le tableau Ventes si dette encore ouverte, normales une fois soldées.
+- ✅ **Calcul dynamique modal Encaisser** : "Reste à payer" et "Reste à rendre" calculés en temps réel pendant la frappe.
 
+*Toutes les fonctionnalités sont testées et opérationnelles sur Mobile et Desktop.*

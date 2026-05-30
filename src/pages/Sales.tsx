@@ -75,6 +75,26 @@ export const Sales: React.FC = () => {
   const [dbBoutiques, setDbBoutiques] = useState<any[]>([]);
   const [boutiqueInfos, setBoutiqueInfos] = useState<Record<string, any>>({});
 
+  // ── Impression thermique automatique ──────────────────────────────────────
+  // L'utilisateur peut activer l'impression auto dans les Paramètres.
+  // Valeur stockée en localStorage : 'auto_print_thermal' = 'true' | 'false'
+  const [autoPrintEnabled, setAutoPrintEnabled] = useState<boolean>(
+    () => localStorage.getItem('auto_print_thermal') === 'true'
+  );
+
+  /**
+   * Déclenche l'impression du ticket thermique automatiquement.
+   * Si aucune imprimante physique n'est disponible, le navigateur
+   * ouvre la boîte de dialogue d'impression standard (avec option
+   * "Enregistrer en PDF" sur tous les OS modernes).
+   */
+  const triggerAutoThermalPrint = () => {
+    // Courte pause pour laisser le DOM du ticket se rendre avant d'imprimer
+    setTimeout(() => {
+      window.print();
+    }, 350);
+  };
+
   // Crédits / Garages
   const [clients, setClients] = useState<any[]>([]);
   const [isCredit, setIsCredit] = useState(false);
@@ -681,6 +701,10 @@ export const Sales: React.FC = () => {
       
       if (localSaleItems.length > 0) {
         setReceiptSale(localSaleItems[0]);
+        // ── Impression thermique automatique ───────────────────────────────
+        if (autoPrintEnabled) {
+          triggerAutoThermalPrint();
+        }
       }
 
     } catch (err: any) {
@@ -750,6 +774,10 @@ export const Sales: React.FC = () => {
 
       if (simulatedSales.length > 0) {
         setReceiptSale(simulatedSales[0]);
+        // ── Impression thermique automatique (mode hors-ligne) ─────────────
+        if (autoPrintEnabled) {
+          triggerAutoThermalPrint();
+        }
       }
     } finally {
       setIsSubmitting(false);

@@ -782,24 +782,61 @@ export const Settings: React.FC = () => {
           }
         };
 
-        // Add a Summary sheet with business details
-        const summaryData = [
+        // ── FEUILLE "ANALYSE GLOBALE" (miroir du PDF/Word) ──────────────────────
+        const totalVentesAll  = ventes.reduce((sum, v) => sum + Number(v.total || 0), 0);
+        const totalAchatsAll  = achats.reduce((sum, a) => sum + Number(a.total || 0), 0);
+        const totalDepAll     = depenses.reduce((sum, d) => sum + Number(d.montant || 0), 0);
+        const beneficeNetAll  = totalVentesAll - totalAchatsAll - totalDepAll;
+        const totalItemsAll   = ventes.reduce((sum, v) => sum + Number(v.quantity || 0), 0);
+        const topSellersLocal = Object.entries(
+          ventes.reduce((acc: Record<string, {qty:number,ca:number}>, v) => {
+            if (!acc[v.piece_name]) acc[v.piece_name] = { qty: 0, ca: 0 };
+            acc[v.piece_name].qty += Number(v.quantity);
+            acc[v.piece_name].ca  += Number(v.total);
+            return acc;
+          }, {})
+        ).map(([n, d]) => ({ nom: n, qty: d.qty, ca: d.ca, marge: Math.round(d.ca * 0.35), pct: totalVentesAll > 0 ? Math.round((d.ca / totalVentesAll) * 100) : 0 }))
+         .sort((a, b) => b.ca - a.ca).slice(0, 10);
+
+        const analyseData: any[][] = [
+          // ── En-tête entreprise ─────────────────────────────────────────────
           [appName.toUpperCase()],
           [appSubtitle],
           [],
           ["INFORMATIONS LÉGALES"],
-          ["Adresse", bAddress],
-          ["Téléphone", bPhone],
-          ["Email", bEmail],
-          ["NIF/STAT", bNifStat],
-          ["RCS", bRcs],
+          ["Adresse",    bAddress  || "–"],
+          ["Téléphone",  bPhone    || "–"],
+          ["Email",      bEmail    || "–"],
+          ["NIF/STAT",   bNifStat  || "–"],
+          ["RCS",        bRcs      || "–"],
           [],
-          ["RAPPORT GÉNÉRÉ LE", new Date().toLocaleString('fr-FR')],
-          ["PÉRIODE", `Du ${pStart} au ${pEnd}`]
+          ["Rapport généré le", new Date().toLocaleString('fr-FR')],
+          ["Période",           `Du ${pStart} au ${pEnd}`],
+          [],
+          // ── KPIs Financiers (identiques au PDF) ───────────────────────────
+          ["PERFORMANCE GLOBALE", ""],
+          ["Chiffre d'Affaires (Ventes)",    totalVentesAll],
+          ["Coût des Achats",                totalAchatsAll],
+          ["Charges & Dépenses",             totalDepAll],
+          ["BÉNÉFICE NET",                   beneficeNetAll],
+          ["Total Articles Vendus (unités)", totalItemsAll],
+          [],
+          // ── Top Ventes (identique au tableau principal PDF) ────────────────
+          ["ANALYSE DÉTAILLÉE PAR PRODUIT (TOP 10)", "", "", "", ""],
+          ["Produit", "Qté Vendue", "Chiffre d'Affaires (Ar)", "Bénéfice Est. (Ar)", "Marge (%)"],
+          ...topSellersLocal.map(t => [t.nom, t.qty, t.ca, t.marge, `${t.pct}%`]),
+          [],
+          // ── Alertes Stock (identique à la section alertes du PDF) ──────────
+          ["ALERTES STOCK BAS", ""],
+          ["Référence", "Désignation", "Qté Disponible", "Seuil Alerte"],
+          ...lowStockItems.map(s => [s.reference || "–", s.piece_name, s.quantity, s.stock_minimum]),
         ];
-        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-        applyExcelStyles(wsSummary);
-        XLSX.utils.book_append_sheet(wb, wsSummary, "Résumé & En-tête");
+
+        const wsAnalyse = XLSX.utils.aoa_to_sheet(analyseData);
+        wsAnalyse['!cols'] = [ {wch:45}, {wch:18}, {wch:25}, {wch:22}, {wch:12} ];
+        // Largeur colonne A plus grande pour les libellés
+        applyExcelStyles(wsAnalyse);
+        XLSX.utils.book_append_sheet(wb, wsAnalyse, "Analyse Globale");
 
         if (reportOpts.ventes) {
           const totalVentes = ventes.reduce((sum, v) => sum + Number(v.total || 0), 0);
@@ -1869,6 +1906,49 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
+
+      {/* ── IMPRESSION THERMIQUE AUTOMATIQUE ────────────────────────────── */}
+      <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '16px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff', display: 'flex', alignItems: 'center', margin: 0 }}>
+            <Printer size={18} style={{ marginRight: '10px', color: '#0066fe' }} />
+            Impression Thermique Automatique
+          </h3>
+        </div>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', marginBottom: '16px', lineHeight: '1.5' }}>
+          Quand cette option est activée, le ticket de caisse s'imprime automatiquement dès qu'une vente est validée.<br/>
+          Si aucune imprimante thermique n'est connectée, le navigateur proposera d'enregistrer le ticket en <strong>PDF</strong>.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: (() => {
+          const enabled = localStorage.getItem('auto_print_thermal') === 'true';
+          return enabled ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.02)';
+        })(), border: `1px solid ${localStorage.getItem('auto_print_thermal') === 'true' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '8px' }}>
+          <div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: localStorage.getItem('auto_print_thermal') === 'true' ? '#10b981' : '#fff' }}>
+              {localStorage.getItem('auto_print_thermal') === 'true' ? '✅ Impression automatique ACTIVÉE' : '⬜ Impression automatique DÉSACTIVÉE'}
+            </div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '3px' }}>
+              Chaque validation de vente déclenchera automatiquement le ticket thermique
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              const current = localStorage.getItem('auto_print_thermal') === 'true';
+              localStorage.setItem('auto_print_thermal', String(!current));
+              // Force re-render
+              window.dispatchEvent(new Event('storage'));
+              showAlert(`Impression automatique ${!current ? 'ACTIVÉE' : 'DÉSACTIVÉE'}. Rechargez la page des Ventes pour appliquer.`, !current ? 'success' : 'info');
+            }}
+            style={{
+              padding: '6px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontWeight: '700', fontSize: '12px',
+              backgroundColor: localStorage.getItem('auto_print_thermal') === 'true' ? '#10b981' : 'rgba(255,255,255,0.1)',
+              color: '#fff', transition: 'all 0.2s ease'
+            }}
+          >
+            {localStorage.getItem('auto_print_thermal') === 'true' ? 'Désactiver' : 'Activer'}
+          </button>
+        </div>
+      </div>
 
       {/* ── PERSONNALISATION DE L'APPLICATION ────────────────────────── */}
       <div style={{ ...s.card, display: activeSettingsTab === 'systeme' ? 'block' : 'none' }}>
