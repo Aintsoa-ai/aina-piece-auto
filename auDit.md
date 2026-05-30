@@ -1,11 +1,11 @@
 # AUDIT TECHNIQUE — AINA PIÈCE AUTO ERP
-> Dernière mise à jour : **31/05/2026 — 01:30 (Madagascar, UTC+3)**
+> Dernière mise à jour : **31/05/2026 — 02:25 (Madagascar, UTC+3)**
 
 ---
 
-## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3 — 31/05/2026 01:30
+## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.2 — 31/05/2026 02:25
 
-**Hash Git actuel :** `bf31ff8` (base) + nouveaux commits en cours  
+**Hash Git actuel :** `d90b806` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app  
 **Repository :** https://github.com/Aintsoa-ai/aina-piece-auto
 
@@ -151,7 +151,9 @@
 
 | Date | Hash | Statut |
 |---|---|---|
-| 31/05/2026 01:30 | en cours | ✅ **STABLE** — Exports uniformisés, impression auto, crédits complets |
+| 31/05/2026 02:25 | `d90b806` | ✅ **STABLE** — Ticket thermique centré et auto-adaptatif (58mm/80mm), code-barres haute résolution |
+| 31/05/2026 02:05 | `3ce8549` | ✅ **STABLE** — Code-barres haute résolution, exports uniformisés, impression auto, crédits complets |
+| 31/05/2026 01:30 | `bf31ff8` | ✅ **STABLE** — Exports uniformisés, impression auto, crédits complets |
 | 30/05/2026 02:32 | `492cd0f` | ✅ Stable — Dashboard, Scanner, Ticket, Crédits v1 |
 | 30/05/2026 00:50 | `6a8a6f6` | ✅ Stable — Ventes, Dashboard, Scanner, Ticket corrects |
 | 29/05/2026 Nuit | `a97b286` | ✅ Stable — Ticket boutique + filtre crédits |
