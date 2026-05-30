@@ -354,36 +354,50 @@ body.light-theme input:-webkit-autofill:active {
 
 
 @media print {
-  /* Cacher tout le reste de la page */
-  body * { visibility: hidden; }
+  /* Réinitialiser la page d'impression */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
 
-  /* N'afficher que le ticket thermique */
+  /* Cacher tout le reste de la page */
+  body * { 
+    visibility: hidden; 
+  }
+
+  /* N'afficher et formater que le ticket thermique */
   .print-area, .print-area * { 
     visibility: visible; 
-    color: #000 !important;
-    background-color: #fff !important;
+    color: #000000 !important;
+    background-color: #ffffff !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  /* Positionnement absolu depuis le coin supérieur gauche */
+  /* Rendre le ticket auto-adaptatif et parfaitement centré sur 58mm et 80mm */
   .print-area { 
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 80mm;      /* Largeur standard imprimante 80mm */
-    max-width: 80mm;
-    margin: 0;
-    padding: 2mm 3mm; /* Marges minimales gauche/droite */
-    font-size: 11pt;
-    font-family: monospace;
-    box-sizing: border-box;
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    margin: 0 auto !important; /* Centrage horizontal parfait */
+    width: 100% !important;
+    max-width: 76mm !important; /* Largeur de sécurité pour 80mm, et se réduit de manière fluide sur 58mm */
+    padding: 4mm 4mm !important; /* Marges gauche/droite équilibrées pour éviter d'être collé au bord */
+    font-size: 10pt !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    box-sizing: border-box !important;
+    display: block !important;
   }
 
-  /* Paramètres de la page */
+  /* Paramètres globaux de la page d'impression */
   @page {
-    size: 80mm auto; /* Largeur fixe, hauteur automatique */
-    margin: 0;       /* Pas de marges imposées par le navigateur */
+    size: auto; /* Largeur de bobine détectée automatiquement par l'imprimante */
+    margin: 0 !important; /* Élimine les décalages imposés par le navigateur */
   }
 }
 
