@@ -1298,10 +1298,11 @@ export const Sales: React.FC = () => {
                 <div style={s.thermalTicket} className="print-area">
                   <div style={s.ticketTitle}>{bName}</div>
                   {bAddress && <div style={s.ticketAddress}>{bAddress}</div>}
-                  <div style={{ ...s.ticketAddress, display: 'flex', justifyContent: 'center', gap: '12px', color: '#000000' }}>
-                    <span><strong>NIF :</strong> {bNifStat || "00000000000"}</span>
-                    <span>|</span>
-                    <span><strong>STAT :</strong> {bRcs || "00000000000000"}</span>
+                  <div style={{ textAlign: 'center', margin: '4px 0' }}>
+                    <div style={{ display: 'inline-block', textAlign: 'left', color: '#000000', fontFamily: 'monospace', fontSize: '12px', lineHeight: '1.4' }}>
+                      <div>NIF  : {bNifStat || "00000000000"}</div>
+                      <div>STAT : {bRcs || "00000000000000"}</div>
+                    </div>
                   </div>
                   {bEmail && <div style={s.ticketAddress}>Email : {bEmail}</div>}
                   {bPhone && <div style={s.ticketAddress}>Téléphone : {bPhone}</div>}
