@@ -1298,8 +1298,11 @@ export const Sales: React.FC = () => {
                 <div style={s.thermalTicket} className="print-area">
                   <div style={s.ticketTitle}>{bName}</div>
                   {bAddress && <div style={s.ticketAddress}>{bAddress}</div>}
-                  <div style={s.ticketAddress}>NIF : {bNifStat || "00000000000"}</div>
-                  <div style={s.ticketAddress}>STAT : {bRcs || "00000000000000"}</div>
+                  <div style={{ ...s.ticketAddress, display: 'flex', justifyContent: 'center', gap: '12px', color: '#000000' }}>
+                    <span><strong>NIF :</strong> {bNifStat || "00000000000"}</span>
+                    <span>|</span>
+                    <span><strong>STAT :</strong> {bRcs || "00000000000000"}</span>
+                  </div>
                   {bEmail && <div style={s.ticketAddress}>Email : {bEmail}</div>}
                   {bPhone && <div style={s.ticketAddress}>Téléphone : {bPhone}</div>}
                   <div style={{ margin: '10px 0' }}></div>
@@ -1309,13 +1312,13 @@ export const Sales: React.FC = () => {
                   
                   {/* Détails du client sur la ligne verte */}
                   {(receiptSale.client_nom || receiptSale.client_immatriculation || receiptSale.client_marque_voiture) ? (
-                    <div style={{ ...s.ticketCenterText, fontSize: '11px', margin: '6px 0 2px 0', borderTop: '2px solid #22c55e', borderBottom: '2px solid #22c55e', padding: '6px 2px', backgroundColor: 'rgba(34, 197, 94, 0.04)', color: '#000000', lineHeight: '1.4' }}>
+                    <div style={{ ...s.ticketCenterText, fontSize: '11px', margin: '6px 0 2px 0', borderTop: '2px solid #000000', borderBottom: '2px solid #000000', padding: '6px 2px', color: '#000000', lineHeight: '1.5' }}>
                       <strong>CLIENT :</strong> {receiptSale.client_nom || 'Divers'}<br/>
                       {receiptSale.client_immatriculation && <span><strong>IMMAT :</strong> {receiptSale.client_immatriculation} &nbsp;&nbsp;</span>}
                       {receiptSale.client_marque_voiture && <span><strong>MARQUE :</strong> {receiptSale.client_marque_voiture}</span>}
                     </div>
                   ) : (
-                    <div style={{ borderTop: '2px solid #22c55e', margin: '6px 0 2px 0' }}></div>
+                    <div style={{ borderTop: '2px solid #000000', margin: '6px 0 2px 0' }}></div>
                   )}
                   
                   <div style={s.ticketAsterisks}>******************************</div>
@@ -1375,7 +1378,7 @@ export const Sales: React.FC = () => {
                     />
                   </div>
 
-                  <div style={{ ...s.ticketFooter, border: '2px solid #0066fe', padding: '6px', margin: '14px 4px 4px 4px', fontSize: '11px', fontWeight: 'bold', color: '#000000', lineHeight: '1.4' }}>
+                  <div style={{ ...s.ticketFooter, padding: '6px 4px', marginTop: '14px', fontSize: '11px', fontWeight: 'bold', color: '#000000', lineHeight: '1.5', fontStyle: 'italic' }}>
                     Hamarino tsara ny entanao, ny entana efa voamarina sy nivoaka ny magazay dia tsy azo averina na atakalo intsony
                   </div>
                 </div>
@@ -1863,7 +1866,8 @@ const s: Record<string, React.CSSProperties> = {
     border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '12px',
     width: '100%',
-    maxWidth: '340px',
+    maxWidth: '380px',
+    maxHeight: '90vh',
     display: 'flex',
     flexDirection: 'column',
     boxShadow: '0 12px 36px rgba(0, 0, 0, 0.55)',
@@ -1873,7 +1877,9 @@ const s: Record<string, React.CSSProperties> = {
     padding: '20px',
     backgroundColor: '#ffffff',
     display: 'flex',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflowY: 'auto',
+    flex: 1
   },
   thermalTicket: {
     color: '#000000',

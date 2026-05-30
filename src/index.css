@@ -354,20 +354,36 @@ body.light-theme input:-webkit-autofill:active {
 
 
 @media print {
+  /* Cacher tout le reste de la page */
   body * { visibility: hidden; }
-  .print-area, .print-area * { visibility: visible; }
-  .print-area { 
-    position: absolute; 
-    left: 0; 
-    top: 0; 
-    margin: 0; 
-    padding: 0; 
-    width: 100%; 
-    max-width: 80mm;
-    color: #000;
+
+  /* N'afficher que le ticket thermique */
+  .print-area, .print-area * { 
+    visibility: visible; 
+    color: #000 !important;
+    background-color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
-  @page {
+
+  /* Positionnement absolu depuis le coin supérieur gauche */
+  .print-area { 
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 80mm;      /* Largeur standard imprimante 80mm */
+    max-width: 80mm;
     margin: 0;
+    padding: 2mm 3mm; /* Marges minimales gauche/droite */
+    font-size: 11pt;
+    font-family: monospace;
+    box-sizing: border-box;
+  }
+
+  /* Paramètres de la page */
+  @page {
+    size: 80mm auto; /* Largeur fixe, hauteur automatique */
+    margin: 0;       /* Pas de marges imposées par le navigateur */
   }
 }
 
