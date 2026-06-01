@@ -33,6 +33,7 @@ interface SaleItem {
 interface CartItem {
   piece: PieceItem;
   quantity: number;
+  customPrice?: number; // Prix personnalisé lors de la vente
 }
 
 interface PieceItem {
@@ -572,6 +573,15 @@ export const Sales: React.FC = () => {
     setCart(prev => prev.filter(item => item.piece.id !== pieceId));
   };
 
+  const handleUpdateCartPrice = (pieceId: string, newPrice: string) => {
+    const parsed = parseInt(String(newPrice).replace(/\D/g, ''), 10);
+    setCart(prev => prev.map(item =>
+      item.piece.id === pieceId
+        ? { ...item, customPrice: isNaN(parsed) ? undefined : parsed }
+        : item
+    ));
+  };
+
   // Perform Sale registration
   const handleOpenCheckout = () => {
     if (cart.length === 0) {
@@ -593,7 +603,7 @@ export const Sales: React.FC = () => {
     let calculatedTotal = 0;
     
     cart.forEach(item => {
-        const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
+        const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
         calculatedTotal += pVente * item.quantity;
     });
 
@@ -640,14 +650,17 @@ export const Sales: React.FC = () => {
       if (venteErr) throw venteErr;
 
       // 3. Insert details_ventes
-      const detailsToInsert = cart.map(item => ({
-          vente_id: newVente.id,
-          piece_id: item.piece.piece_id || item.piece.id, // Use actual piece_id, fallback to id
-          quantite: item.quantity,
-          prix_vente: item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0,
-          remise: 0,
-          total: (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity
-      }));
+      const detailsToInsert = cart.map(item => {
+          const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
+          return {
+            vente_id: newVente.id,
+            piece_id: item.piece.piece_id || item.piece.id,
+            quantite: item.quantity,
+            prix_vente: pVente,
+            remise: item.customPrice != null && item.customPrice < item.piece.prix_vente ? item.piece.prix_vente - item.customPrice : 0,
+            total: pVente * item.quantity
+          };
+      });
 
       const { error: detailsErr } = await supabase
         .from('details_ventes')
@@ -671,7 +684,7 @@ export const Sales: React.FC = () => {
 
       // Build local item for immediate receipt
       const localSaleItems = cart.map((item, index) => {
-        const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
+        const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
         return {
           id: `${newVente.id}-sim-${index}`,
           date: new Date().toLocaleString('fr-FR', {
@@ -724,17 +737,20 @@ export const Sales: React.FC = () => {
         montant_paye: isCredit ? 0 : calculatedTotal,
         total: calculatedTotal,
         created_at: new Date().toISOString(),
-        details: cart.map(item => ({
-          piece_id: item.piece.piece_id || item.piece.id,
-          quantite: item.quantity,
-          prix_vente: item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0,
-          total: (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity
-        }))
+        details: cart.map(item => {
+          const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
+          return {
+            piece_id: item.piece.piece_id || item.piece.id,
+            quantite: item.quantity,
+            prix_vente: pVente,
+            total: pVente * item.quantity
+          };
+        })
       });
 
       // Mettre à jour visuellement le stock local dans l'état (simulation locale)
       const simulatedSales = cart.map((item, index) => {
-        const pVente = item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0;
+        const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
         return {
           id: `${offlineSaleId}-sim-${index}`,
           date: new Date().toLocaleString('fr-FR', {
@@ -1076,21 +1092,53 @@ export const Sales: React.FC = () => {
                     {cart.length === 0 ? (
                       <div style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: '30px', fontSize: '13px' }}>Le panier est vide. Cliquez sur les pièces à gauche pour les ajouter.</div>
                     ) : (
-                      cart.map(item => (
-                        <div key={item.piece.id} style={s.selectionSummaryCard}>
-                          <div style={{ flex: 1 }}>
-                            <div style={s.selectionTitle}>{item.piece.designation}</div>
-                            <div style={s.selectionRef}>{item.piece.reference} - {formatAr(item.piece.prix_vente)}</div>
+                      cart.map(item => {
+                        const effectivePrice = item.customPrice ?? item.piece.prix_vente;
+                        const isDiscounted = item.customPrice != null && item.customPrice < item.piece.prix_vente;
+                        return (
+                          <div key={item.piece.id} style={s.selectionSummaryCard}>
+                            <div style={{ flex: 1 }}>
+                              <div style={s.selectionTitle}>{item.piece.designation}</div>
+                              <div style={s.selectionRef}>{item.piece.reference}</div>
+                              {/* Prix modifiable */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Prix (Ar):</span>
+                                <input
+                                  type="text"
+                                  value={effectivePrice === 0 ? '' : new Intl.NumberFormat('fr-FR').format(effectivePrice).replace(/\u202f/g, ' ')}
+                                  onChange={(e) => handleUpdateCartPrice(item.piece.id, e.target.value)}
+                                  style={{
+                                    width: '100px',
+                                    backgroundColor: isDiscounted ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.07)',
+                                    border: isDiscounted ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.15)',
+                                    borderRadius: '5px',
+                                    padding: '3px 7px',
+                                    color: isDiscounted ? '#f59e0b' : '#ffffff',
+                                    fontSize: '12px',
+                                    fontWeight: '700',
+                                    outline: 'none',
+                                  }}
+                                />
+                                {isDiscounted && (
+                                  <span style={{ fontSize: '10px', color: '#ef4444', textDecoration: 'line-through' }}>
+                                    {new Intl.NumberFormat('fr-FR').format(item.piece.prix_vente).replace(/\u202f/g, ' ')}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ fontSize: '11px', color: '#10b981', marginTop: '2px', fontWeight: '600' }}>
+                                Sous-total: {new Intl.NumberFormat('fr-FR').format(effectivePrice * item.quantity).replace(/\u202f/g, ' ')} Ar
+                              </div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <button style={{...s.qtyBtn, width: '22px', height: '22px', fontSize: '14px'}} onClick={() => handleUpdateCartQuantity(item.piece.id, -1)}>-</button>
+                              <span style={{ color: '#fff', fontSize: '13px', minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
+                              <button style={{...s.qtyBtn, width: '22px', height: '22px', fontSize: '14px'}} onClick={() => handleUpdateCartQuantity(item.piece.id, 1)}>+</button>
+                              <button style={{ background: 'none', border: 'none', color: '#ef4444', marginLeft: '5px', cursor: 'pointer' }} onClick={() => handleRemoveFromCart(item.piece.id)}><X size={14} /></button>
+                            </div>
                           </div>
-                          
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <button style={{...s.qtyBtn, width: '22px', height: '22px', fontSize: '14px'}} onClick={() => handleUpdateCartQuantity(item.piece.id, -1)}>-</button>
-                            <span style={{ color: '#fff', fontSize: '13px', minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
-                            <button style={{...s.qtyBtn, width: '22px', height: '22px', fontSize: '14px'}} onClick={() => handleUpdateCartQuantity(item.piece.id, 1)}>+</button>
-                            <button style={{ background: 'none', border: 'none', color: '#ef4444', marginLeft: '5px', cursor: 'pointer' }} onClick={() => handleRemoveFromCart(item.piece.id)}><X size={14} /></button>
-                          </div>
-                        </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
 
