@@ -14,8 +14,9 @@ import {
   Printer
 } from 'lucide-react';
 
-interface PieceItem {
+export interface PieceItem {
   id: string;
+  piece_id?: string;
   reference: string;
   designation: string;
   marque: string;
@@ -87,106 +88,6 @@ export const Pieces: React.FC = () => {
 
   const isAdmin = role === 'administrateur';
 
-  // Exact mock list matching reference screenshot 1
-  const demoPieces: PieceItem[] = [
-    {
-      id: 'p1',
-      reference: 'FH-001',
-      designation: 'Filtre à huile',
-      marque: 'Bosch',
-      categorie: 'Filtration',
-      qte: 45,
-      achat: 25000,
-      vente: 38000,
-      stockStatus: 'OK',
-      compatibilite: 'Universal',
-      oem_number: 'OEM-FH-001',
-      emplacement: 'A-12',
-      stock_minimum: 5,
-      description: 'Filtre à huile haute performance Bosch.'
-    },
-    {
-      id: 'p2',
-      reference: 'PF-022',
-      designation: 'Plaquettes de frein avant',
-      marque: 'Brembo',
-      categorie: 'Freinage',
-      qte: 12,
-      achat: 85000,
-      vente: 125000,
-      stockStatus: 'OK',
-      compatibilite: 'Peugeot / Renault',
-      oem_number: 'OEM-PF-022',
-      emplacement: 'B-04',
-      stock_minimum: 5,
-      description: 'Plaquettes de frein Brembo.'
-    },
-    {
-      id: 'p3',
-      reference: 'BG-105',
-      designation: "Bougie d'allumage",
-      marque: 'NGK',
-      categorie: 'Allumage',
-      qte: 3,
-      achat: 8000,
-      vente: 14000,
-      stockStatus: 'Faible',
-      compatibilite: 'Multi-brand',
-      oem_number: 'OEM-BG-105',
-      emplacement: 'C-08',
-      stock_minimum: 5,
-      description: "Bougie d'allumage NGK longue durée."
-    },
-    {
-      id: 'p4',
-      reference: 'AM-307',
-      designation: 'Amortisseur arrière',
-      marque: 'Monroe',
-      categorie: 'Suspension',
-      qte: 0,
-      achat: 180000,
-      vente: 265000,
-      stockStatus: 'Rupture',
-      compatibilite: 'Peugeot 307',
-      oem_number: 'OEM-AM-307',
-      emplacement: 'D-02',
-      stock_minimum: 2,
-      description: 'Amortisseur à gaz Monroe.'
-    },
-    {
-      id: 'p5',
-      reference: 'BAT-150',
-      designation: 'Batterie 60Ah',
-      marque: 'Varta',
-      categorie: 'Électrique',
-      qte: 18,
-      achat: 320000,
-      vente: 450000,
-      stockStatus: 'OK',
-      compatibilite: '12V cars',
-      oem_number: 'OEM-BAT-150',
-      emplacement: 'E-01',
-      stock_minimum: 3,
-      description: 'Batterie Varta haute performance.'
-    },
-    {
-      id: 'p6',
-      reference: 'CRX-099',
-      designation: 'Courroie de distribution',
-      marque: 'Gates',
-      categorie: 'Moteur',
-      qte: 22,
-      achat: 95000,
-      vente: 145000,
-      stockStatus: 'OK',
-      compatibilite: 'Renault Clio',
-      oem_number: 'OEM-CRX-099',
-      emplacement: 'F-06',
-      stock_minimum: 4,
-      description: 'Courroie de distribution renforcée Gates.'
-    }
-  ];
-
   const formatAr = (val: number) => {
     return new Intl.NumberFormat('fr-FR').format(val) + ' Ar';
   };
@@ -199,7 +100,6 @@ export const Pieces: React.FC = () => {
     );
 
     const queryPromise = (async () => {
-      // Fetch pieces, stocks, and piece_fournisseurs
       const { data: piecesData, error: piecesErr } = await supabase.from('pieces').select('*');
       const { data: stockData } = await supabase.from('stock').select('*');
       const { data: suppliersData } = await supabase.from('piece_fournisseurs').select('*');
@@ -219,57 +119,72 @@ export const Pieces: React.FC = () => {
 
       if (result && !result.isTimeout && result.piecesData && result.piecesData.length > 0) {
         const { piecesData, stockData, suppliersData, listBoutiques } = result;
+        const parsed: PieceItem[] = [];
 
-        const parsed: PieceItem[] = piecesData.map((item: any) => {
-          // Find stock for this piece
+        piecesData.forEach((item: any) => {
           const pieceStocks = stockData?.filter((s: any) => s.piece_id === item.id) || [];
-          const totalQty = pieceStocks.reduce((acc: number, curr: any) => acc + Number(curr.quantity_disponible || 0), 0);
-          const minStock = pieceStocks[0]?.stock_minimum || 5;
-
-          // Find purchase and sales price
           const spPrice = suppliersData?.find((s: any) => s.piece_id === item.id);
           const achatPrice = item.prix_achat || (spPrice ? Number(spPrice.prix_achat) : 0);
           const ventePrice = item.prix_vente || (achatPrice > 0 ? achatPrice * 1.5 : 0);
 
-          // Determine status
-          let status: 'OK' | 'Faible' | 'Rupture' = 'OK';
-          if (totalQty === 0) status = 'Rupture';
-          else if (totalQty <= minStock) status = 'Faible';
+          if (pieceStocks.length === 0) {
+            parsed.push({
+              id: item.id,
+              piece_id: item.id,
+              reference: item.reference,
+              designation: item.designation,
+              marque: item.marque || '—',
+              categorie: item.categorie || '—',
+              qte: 0,
+              achat: achatPrice,
+              vente: ventePrice,
+              stockStatus: 'Rupture',
+              code_barre: item.code_barre || '',
+              compatibilite: item.compatibilite || '',
+              oem_number: item.oem_number || '',
+              emplacement: '',
+              stock_minimum: 5,
+              description: item.description || '',
+              lieu: '—',
+              boutiquesIds: []
+            });
+          } else {
+            pieceStocks.forEach((s: any) => {
+              const b = listBoutiques?.find((lb: any) => lb.id === s.boutique_id);
+              const qty = Number(s.quantity_disponible || 0);
+              const minStock = s.stock_minimum || 5;
+              let status: 'OK' | 'Faible' | 'Rupture' = 'OK';
+              if (qty === 0) status = 'Rupture';
+              else if (qty <= minStock) status = 'Faible';
 
-          const boutiquesForPiece = pieceStocks.map((s: any) => {
-            const b = listBoutiques?.find((lb: any) => lb.id === s.boutique_id);
-            return b ? b.name : null;
-          }).filter(Boolean);
-          const uniqueBoutiques = Array.from(new Set(boutiquesForPiece));
-          const lieu = uniqueBoutiques.join(', ');
-          const boutiquesIds = Array.from(new Set(pieceStocks.map((s:any) => s.boutique_id)));
-
-          return {
-            id: item.id,
-            reference: item.reference,
-            designation: item.designation,
-            marque: item.marque || '—',
-            categorie: item.categorie || '—',
-            qte: totalQty,
-            achat: achatPrice,
-            vente: ventePrice,
-            stockStatus: status,
-            code_barre: item.code_barre || '',
-            compatibilite: item.compatibilite || '',
-            oem_number: item.oem_number || '',
-            emplacement: pieceStocks[0]?.emplacement || '',
-            stock_minimum: minStock,
-            description: item.description || '',
-            lieu,
-            boutiquesIds
-          };
+              parsed.push({
+                id: `${item.id}-${s.boutique_id}`,
+                piece_id: item.id,
+                reference: item.reference,
+                designation: item.designation,
+                marque: item.marque || '—',
+                categorie: item.categorie || '—',
+                qte: qty,
+                achat: achatPrice,
+                vente: ventePrice,
+                stockStatus: status,
+                code_barre: item.code_barre || '',
+                compatibilite: item.compatibilite || '',
+                oem_number: item.oem_number || '',
+                emplacement: s.emplacement || '',
+                stock_minimum: minStock,
+                description: item.description || '',
+                lieu: b ? b.name : '—',
+                boutiquesIds: [s.boutique_id]
+              });
+            });
+          }
         });
 
         setPieces(parsed);
         
       } else {
         setPieces([]);
-        
         setBoutiques([{ id: 'b1', name: 'Boutique Centre' }]);
         setFournisseurs([{ id: 'f1', nom: 'Auto Parts Madagascar' }]);
       }
@@ -384,7 +299,7 @@ export const Pieces: React.FC = () => {
   };
 
   const handleOpenEditModal = (piece: PieceItem) => {
-    setEditId(piece.id);
+    setEditId(piece.piece_id || piece.id);
     setReference(piece.reference);
     setCodeBarre(piece.code_barre || '');
     setDesignation(piece.designation);
@@ -709,7 +624,7 @@ export const Pieces: React.FC = () => {
                   <td style={{ ...s.td, fontWeight: '700', color: '#0066fe' }}>{piece.designation}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{piece.marque}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{piece.categorie}</td>
-                  <td style={{ ...s.td, color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>{piece.lieu || '—'}</td>
+                  <td style={{ ...s.td, color: 'rgba(255,255,255,0.8)', fontSize: '12px', textTransform: 'uppercase' }}>{piece.lieu || '—'}</td>
                   <td style={{ ...s.td, fontWeight: '700' }}>{piece.qte}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{formatAr(piece.achat)}</td>
                   <td style={{ ...s.td, fontWeight: '700' }}>{formatAr(piece.vente)}</td>
@@ -737,7 +652,7 @@ export const Pieces: React.FC = () => {
                         <Edit size={14} />
                       </button>
                       {isAdmin && (
-                        <button style={{ ...s.actionBtn, color: '#ef4444' }} onClick={() => handleDelete(piece.id)} title="Supprimer">
+                        <button style={{ ...s.actionBtn, color: '#ef4444' }} onClick={() => handleDelete(piece.piece_id || piece.id)} title="Supprimer">
                           <Trash2 size={14} />
                         </button>
                       )}
