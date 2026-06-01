@@ -1319,7 +1319,7 @@ export const Sales: React.FC = () => {
             </div>
             <div style={s.modalBody}>
               {(() => {
-                const cartTotal = cart.reduce((sum, item) => sum + ((item.customPrice ?? item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity), 0);
+                const cartTotal = cart.reduce((sum, item) => sum + ((item.customPrice ?? (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0)) * item.quantity), 0);
                 const isValidAmount = isCredit || (especeRecue && Number(especeRecue) >= cartTotal);
                 
                 return (
@@ -1388,7 +1388,7 @@ export const Sales: React.FC = () => {
             <div style={s.modalFooter}>
               <button style={s.btnAnnuler} onClick={() => setIsCheckoutModalOpen(false)}>Annuler</button>
               {(() => {
-                const cartTotal = cart.reduce((sum, item) => sum + ((item.customPrice ?? item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity), 0);
+                const cartTotal = cart.reduce((sum, item) => sum + ((item.customPrice ?? (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0)) * item.quantity), 0);
                 const isAmountValid = isCredit || (especeRecue && Number(especeRecue) >= cartTotal);
                 return (
                   <button 
