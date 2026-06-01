@@ -603,7 +603,7 @@ export const Sales: React.FC = () => {
     let calculatedTotal = 0;
     
     cart.forEach(item => {
-        const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
+        const pVente = item.customPrice ?? (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0);
         calculatedTotal += pVente * item.quantity;
     });
 
@@ -651,7 +651,7 @@ export const Sales: React.FC = () => {
 
       // 3. Insert details_ventes
       const detailsToInsert = cart.map(item => {
-          const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
+          const pVente = item.customPrice ?? (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0);
           return {
             vente_id: newVente.id,
             piece_id: item.piece.piece_id || item.piece.id,
@@ -684,7 +684,7 @@ export const Sales: React.FC = () => {
 
       // Build local item for immediate receipt
       const localSaleItems = cart.map((item, index) => {
-        const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
+        const pVente = item.customPrice ?? (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0);
         return {
           id: `${newVente.id}-sim-${index}`,
           date: new Date().toLocaleString('fr-FR', {
@@ -738,7 +738,7 @@ export const Sales: React.FC = () => {
         total: calculatedTotal,
         created_at: new Date().toISOString(),
         details: cart.map(item => {
-          const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
+          const pVente = item.customPrice ?? (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0);
           return {
             piece_id: item.piece.piece_id || item.piece.id,
             quantite: item.quantity,
@@ -750,7 +750,7 @@ export const Sales: React.FC = () => {
 
       // Mettre à jour visuellement le stock local dans l'état (simulation locale)
       const simulatedSales = cart.map((item, index) => {
-        const pVente = item.customPrice ?? item.piece.prix_vente ?? item.piece.prix_achat * 1.5 ?? 0;
+        const pVente = item.customPrice ?? (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0);
         return {
           id: `${offlineSaleId}-sim-${index}`,
           date: new Date().toLocaleString('fr-FR', {
