@@ -1276,7 +1276,7 @@ export const Sales: React.FC = () => {
                   {/* Calculations Preview */}
                   <div style={s.totalPreviewLine}>
                     <div style={s.previewLabel}>Total à payer :</div>
-                    <div style={s.previewVal}>{formatAr(cart.reduce((sum, item) => sum + (item.piece.prix_vente * item.quantity), 0))}</div>
+                    <div style={s.previewVal}>{formatAr(cart.reduce((sum, item) => sum + ((item.customPrice ?? item.piece.prix_vente) * item.quantity), 0))}</div>
                   </div>
 
                 </div>
@@ -1319,11 +1319,38 @@ export const Sales: React.FC = () => {
             </div>
             <div style={s.modalBody}>
               {(() => {
-                const cartTotal = cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0);
+                const cartTotal = cart.reduce((sum, item) => sum + ((item.customPrice ?? item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity), 0);
                 const isValidAmount = isCredit || (especeRecue && Number(especeRecue) >= cartTotal);
                 
                 return (
                   <>
+                    {/* Détail des articles */}
+                    <div style={{ marginBottom: '16px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>Détail de la vente</div>
+                      {cart.map(item => {
+                        const effectivePrice = item.customPrice ?? item.piece.prix_vente;
+                        const isModified = item.customPrice != null && item.customPrice !== item.piece.prix_vente;
+                        return (
+                          <div key={item.piece.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: '12px', color: '#fff', fontWeight: '600' }}>{item.piece.designation}</div>
+                              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
+                                x{item.quantity} &times; {new Intl.NumberFormat('fr-FR').format(effectivePrice).replace(/\u202f/g, ' ')} Ar
+                                {isModified && (
+                                  <span style={{ color: '#f59e0b', marginLeft: '6px', fontStyle: 'italic' }}>
+                                    (était {new Intl.NumberFormat('fr-FR').format(item.piece.prix_vente).replace(/\u202f/g, ' ')} Ar)
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div style={{ fontSize: '13px', fontWeight: '700', color: isModified ? '#f59e0b' : '#22c55e' }}>
+                              {new Intl.NumberFormat('fr-FR').format(effectivePrice * item.quantity).replace(/\u202f/g, ' ')} Ar
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
                     <div style={{ textAlign: 'center', marginBottom: '10px' }}>
                       <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Total à payer</div>
                       <div style={{ fontSize: '32px', fontWeight: '800', color: '#22c55e' }}>
@@ -1361,7 +1388,7 @@ export const Sales: React.FC = () => {
             <div style={s.modalFooter}>
               <button style={s.btnAnnuler} onClick={() => setIsCheckoutModalOpen(false)}>Annuler</button>
               {(() => {
-                const cartTotal = cart.reduce((sum, item) => sum + (item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity, 0);
+                const cartTotal = cart.reduce((sum, item) => sum + ((item.customPrice ?? item.piece.prix_vente || item.piece.prix_achat * 1.5 || 0) * item.quantity), 0);
                 const isAmountValid = isCredit || (especeRecue && Number(especeRecue) >= cartTotal);
                 return (
                   <button 
