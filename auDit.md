@@ -1,11 +1,11 @@
 # AUDIT TECHNIQUE — AINA PIÈCE AUTO ERP
-> Dernière mise à jour : **31/05/2026 — 02:25 (Madagascar, UTC+3)**
+> Dernière mise à jour : **01/06/2026 — 13:30 (Madagascar, UTC+3)**
 
 ---
 
-## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.2 — 31/05/2026 02:25
+## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.3 — 01/06/2026 13:30
 
-**Hash Git actuel :** `d90b806` (Stable)  
+**Hash Git actuel :** `d29458c` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app  
 **Repository :** https://github.com/Aintsoa-ai/aina-piece-auto
 
@@ -17,6 +17,7 @@
 | Fonctionnalité | Statut | Note |
 |---|---|---|
 | Panier multi-articles | ✅ OK | Double panneau fonctionnel |
+| Prix modifiable dans panier | ✅ OK | **AJOUTÉ 01/06** — Prix éditable, code couleur orange |
 | Calcul total dynamique | ✅ OK | Temps réel |
 | Encaissement avec rendu monnaie | ✅ OK | Modal intermédiaire |
 | Ticket thermique | ✅ OK | Boutique correcte figée, CSS print |
@@ -28,6 +29,12 @@
 | Annulation vente (Admin) | ✅ OK | Remise stock automatique |
 | Mode hors-ligne | ✅ OK | IndexedDB + syncUp |
 | Code couleur crédits en attente | ✅ OK | **AJOUTÉ 31/05** — fond rouge si `client_total_du > 0` |
+
+### Module Pièces (Pieces.tsx)
+| Fonctionnalité | Statut | Note |
+|---|---|---|
+| Colonne Lieu (Boutique) | ✅ OK | **AJOUTÉ 01/06** — Affiche les boutiques pour chaque pièce |
+| Filtre Professionnel | ✅ OK | **AJOUTÉ 01/06** — Dropdown pour filtrer les pièces par boutique |
 
 ### Module Clients & Crédits (Clients.tsx)
 | Fonctionnalité | Statut | Note |
@@ -151,6 +158,7 @@
 
 | Date | Hash | Statut |
 |---|---|---|
+| 01/06/2026 13:30 | `d29458c` | ✅ **STABLE** — Colonne Lieu, Filtre Boutique, Prix Panier éditable (UI/UX Amélioré) |
 | 31/05/2026 02:25 | `d90b806` | ✅ **STABLE** — Ticket thermique centré et auto-adaptatif (58mm/80mm), code-barres haute résolution |
 | 31/05/2026 02:05 | `3ce8549` | ✅ **STABLE** — Code-barres haute résolution, exports uniformisés, impression auto, crédits complets |
 | 31/05/2026 01:30 | `bf31ff8` | ✅ **STABLE** — Exports uniformisés, impression auto, crédits complets |
