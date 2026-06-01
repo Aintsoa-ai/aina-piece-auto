@@ -1074,7 +1074,7 @@ const s: Record<string, React.CSSProperties> = {
     backgroundColor: '#0d1117',
     border: '1px solid rgba(255, 255, 255, 0.05)',
     borderRadius: '10px',
-    overflow: 'hidden'
+    overflowX: 'auto'
   },
   table: {
     width: '100%',
@@ -1082,7 +1082,7 @@ const s: Record<string, React.CSSProperties> = {
     textAlign: 'left'
   },
   th: {
-    padding: '14px 20px',
+    padding: '14px 12px',
     fontSize: '11px',
     fontWeight: '700',
     color: 'rgba(255, 255, 255, 0.35)',
@@ -1094,7 +1094,7 @@ const s: Record<string, React.CSSProperties> = {
     transition: 'background-color 0.15s ease'
   },
   td: {
-    padding: '14px 20px',
+    padding: '14px 12px',
     fontSize: '13.5px',
     color: '#ffffff'
   },
