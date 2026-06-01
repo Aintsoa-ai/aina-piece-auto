@@ -30,6 +30,8 @@ interface PieceItem {
   emplacement?: string;
   stock_minimum?: number;
   description?: string;
+  lieu?: string;
+  boutiquesIds?: string[];
 }
 const formatNum = (val: string | number | undefined | null) => {
   if (val === null || val === undefined || val === '') return '';
@@ -49,6 +51,7 @@ export const Pieces: React.FC = () => {
   const [pieces, setPieces] = useState<PieceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterBoutique, setFilterBoutique] = useState('');
   const isDemoData = false;
 
   // Form / Modal States
@@ -208,14 +211,14 @@ export const Pieces: React.FC = () => {
       if (listFournisseurs) setFournisseurs(listFournisseurs);
 
       if (piecesErr) throw piecesErr;
-      return { piecesData, stockData, suppliersData };
+      return { piecesData, stockData, suppliersData, listBoutiques };
     })();
 
     try {
       const result = await Promise.race([queryPromise, timeoutPromise]);
 
       if (result && !result.isTimeout && result.piecesData && result.piecesData.length > 0) {
-        const { piecesData, stockData, suppliersData } = result;
+        const { piecesData, stockData, suppliersData, listBoutiques } = result;
 
         const parsed: PieceItem[] = piecesData.map((item: any) => {
           // Find stock for this piece
@@ -233,6 +236,14 @@ export const Pieces: React.FC = () => {
           if (totalQty === 0) status = 'Rupture';
           else if (totalQty <= minStock) status = 'Faible';
 
+          const boutiquesForPiece = pieceStocks.map((s: any) => {
+            const b = listBoutiques?.find((lb: any) => lb.id === s.boutique_id);
+            return b ? b.name : null;
+          }).filter(Boolean);
+          const uniqueBoutiques = Array.from(new Set(boutiquesForPiece));
+          const lieu = uniqueBoutiques.join(', ');
+          const boutiquesIds = Array.from(new Set(pieceStocks.map((s:any) => s.boutique_id)));
+
           return {
             id: item.id,
             reference: item.reference,
@@ -248,7 +259,9 @@ export const Pieces: React.FC = () => {
             oem_number: item.oem_number || '',
             emplacement: pieceStocks[0]?.emplacement || '',
             stock_minimum: minStock,
-            description: item.description || ''
+            description: item.description || '',
+            lieu,
+            boutiquesIds
           };
         });
 
@@ -608,13 +621,17 @@ export const Pieces: React.FC = () => {
     }
   };
 
-  const filteredPieces = pieces.filter(p =>
-    p.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.marque.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.categorie.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (p.code_barre && p.code_barre.includes(searchQuery))
-  );
+  const filteredPieces = pieces.filter(p => {
+    const matchesSearch = p.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.marque.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.categorie.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.code_barre && p.code_barre.includes(searchQuery));
+      
+    const matchesBoutique = filterBoutique === '' || (p.boutiquesIds && p.boutiquesIds.includes(filterBoutique));
+    
+    return matchesSearch && matchesBoutique;
+  });
 
   const totalReferences = filteredPieces.length;
   const totalUnits = filteredPieces.reduce((acc, curr) => acc + curr.qte, 0);
@@ -639,15 +656,27 @@ export const Pieces: React.FC = () => {
       </div>
 
       {/* SEARCH BAR exactly matching reference screenshot */}
-      <div style={s.searchWrapper}>
-        <Search size={16} style={s.searchIcon} />
-        <input
-          type="text"
-          placeholder="Rechercher par référence, pièce, marque..."
-          style={s.searchInput}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={s.searchWrapper}>
+          <Search size={16} style={s.searchIcon} />
+          <input
+            type="text"
+            placeholder="Rechercher par référence, pièce, marque..."
+            style={s.searchInput}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <select
+          style={{ ...s.searchInput, width: '250px', paddingLeft: '12px', cursor: 'pointer', appearance: 'auto' }}
+          value={filterBoutique}
+          onChange={(e) => setFilterBoutique(e.target.value)}
+        >
+          <option value="">Tous les professionnels (Boutiques)</option>
+          {boutiques.map((b) => (
+            <option key={b.id} value={b.id}>{b.name}</option>
+          ))}
+        </select>
       </div>
 
       {/* TABLE WRAPPER CONTAINER */}
@@ -665,6 +694,7 @@ export const Pieces: React.FC = () => {
                 <th style={s.th}>PIÈCE</th>
                 <th style={s.th}>MARQUE</th>
                 <th style={s.th}>CATÉGORIE</th>
+                <th style={s.th}>LIEU</th>
                 <th style={s.th}>QTÉ</th>
                 <th style={s.th}>ACHAT</th>
                 <th style={s.th}>VENTE</th>
@@ -679,6 +709,7 @@ export const Pieces: React.FC = () => {
                   <td style={{ ...s.td, fontWeight: '700', color: '#0066fe' }}>{piece.designation}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{piece.marque}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{piece.categorie}</td>
+                  <td style={{ ...s.td, color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>{piece.lieu || '—'}</td>
                   <td style={{ ...s.td, fontWeight: '700' }}>{piece.qte}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{formatAr(piece.achat)}</td>
                   <td style={{ ...s.td, fontWeight: '700' }}>{formatAr(piece.vente)}</td>
