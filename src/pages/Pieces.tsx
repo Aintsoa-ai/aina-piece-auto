@@ -731,13 +731,46 @@ export const Pieces: React.FC = () => {
                   {/* Row 2 */}
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Code-barres (Scan)</label>
-                    <input 
-                      type="text"
-                      style={s.inputField}
-                      value={codeBarre}
-                      onChange={(e) => setCodeBarre(decodeAzertyBarcode(e.target.value))}
-                      placeholder="Scannez ou tapez le code"
-                    />
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input 
+                        type="text"
+                        style={{ ...s.inputField, flex: 1 }}
+                        value={codeBarre}
+                        onChange={(e) => setCodeBarre(decodeAzertyBarcode(e.target.value))}
+                        placeholder="Scannez ou tapez le code"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // Génération automatique d'un code EAN-13 valide
+                          let code = '20'; // Préfixe 20 réservé pour usage interne en magasin
+                          for (let i = 0; i < 10; i++) {
+                            code += Math.floor(Math.random() * 10);
+                          }
+                          let sum = 0;
+                          for (let i = 0; i < 12; i++) {
+                            sum += parseInt(code[i], 10) * (i % 2 === 0 ? 1 : 3);
+                          }
+                          const checksum = (10 - (sum % 10)) % 10;
+                          setCodeBarre(code + checksum);
+                        }}
+                        style={{
+                          backgroundColor: '#0066fe',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '0 14px',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'background-color 0.2s ease',
+                        }}
+                        title="Générer un code-barres EAN-13 valide"
+                      >
+                        ⚡ Générer EAN-13
+                      </button>
+                    </div>
                   </div>
                   <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Marque</label>
@@ -910,7 +943,21 @@ export const Pieces: React.FC = () => {
       {printLabelPiece && (() => {
         const piece = printLabelPiece;
         const barcodeText = piece.code_barre || piece.reference;
-        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(barcodeText)}&scale=6&height=32&includetext`;
+        
+        // Détecter dynamiquement le type de code-barres (EAN-13 si numérique)
+        const isOnlyDigits = /^\d+$/.test(barcodeText);
+        let bcid = 'code128';
+        if (isOnlyDigits) {
+          if (barcodeText.length === 12 || barcodeText.length === 13) {
+            bcid = 'ean13';
+          } else if (barcodeText.length === 8) {
+            bcid = 'ean8';
+          } else if (barcodeText.length === 11) {
+            bcid = 'upca';
+          }
+        }
+        
+        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=${bcid}&text=${encodeURIComponent(barcodeText)}&scale=6&height=32&includetext`;
         const prixFormate = new Intl.NumberFormat('fr-FR').format(piece.vente);
         const nomCourt = piece.designation.length > 28 ? piece.designation.substring(0, 25) + '...' : piece.designation;
 
