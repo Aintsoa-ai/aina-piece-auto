@@ -960,7 +960,8 @@ if (!isModalOpen) {
         }
         
 const ean13Code = getEAN13FromText(barcodeText);
-        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=ean13&text=${encodeURIComponent(ean13Code)}&scale=4&height=40&includetext&textsize=11&textxalign=center`;
+        // scale=2 → ~5cm large sur imprimante 203dpi, height=25mm → ~3cm de barres
+        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=ean13&text=${encodeURIComponent(ean13Code)}&scale=3&height=25&includetext&textsize=12&textxalign=center`;
         const prixFormate = new Intl.NumberFormat('fr-FR').format(piece.vente);
         const nomCourt = piece.designation.length > 28 ? piece.designation.substring(0, 25) + '...' : piece.designation;
 
@@ -975,18 +976,22 @@ const ean13Code = getEAN13FromText(barcodeText);
   <title>Étiquette — ${nomCourt}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 60mm; background: #fff; }
-    @page { size: 60mm 40mm; margin: 0; }
+    html, body { width: 58mm; background: #fff; }
+    @page { size: 58mm 50mm; margin: 0; }
     .label {
-      width: 60mm; height: 40mm;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 2mm 3mm; font-family: Arial, sans-serif;
-      text-align: center; background: #fff;
+      width: 58mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2mm 2mm 1mm 2mm;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #fff;
     }
-    .label-name  { font-size: 9pt; font-weight: 900; text-transform: uppercase; line-height: 1.2; margin-bottom: 0.5mm; }
-    .label-ref   { font-size: 7pt; color: #444; font-weight: 600; margin-bottom: 1mm; }
-    .label-img   { width: 100%; max-height: 24mm; object-fit: contain; display: block; }
+    .label-name { font-size: 8pt; font-weight: 900; text-transform: uppercase; line-height: 1.2; margin-bottom: 1mm; }
+    .label-ref  { font-size: 7pt; color: #333; font-weight: 600; margin-bottom: 1.5mm; }
+    /* BARCODE : exactement 5cm × 3cm */
+    .label-img  { width: 50mm; height: 30mm; object-fit: fill; display: block; }
   </style>
 </head>
 <body>
@@ -1039,11 +1044,18 @@ const ean13Code = getEAN13FromText(barcodeText);
                   <div style={{ fontSize: '10px', color: '#555', fontWeight: '700' }}>
                     Réf: {piece.reference}
                   </div>
-                  {/* Code-barres — grand et scannable avec chiffres visibles */}
+                  {/* Code-barres — proportions réelles 5cm × 3cm */}
                   <img
                     src={barcodeUrl}
                     alt="Code Barres"
-                    style={{ width: '100%', height: '110px', objectFit: 'contain', margin: '6px 0 2px', imageRendering: 'crisp-edges', display: 'block' }}
+                    style={{
+                      width: '250px',   /* ~5cm à 96dpi */
+                      height: '115px',  /* ~3cm à 96dpi */
+                      objectFit: 'fill',
+                      margin: '8px 0 4px',
+                      imageRendering: 'crisp-edges',
+                      display: 'block'
+                    }}
                   />
                 </div>
                 <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', textAlign: 'center', lineHeight: '1.5' }}>
