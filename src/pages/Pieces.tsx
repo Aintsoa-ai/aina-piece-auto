@@ -3,6 +3,7 @@ import { showConfirm, showAlert } from '../utils/alerts';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { decodeAzertyBarcode } from '../utils/barcode';
+import { getEAN13FromText } from '../utils/ean13';
 import { 
   Plus, 
   X, 
@@ -224,14 +225,15 @@ export const Pieces: React.FC = () => {
            const scannedCode = decodeAzertyBarcode(barcodeBuffer).trim();
            barcodeBuffer = '';
            
-           const piece = pieces.find(p => 
-             (p.code_barre && p.code_barre.trim() === scannedCode) || 
-             (p.reference && p.reference.trim().toUpperCase() === scannedCode.toUpperCase())
-           );
+const piece = pieces.find(p => 
+              (p.code_barre && p.code_barre.trim() === scannedCode) || 
+              (p.reference && p.reference.trim().toUpperCase() === scannedCode.toUpperCase()) ||
+              (getEAN13FromText(p.code_barre || p.reference) === scannedCode)
+            );
            if (piece) {
-             if (!isModalOpen) {
-               setSearchQuery(scannedCode);
-             } else {
+if (!isModalOpen) {
+                setSearchQuery(piece.code_barre || piece.reference);
+              } else {
                // Si on édite/crée déjà, et qu'on scanne une pièce existante, on pré-remplit juste le champ si on est dessus
                // Mais en global, mieux vaut laisser le champ ciblé faire son job.
              }
@@ -957,7 +959,8 @@ export const Pieces: React.FC = () => {
           }
         }
         
-        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=${bcid}&text=${encodeURIComponent(barcodeText)}&scale=6&height=32&includetext`;
+const ean13Code = getEAN13FromText(barcodeText);
+        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=ean13&text=${encodeURIComponent(ean13Code)}&scale=6&height=32&includetext`;
         const prixFormate = new Intl.NumberFormat('fr-FR').format(piece.vente);
         const nomCourt = piece.designation.length > 28 ? piece.designation.substring(0, 25) + '...' : piece.designation;
 

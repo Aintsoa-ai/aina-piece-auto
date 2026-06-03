@@ -3,6 +3,7 @@ import { supabase } from '../services/supabaseClient';
 import { useSettings } from '../context/SettingsContext';
 import { useAuth } from '../context/AuthContext';
 import { decodeAzertyBarcode } from '../utils/barcode';
+import { getEAN13FromText } from '../utils/ean13';
 import { 
   Plus, 
   X, 
@@ -301,9 +302,10 @@ export const Purchases: React.FC = () => {
            const scannedCode = decodeAzertyBarcode(barcodeBuffer).trim();
            barcodeBuffer = '';
            
-           const piece = pieces.find(p => 
+const piece = pieces.find(p => 
              (p.code_barre && p.code_barre.trim() === scannedCode) || 
-             (p.reference && p.reference.trim().toUpperCase() === scannedCode.toUpperCase())
+             (p.reference && p.reference.trim().toUpperCase() === scannedCode.toUpperCase()) ||
+             (getEAN13FromText(p.code_barre || p.reference) === scannedCode)
            );
            if (piece) {
              if (!isModalOpen) {

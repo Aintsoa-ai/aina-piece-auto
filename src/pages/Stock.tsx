@@ -14,6 +14,7 @@ import {
   Plus
 } from 'lucide-react';
 import { decodeAzertyBarcode } from '../utils/barcode';
+import { getEAN13FromText } from '../utils/ean13';
 
 interface StockRow {
   id: string;
@@ -290,8 +291,17 @@ export const Stock: React.FC = () => {
           e.preventDefault();
           e.stopPropagation();
           
-          const scannedCode = decodeAzertyBarcode(barcodeBuffer);
-          setSearchQuery(scannedCode.toUpperCase());
+const scannedCode = decodeAzertyBarcode(barcodeBuffer).trim().toUpperCase();
+          const matchedRow = stockRows.find(row => 
+            (row.code_barre && row.code_barre.trim().toUpperCase() === scannedCode) ||
+            (row.reference.toUpperCase() === scannedCode) ||
+            (getEAN13FromText(row.code_barre || row.reference) === scannedCode)
+          );
+          if (matchedRow) {
+            setSearchQuery(matchedRow.code_barre || matchedRow.reference);
+          } else {
+            setSearchQuery(scannedCode);
+          }
           barcodeBuffer = '';
         }
       } else if (e.key.length === 1) {

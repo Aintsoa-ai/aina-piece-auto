@@ -7,6 +7,7 @@ import { db } from '../services/db';
 import { v4 as uuidv4 } from 'uuid';
 import { showAlert, showConfirm } from '../utils/alerts';
 import { decodeAzertyBarcode } from '../utils/barcode';
+import { getEAN13FromText } from '../utils/ean13';
 import Barcode from 'react-barcode';
 
 interface SaleItem {
@@ -464,10 +465,11 @@ export const Sales: React.FC = () => {
            const scannedCode = decodeAzertyBarcode(barcodeBuffer).trim();
            barcodeBuffer = '';
            
-           const piece = pieces.find(p => 
-             (p.code_barre && p.code_barre.trim() === scannedCode) || 
-             (p.reference && p.reference.trim().toUpperCase() === scannedCode.toUpperCase())
-           );
+const piece = pieces.find(p => 
+              (p.code_barre && p.code_barre.trim() === scannedCode) || 
+              (p.reference && p.reference.trim().toUpperCase() === scannedCode.toUpperCase()) ||
+              (getEAN13FromText(p.code_barre || p.reference) === scannedCode)
+            );
            if (piece) {
              if (!isModalOpen) {
                // Ouvrir la modale et préparer le terrain
@@ -511,11 +513,12 @@ export const Sales: React.FC = () => {
   }, [isModalOpen, isCheckoutModalOpen, pieces, profile]);
 
   // Filter pieces based on search inside modal
-  const filteredPieces = pieces.filter(p => 
+const filteredPieces = pieces.filter(p => 
     p.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.marque.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (p.code_barre && p.code_barre.includes(searchQuery))
+    (p.code_barre && p.code_barre.includes(searchQuery)) ||
+    (getEAN13FromText(p.code_barre || p.reference).includes(searchQuery))
   );
 
   // Triggered when "+ Nouvelle vente" is clicked
