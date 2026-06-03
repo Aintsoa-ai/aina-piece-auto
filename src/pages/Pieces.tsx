@@ -907,96 +907,121 @@ export const Pieces: React.FC = () => {
       )}
 
       {/* ─── MODAL D'IMPRESSION D'ÉTIQUETTE ─────────────── */}
-      {printLabelPiece && (
-        <div style={s.modalOverlay}>
-          <style>
-            {`
-              @media print {
-                body * {
-                  visibility: hidden;
-                }
-                .print-only-label, .print-only-label * {
-                  visibility: visible;
-                  color: #000000 !important;
-                }
-                .print-only-label {
-                  position: absolute !important;
-                  left: 0 !important;
-                  top: 0 !important;
-                  width: 50mm !important;
-                  height: 30mm !important;
-                  background: white !important;
-                  display: flex !important;
-                  flex-direction: column !important;
-                  align-items: center !important;
-                  justify-content: center !important;
-                  margin: 0 !important;
-                  padding: 1mm 2mm !important;
-                  box-sizing: border-box !important;
-                }
-                @page {
-                  size: 50mm 30mm !important;
-                  margin: 0 !important;
-                }
-              }
-            `}
-          </style>
-          <div style={{ ...s.modalCard, maxWidth: '380px' }}>
-            <div style={s.modalHeader} className="no-print">
-              <h3 style={s.modalTitle}>Étiquette Code-barres</h3>
-              <button style={s.modalCloseBtn} onClick={() => setPrintLabelPiece(null)}>
-                <X size={18} />
-              </button>
-            </div>
-            
-            <div style={{ padding: '30px 20px', display: 'flex', justifyContent: 'center', backgroundColor: '#0d1117' }}>
-              <div className="print-only-label" style={{ 
-                backgroundColor: '#ffffff', 
-                color: '#000000',
-                padding: '10px 12px', 
-                borderRadius: '6px',
-                textAlign: 'center',
-                width: '280px',
-                height: '168px',
-                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.4)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box'
-              }}>
-                <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '2px', color: '#000000', lineHeight: '1.2', textTransform: 'uppercase' }}>
-                  {printLabelPiece.designation.length > 25 ? printLabelPiece.designation.substring(0, 22) + '...' : printLabelPiece.designation}
+      {printLabelPiece && (() => {
+        const piece = printLabelPiece;
+        const barcodeText = piece.code_barre || piece.reference;
+        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(barcodeText)}&scale=6&height=32&includetext`;
+        const prixFormate = new Intl.NumberFormat('fr-FR').format(piece.vente);
+        const nomCourt = piece.designation.length > 28 ? piece.designation.substring(0, 25) + '...' : piece.designation;
+
+        // Impression intelligente dans une fenêtre dédiée — compatible toute imprimante thermique
+        const handlePrintLabel = () => {
+          const pw = window.open('', '_blank', 'width=320,height=480,menubar=no,toolbar=no,scrollbars=no');
+          if (!pw) { window.print(); return; }
+          pw.document.write(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Étiquette — ${nomCourt}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 60mm; background: #fff; }
+    @page { size: 60mm 40mm; margin: 0; }
+    .label {
+      width: 60mm; height: 40mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2mm 3mm; font-family: Arial, sans-serif;
+      text-align: center; background: #fff;
+    }
+    .label-name  { font-size: 9pt; font-weight: 900; text-transform: uppercase; line-height: 1.2; margin-bottom: 0.5mm; }
+    .label-ref   { font-size: 7pt; color: #444; font-weight: 600; margin-bottom: 1mm; }
+    .label-img   { width: 100%; max-height: 20mm; object-fit: contain; display: block; }
+    .label-price { font-size: 13pt; font-weight: 900; margin-top: 1mm; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+  <div class="label">
+    <div class="label-name">${nomCourt}</div>
+    <div class="label-ref">Réf: ${piece.reference}</div>
+    <img class="label-img" src="${barcodeUrl}" alt="Barcode"
+      onload="window.focus(); window.print(); setTimeout(function(){ window.close(); }, 800);"
+      onerror="window.focus(); window.print(); setTimeout(function(){ window.close(); }, 800);" />
+    <div class="label-price">${prixFormate} Ar</div>
+  </div>
+</body>
+</html>`);
+          pw.document.close();
+        };
+
+        return (
+          <div style={s.modalOverlay}>
+            <div style={{ ...s.modalCard, maxWidth: '400px' }}>
+              <div style={s.modalHeader}>
+                <h3 style={s.modalTitle}>🏷️ Étiquette Code-barres</h3>
+                <button style={s.modalCloseBtn} onClick={() => setPrintLabelPiece(null)}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Aperçu de l'étiquette */}
+              <div style={{ padding: '28px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', backgroundColor: '#0d1117' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Aperçu étiquette (60mm × 40mm)</div>
+                <div style={{
+                  backgroundColor: '#ffffff',
+                  color: '#000000',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  width: '320px',
+                  minHeight: '200px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  boxSizing: 'border-box'
+                }}>
+                  {/* Nom */}
+                  <div style={{ fontSize: '13px', fontWeight: '900', color: '#000', lineHeight: '1.2', textTransform: 'uppercase', textAlign: 'center' }}>
+                    {nomCourt}
+                  </div>
+                  {/* Référence */}
+                  <div style={{ fontSize: '10px', color: '#555', fontWeight: '700' }}>
+                    Réf: {piece.reference}
+                  </div>
+                  {/* Code-barres — grand et scannable */}
+                  <img
+                    src={barcodeUrl}
+                    alt="Code Barres"
+                    style={{ width: '100%', height: '100px', objectFit: 'contain', margin: '4px 0', imageRendering: 'crisp-edges' }}
+                  />
+                  {/* Prix */}
+                  <div style={{ fontSize: '16px', fontWeight: '900', color: '#000', marginTop: '2px', letterSpacing: '0.5px' }}>
+                    {prixFormate} Ar
+                  </div>
                 </div>
-                <div style={{ fontSize: '9px', color: '#333333', marginBottom: '4px', fontWeight: '600' }}>
-                  Ref: {printLabelPiece.reference}
-                </div>
-                
-                <img 
-                  src={`https://bwipjs-api.metafloor.com/?bcid=code128&text=${printLabelPiece.code_barre || printLabelPiece.reference}&scale=4&height=22&includetext`} 
-                  alt="Code Barres" 
-                  style={{ width: '100%', height: '78px', objectFit: 'contain', margin: '3px 0' }}
-                />
-                
-                <div style={{ fontSize: '13px', fontWeight: '900', marginTop: '2px', color: '#000000' }}>
-                  {new Intl.NumberFormat('fr-FR').format(printLabelPiece.vente)} Ar
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', textAlign: 'center', lineHeight: '1.5' }}>
+                  ✅ Compatible imprimante thermique 58mm / 80mm<br/>
+                  🔍 Code: <span style={{ color: '#10b981', fontFamily: 'monospace' }}>{barcodeText}</span>
                 </div>
               </div>
-            </div>
-            
-            <div style={s.modalFooter} className="no-print">
-              <button style={s.btnAnnuler} onClick={() => setPrintLabelPiece(null)}>Fermer</button>
-              <button 
-                style={{ ...s.btnAnnuler, backgroundColor: '#10b981', color: '#fff', border: 'none', display: 'flex', alignItems: 'center' }} 
-                onClick={() => window.print()}
-              >
-                <Printer size={16} style={{ marginRight: '8px' }} />
-                Imprimer
-              </button>
+
+              <div style={s.modalFooter}>
+                <button style={s.btnAnnuler} onClick={() => setPrintLabelPiece(null)}>Fermer</button>
+                <button
+                  style={{ ...s.btnAnnuler, backgroundColor: '#10b981', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                  onClick={handlePrintLabel}
+                >
+                  <Printer size={16} />
+                  Imprimer l'étiquette
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
     </div>
   );

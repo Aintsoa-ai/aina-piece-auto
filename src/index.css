@@ -354,7 +354,7 @@ body.light-theme input:-webkit-autofill:active {
 
 
 @media print {
-  /* Réinitialiser la page d'impression */
+  /* ── Réinitialisation complète de la page d'impression ── */
   html, body {
     margin: 0 !important;
     padding: 0 !important;
@@ -362,42 +362,58 @@ body.light-theme input:-webkit-autofill:active {
     color: #000000 !important;
     width: 100% !important;
     height: auto !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
-  /* Cacher tout le reste de la page */
-  body * { 
-    visibility: hidden; 
+  /* Masquer tout sauf la zone d'impression */
+  body * {
+    visibility: hidden;
   }
 
-  /* N'afficher et formater que le ticket thermique */
-  .print-area, .print-area * { 
-    visibility: visible; 
+  /* ── Zone du ticket thermique ── */
+  .print-area, .print-area * {
+    visibility: visible !important;
     color: #000000 !important;
     background-color: #ffffff !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  /* Rendre le ticket auto-adaptatif et parfaitement centré sur 58mm et 80mm */
-  .print-area { 
-    position: absolute !important;
+  /* ── Mise en page du ticket — compatible 58mm & 80mm ── */
+  .print-area {
+    position: fixed !important;
     left: 0 !important;
-    right: 0 !important;
     top: 0 !important;
-    margin: 0 auto !important; /* Centrage horizontal parfait */
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 0 4mm !important;        /* Marges latérales équilibrées */
     width: 100% !important;
-    max-width: 76mm !important; /* Largeur de sécurité pour 80mm, et se réduit de manière fluide sur 58mm */
-    padding: 4mm 4mm !important; /* Marges gauche/droite équilibrées pour éviter d'être collé au bord */
-    font-size: 10pt !important;
+    max-width: 72mm !important;       /* S'adapte à 58mm et 80mm */
+    font-size: 9.5pt !important;
     font-family: 'Courier New', Courier, monospace !important;
     box-sizing: border-box !important;
     display: block !important;
+    overflow: visible !important;
   }
 
-  /* Paramètres globaux de la page d'impression */
+  /* ── Code-barres : toujours pleine largeur & bien lisible ── */
+  .print-area svg,
+  .print-area img,
+  .print-area canvas {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 2mm auto !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* ── Paramètres de page imprimante thermique ── */
   @page {
-    size: auto; /* Largeur de bobine détectée automatiquement par l'imprimante */
-    margin: 0 !important; /* Élimine les décalages imposés par le navigateur */
+    size: auto;           /* Largeur de bobine détectée automatiquement */
+    margin: 0mm !important;
   }
 }
 

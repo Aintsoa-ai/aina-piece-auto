@@ -800,8 +800,50 @@ export const Sales: React.FC = () => {
     }
   };
 
+  /**
+   * Impression du ticket thermique dans une nouvelle fenêtre dédiée.
+   * Compatible avec toute imprimante thermique (58mm, 80mm) sans interférence de l'UI.
+   * Fallback automatique vers window.print() si la fenêtre ne peut pas s'ouvrir.
+   */
   const handlePrint = () => {
-    window.print();
+    const printArea = document.querySelector('.print-area') as HTMLElement | null;
+    if (!printArea) { window.print(); return; }
+
+    const pw = window.open('', '_blank', 'width=400,height=700,menubar=no,toolbar=no,scrollbars=yes');
+    if (!pw) { window.print(); return; }
+
+    pw.document.write(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Ticket</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { background: #fff; color: #000; font-family: 'Courier New', Courier, monospace; font-size: 12px; }
+    @page { size: auto; margin: 0; }
+    @media print {
+      html, body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+      .ticket-wrap { margin: 0 auto; width: 100%; max-width: 76mm; padding: 3mm 4mm; font-size: 10pt; }
+    }
+    .ticket-wrap { margin: 0 auto; width: 100%; max-width: 76mm; padding: 6px 8px; color: #000; background: #fff; }
+    img { max-width: 100%; display: block; margin: 0 auto; }
+    svg { max-width: 100%; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="ticket-wrap">
+    ${printArea.innerHTML}
+  </div>
+  <script>
+    // Attendre que les images (barcode SVG) soient prêtes puis imprimer
+    window.onload = function() {
+      setTimeout(function() { window.focus(); window.print(); }, 400);
+    };
+    window.onafterprint = function() { window.close(); };
+  <\/script>
+</body>
+</html>`);
+    pw.document.close();
   };
 
   // Print function
@@ -1506,15 +1548,16 @@ export const Sales: React.FC = () => {
                   <div style={s.ticketAsterisks}>******************************</div>
                   
                   <div style={s.barcodeContainer}>
-                    <Barcode 
+                    <Barcode
                       value={`REC-${receiptSale.id.substring(0,8).toUpperCase()}`}
-                      width={1.5}
-                      height={40}
-                      fontSize={11}
-                      margin={0}
+                      width={2.5}
+                      height={72}
+                      fontSize={13}
+                      margin={4}
                       displayValue={true}
                       background="#ffffff"
                       lineColor="#000000"
+                      format="CODE128"
                     />
                   </div>
 
