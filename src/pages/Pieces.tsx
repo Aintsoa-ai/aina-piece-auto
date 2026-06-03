@@ -960,7 +960,7 @@ if (!isModalOpen) {
         }
         
 const ean13Code = getEAN13FromText(barcodeText);
-        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=ean13&text=${encodeURIComponent(ean13Code)}&scale=6&height=32&includetext`;
+        const barcodeUrl = `https://bwipjs-api.metafloor.com/?bcid=ean13&text=${encodeURIComponent(ean13Code)}&scale=4&height=40&includetext&textsize=11&textxalign=center`;
         const prixFormate = new Intl.NumberFormat('fr-FR').format(piece.vente);
         const nomCourt = piece.designation.length > 28 ? piece.designation.substring(0, 25) + '...' : piece.designation;
 
@@ -986,8 +986,7 @@ const ean13Code = getEAN13FromText(barcodeText);
     }
     .label-name  { font-size: 9pt; font-weight: 900; text-transform: uppercase; line-height: 1.2; margin-bottom: 0.5mm; }
     .label-ref   { font-size: 7pt; color: #444; font-weight: 600; margin-bottom: 1mm; }
-    .label-img   { width: 100%; max-height: 20mm; object-fit: contain; display: block; }
-    .label-price { font-size: 13pt; font-weight: 900; margin-top: 1mm; letter-spacing: 0.5px; }
+    .label-img   { width: 100%; max-height: 24mm; object-fit: contain; display: block; }
   </style>
 </head>
 <body>
@@ -997,7 +996,6 @@ const ean13Code = getEAN13FromText(barcodeText);
     <img class="label-img" src="${barcodeUrl}" alt="Barcode"
       onload="window.focus(); window.print(); setTimeout(function(){ window.close(); }, 800);"
       onerror="window.focus(); window.print(); setTimeout(function(){ window.close(); }, 800);" />
-    <div class="label-price">${prixFormate} Ar</div>
   </div>
 </body>
 </html>`);
@@ -1041,16 +1039,12 @@ const ean13Code = getEAN13FromText(barcodeText);
                   <div style={{ fontSize: '10px', color: '#555', fontWeight: '700' }}>
                     Réf: {piece.reference}
                   </div>
-                  {/* Code-barres — grand et scannable */}
+                  {/* Code-barres — grand et scannable avec chiffres visibles */}
                   <img
                     src={barcodeUrl}
                     alt="Code Barres"
-                    style={{ width: '100%', height: '100px', objectFit: 'contain', margin: '4px 0', imageRendering: 'crisp-edges' }}
+                    style={{ width: '100%', height: '110px', objectFit: 'contain', margin: '6px 0 2px', imageRendering: 'crisp-edges', display: 'block' }}
                   />
-                  {/* Prix */}
-                  <div style={{ fontSize: '16px', fontWeight: '900', color: '#000', marginTop: '2px', letterSpacing: '0.5px' }}>
-                    {prixFormate} Ar
-                  </div>
                 </div>
                 <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', textAlign: 'center', lineHeight: '1.5' }}>
                   ✅ Compatible imprimante thermique 58mm / 80mm<br/>
