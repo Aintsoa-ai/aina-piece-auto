@@ -114,19 +114,16 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ---
 
-## 📍 POINT DE SAUVEGARDE v3.2 — 31/05/2026 02:25 (Madagascar, UTC+3)
+## 📍 POINT DE SAUVEGARDE v3.6 — 03/06/2026 16:05 (Madagascar, UTC+3)
 
-**Hash Git :** `d90b806` (Stable)  
+**Hash Git :** `2c480fc` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app
 
-### Nouvelles fonctionnalités et améliorations validées (31/05/2026)
-- ✅ **Mise en page thermique centrée et auto-adaptative (58mm/80mm)** : Optimisation complète des styles d'impression CSS (`@media print`) pour équilibrer parfaitement les marges à gauche et à droite. Le ticket s'adapte automatiquement à n'importe quelle largeur de bobine thermique et reste rigoureusement centré sur le papier, sans aucun décalage.
-- ✅ **Uniformisation des rapports et exports (PDF = Word = Excel)** : L'Excel intègre une feuille "Analyse Globale" avec exactement la même présentation, les KPIs financiers, le Top 10 Produits et les alertes de stock bas que les formats PDF et Word.
-- ✅ **Impression thermique automatique et intelligente** : Option configurable depuis Paramètres → Système permettant l'impression instantanée du ticket de caisse à la validation. En cas d'imprimante indisponible, le système bascule automatiquement sur un enregistrement PDF.
-- ✅ **Intégration des Règlements de Crédits** : Enregistrement automatique de chaque règlement de facture impayée sous forme d'une transaction spéciale (`REGLEMENT_CREDIT`) dans le flux global des ventes pour une traçabilité irréprochable.
-- ✅ **Code couleur pour crédits actifs/soldés** : Coloration rouge clair instantanée dans le tableau des ventes pour les transactions associées à une dette client en cours. La ligne redevient normale dès que la dette du client est intégralement réglée.
-- ✅ **Calculateur de rendu monnaie en temps réel** : La boîte de dialogue de paiement de crédit calcule instantanément et affiche en vert ou en rouge le "Reste à payer" ou le "Reste à rendre" pendant la saisie.
-- ✅ **Paiement borné au montant de la dette** : Sécurité logicielle interdisant la saisie d'un montant supérieur à la dette réelle du client.
-- ✅ **Optimisation du scanner de code-barres** : Augmentation de la résolution des étiquettes et recalibrage des dimensions standard (50mm x 30mm) pour garantir une lecture instantanée par toutes les douchettes du marché.
+### Nouvelles fonctionnalités et améliorations validées (03/06/2026)
+- ✅ **Standardisation EAN-13 Déterministe** : Algorithme convertissant dynamiquement toute référence de pièce (`Y16`, `FH-001`) en un code à 13 chiffres standardisé.
+- ✅ **Impression Thermique 5cm × 3cm** : Format exact de code-barres configuré pour le papier thermique de 58mm/80mm.
+- ✅ **Masquage du Prix** : Le prix a été retiré des étiquettes d'impression des pièces.
+- ✅ **Chiffres EAN-13 Visibles** : Amélioration de la taille de police et du centrage des chiffres sous les barres de garde.
+- ✅ **Compatibilité Scanner Multimodule** : Le scanner de code-barres douchette résout automatiquement le code EAN-13 scanné en recherchant la référence ou son équivalent EAN-13 dans les modules Ventes, Dépôts/Stock, Achats et Pièces.
 
 *Toutes les fonctionnalités ont été testées avec succès sur Mobile et Desktop.*

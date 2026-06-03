@@ -14,7 +14,14 @@ Voir les commits Git et `auDit.md` pour le détail complet des phases 1 à 13.
 - [x] **UI Ventes** : Prix de vente modifiable directement dans le panier.
 - [x] Documentation mise à jour (README, auDit, plan, nos_idees, GUIDE).
 
-## Phase 15 : Améliorations Futures (À Planifier)
+## Phase 15 : Standardisation EAN-13 et Étiquettes 5cmx3cm (03/06/2026) ✅
+- [x] **Générateur Déterministe EAN-13** : Algorithme convertissant toute référence en EAN-13 valide.
+- [x] **Compatibilité Scanner Multimodule** : Reconnaissance et résolution automatique des codes EAN-13 scannés (Ventes, Achats, Stock, Pièces).
+- [x] **Format d'Impression Thermique 5cm × 3cm** : Dimensions exactes de l'image de code-barres.
+- [x] **Masquage du prix** sur les étiquettes de pièces.
+- [x] **Chiffres EAN-13 de garde** parfaitement centrés et lisibles.
+
+## Phase 16 : Améliorations Futures (À Planifier)
 - [ ] Toggle impression auto réactif sans rechargement page Ventes (useEffect storage listener).
 - [ ] Contrainte UNIQUE sur `code_barre` en base de données.
 - [ ] Limite temporelle Dashboard (30 derniers jours par défaut).

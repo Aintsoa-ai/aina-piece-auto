@@ -1,17 +1,26 @@
 # AUDIT TECHNIQUE — AINA PIÈCE AUTO ERP
-> Dernière mise à jour : **01/06/2026 — 16:35 (Madagascar, UTC+3)**
+> Dernière mise à jour : **03/06/2026 — 16:05 (Madagascar, UTC+3)**
 
 ---
 
-## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.4 — 01/06/2026 16:35
+## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.6 — 03/06/2026 16:05
 
-**Hash Git actuel :** `9819ec3` (Stable)  
+**Hash Git actuel :** `2c480fc` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app  
 **Repository :** https://github.com/Aintsoa-ai/aina-piece-auto
 
 ---
 
-## 🟢 FONCTIONNALITÉS VALIDÉES ET OPÉRATIONNELLES (31/05/2026)
+## 🟢 FONCTIONNALITÉS VALIDÉES ET OPÉRATIONNELLES (03/06/2026)
+
+### Module Pièces & Impression Codes-barres (Pieces.tsx)
+| Fonctionnalité | Statut | Note |
+|---|---|---|
+| Générateur Déterministe EAN-13 | ✅ OK | **NOUVEAU 03/06** — Génère un EAN-13 valide à 13 chiffres à partir de n'importe quelle référence (ex: `Y16`). |
+| Étiquette Thermique 5cm × 3cm | ✅ OK | **NOUVEAU 03/06** — Dimension exacte de l'image de code-barres (`50mm × 30mm`) à l'impression thermique. |
+| Masquage du Prix sur Étiquette | ✅ OK | **NOUVEAU 03/06** — Retrait du prix sur l'étiquette à la demande du client. |
+| Chiffres de Garde EAN-13 | ✅ OK | **NOUVEAU 03/06** — Centrage et lisibilité accrue sous le code-barres (`textsize=12`, `textxalign=center`). |
+| Scanner Douchette Multimodule | ✅ OK | **NOUVEAU 03/06** — Décodage et association automatique des codes EAN-13 scannés sur Pièces, Ventes, Achats et Stock. |
 
 ### Module Ventes (Sales.tsx)
 | Fonctionnalité | Statut | Note |
@@ -158,6 +167,7 @@
 
 | Date | Hash | Statut |
 |---|---|---|
+| 03/06/2026 16:05 | `2c480fc` | ✅ **STABLE** — Standardisation EAN-13 déterministe (5cmx3cm) et scanner multimodule (Ventes, Achats, Stock, Pièces) |
 | 01/06/2026 16:35 | `9819ec3` | ✅ **STABLE** — Séparation visuelle des stocks par boutique (1 ligne/boutique), réparation colonne Actions (overflow/CSS) |
 | 01/06/2026 13:30 | `d29458c` | ✅ **STABLE** — Colonne Lieu, Filtre Boutique, Prix Panier éditable (UI/UX Amélioré) |
 | 31/05/2026 02:25 | `d90b806` | ✅ **STABLE** — Ticket thermique centré et auto-adaptatif (58mm/80mm), code-barres haute résolution |

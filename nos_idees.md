@@ -113,7 +113,8 @@ Créer une page de démonstration publique (avec fausses données) + grille tari
 - ✅ Hard Reset complet (incluant Clients & Crédits)
 - ✅ Dashboard avec filtre date locale (correction UTC+3 Madagascar)
 - ✅ Import Excel massif avec déduplication et option GLOBAL
-- ✅ Génération et impression étiquettes codes-barres (50x30mm)
+- ✅ Génération et impression étiquettes EAN-13 déterministes (5cm x 3cm) sans prix
+- ✅ Scanner douchette compatible EAN-13 déterministe sur tous les modules (Ventes, Stock, Achats, Pièces)
 - ✅ Radar de présence boutiques (WebSocket Supabase + heartbeat 5min)
 - ✅ Export PDF/Word/Excel rapports multi-boutiques **UNIFORMISÉS**
 - ✅ Verrouillage horaire boutique + alerte fermeture 15min
