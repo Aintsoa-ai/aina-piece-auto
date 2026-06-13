@@ -32,9 +32,9 @@ export interface PieceItem {
   emplacement?: string;
   stock_minimum?: number;
   description?: string;
-  lieu?: string;
   boutiquesIds?: string[];
   date_arrivage?: string;
+  raw_created_at?: string;
 }
 const formatNum = (val: string | number | undefined | null) => {
   if (val === null || val === undefined || val === '') return '';
@@ -78,6 +78,7 @@ export const Pieces: React.FC = () => {
   const [selectedBoutique, setSelectedBoutique] = useState('');
   const [selectedFournisseur, setSelectedFournisseur] = useState('');
   const [description, setDescription] = useState('');
+  const [dateArrivage, setDateArrivage] = useState(new Date().toISOString().split('T')[0]);
 
   // Dropdown list options
   const [boutiques, setBoutiques] = useState<{ id: string; name: string }[]>([]);
@@ -164,7 +165,8 @@ export const Pieces: React.FC = () => {
               description: item.description || '',
               lieu: '—',
               boutiquesIds: [],
-              date_arrivage: item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR') : '—'
+              date_arrivage: item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR') : '—',
+              raw_created_at: item.created_at
             });
           } else {
             pieceStocks.forEach((s: any) => {
@@ -194,7 +196,8 @@ export const Pieces: React.FC = () => {
                 description: item.description || '',
                 lieu: b ? b.name : '—',
                 boutiquesIds: [s.boutique_id],
-                date_arrivage: item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR') : '—'
+                date_arrivage: item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR') : '—',
+                raw_created_at: item.created_at
               });
             });
           }
@@ -316,6 +319,7 @@ if (!isModalOpen) {
     setSelectedBoutique('GLOBAL');
     setSelectedFournisseur(fournisseurs[0]?.id || '');
     setDescription('');
+    setDateArrivage(new Date().toISOString().split('T')[0]);
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsModalOpen(true);
@@ -346,6 +350,7 @@ if (!isModalOpen) {
     }
     setSelectedFournisseur(fournisseurs[0]?.id || '');
     setDescription(piece.description || '');
+    setDateArrivage(piece.raw_created_at ? piece.raw_created_at.split('T')[0] : new Date().toISOString().split('T')[0]);
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsModalOpen(true);
@@ -373,6 +378,9 @@ if (!isModalOpen) {
       return;
     }
 
+    const parsedDate = new Date(dateArrivage);
+    const isoDate = !isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : undefined;
+
     const payloadPiece = {
       reference: reference.toUpperCase().trim(),
       code_barre: codeBarre.trim() || null,
@@ -386,6 +394,7 @@ if (!isModalOpen) {
       // pour que Sales.tsx lise le bon prix sans dépendre d'un calcul approximatif
       prix_vente: parseNum(prixVente) || null,
       prix_achat: parseNum(prixAchat) || null,
+      ...(isoDate && { created_at: isoDate })
     };
 
     try {
@@ -861,8 +870,17 @@ if (!isModalOpen) {
                     />
                   </div>
 
-                  {/* Row 4 - Full Width Compatibilité véhicule */}
-                  <div style={{ ...s.inputContainer, gridColumn: 'span 2' }}>
+                  {/* Row Date d'Arrivage & Compatibilité */}
+                  <div style={s.inputContainer}>
+                    <label style={s.inputLabel}>Date d'Arrivage</label>
+                    <input 
+                      type="date"
+                      style={s.inputField}
+                      value={dateArrivage}
+                      onChange={(e) => setDateArrivage(e.target.value)}
+                    />
+                  </div>
+                  <div style={s.inputContainer}>
                     <label style={s.inputLabel}>Compatibilité véhicule</label>
                     <input 
                       type="text"
