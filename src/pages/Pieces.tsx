@@ -184,7 +184,6 @@ export const Pieces: React.FC = () => {
               });
             });
           }
-          }
         });
         }
 
