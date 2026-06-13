@@ -441,7 +441,8 @@ if (!isModalOpen) {
             if (existStock) {
               const { error: stockErr } = await supabase.from('stock').update({
                 quantity_disponible: qtyForThisBoutique,
-                seuil_alerte: parseNum(stockMinimum) || 5,
+                stock_minimum: parseNum(stockMinimum) || 5,
+                emplacement: emplacement.trim() || null,
               }).eq('id', existStock.id);
               if (stockErr) throw stockErr;
             } else {
@@ -450,7 +451,8 @@ if (!isModalOpen) {
                 boutique_id: b.id,
                 quantity_disponible: qtyForThisBoutique,
                 quantity_achetee: qtyForThisBoutique,
-                seuil_alerte: parseNum(stockMinimum) || 5,
+                stock_minimum: parseNum(stockMinimum) || 5,
+                emplacement: emplacement.trim() || null,
               });
               if (stockErr) throw stockErr;
             }
@@ -468,7 +470,8 @@ if (!isModalOpen) {
             console.log('[Stock] Mise à jour stock existant id:', existStock.id);
             const { error: stockErr } = await supabase.from('stock').update({
               quantity_disponible: parseNum(quantite),
-              seuil_alerte: parseNum(stockMinimum) || 5,
+              stock_minimum: parseNum(stockMinimum) || 5,
+              emplacement: emplacement.trim() || null,
             }).eq('id', existStock.id);
             if (stockErr) throw stockErr;
           } else {
@@ -478,7 +481,8 @@ if (!isModalOpen) {
               boutique_id: selectedBoutique,
               quantity_disponible: parseNum(quantite),
               quantity_achetee: parseNum(quantite),
-              seuil_alerte: parseNum(stockMinimum) || 5,
+              stock_minimum: parseNum(stockMinimum) || 5,
+              emplacement: emplacement.trim() || null,
             });
             if (stockErr) throw stockErr;
           }
@@ -513,7 +517,8 @@ if (!isModalOpen) {
             boutique_id: b.id,
             quantity_disponible: qtyPerBoutique + (i === 0 ? remainder : 0),
             quantity_achetee: qtyPerBoutique + (i === 0 ? remainder : 0),
-            seuil_alerte: parseNum(stockMinimum) || 5,
+            stock_minimum: parseNum(stockMinimum) || 5,
+            emplacement: emplacement.trim() || null,
           }));
           const { error: stockErr } = await supabase.from('stock').insert(stockInserts);
           if (stockErr) throw stockErr;
@@ -523,7 +528,8 @@ if (!isModalOpen) {
             boutique_id: selectedBoutique,
             quantity_disponible: parseNum(quantite),
             quantity_achetee: parseNum(quantite),
-            seuil_alerte: parseNum(stockMinimum) || 5,
+            stock_minimum: parseNum(stockMinimum) || 5,
+            emplacement: emplacement.trim() || null,
           });
           if (stockErr) throw stockErr;
         }
