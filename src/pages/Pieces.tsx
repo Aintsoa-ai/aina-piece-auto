@@ -494,7 +494,6 @@ if (!isModalOpen) {
             stock_minimum: parseNum(stockMinimum) || 5,
             emplacement: emplacement.trim() || null
           }));
-          }));
           const { error: stockErr } = await supabase.from('stock').insert(stockInserts);
           if (stockErr) throw stockErr;
         } else if (selectedBoutique) {
