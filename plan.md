@@ -26,6 +26,8 @@ Voir les commits Git et `auDit.md` pour le détail complet des phases 1 à 13.
 - [x] **Recherche Pièces** : Résolution du filtrage insensible à la casse et de la compatibilité avec codes-barres.
 - [x] **Mise à Jour Quantité** : Cible automatique de la boutique sélectionnée (correction de l'écrasement global).
 - [x] **Résolution Base Vierge** : Correction du problème "lieu vide" (b1) et "quantité à 0" à l'ajout initial.
+- [x] **Pagination Supabase (fetchAll)** : Contournement de la limite par défaut de 1000 lignes pour garantir un catalogue et un stock complets.
+- [x] **Alignement Schéma de Base** : Retour à `stock_minimum` au lieu de `seuil_alerte` pour éviter les blocages silencieux.
 
 ## Phase 17 : Améliorations Futures (À Planifier)
 - [ ] Toggle impression auto réactif sans rechargement page Ventes (useEffect storage listener).

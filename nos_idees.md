@@ -146,3 +146,4 @@ Créer une page de démonstration publique (avec fausses données) + grille tari
 - ✅ **Filtre de recherche insensible à la casse** sur tout le catalogue (13/06/2026)
 - ✅ **Correction Stock ciblé** sur la modification des pièces (13/06/2026)
 - ✅ **Correction Base vierge** : plus de lieu vide ou quantité 0 lors de l'initialisation (13/06/2026)
+- ✅ **Pagination Supabase (fetchAll)** : contournement de la limite des 1000 lignes pour charger la totalité du stock (13/06/2026)

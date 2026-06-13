@@ -114,12 +114,14 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ---
 
-## 📍 POINT DE SAUVEGARDE v3.7 — 13/06/2026 14:30 (Madagascar, UTC+3)
+## 📍 POINT DE SAUVEGARDE v3.8 — 13/06/2026 16:30 (Madagascar, UTC+3)
 
 **Hash Git :** `HEAD` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app
 
 ### Nouvelles fonctionnalités et améliorations validées (13/06/2026)
+- ✅ **Pagination Automatique Supabase** : Implémentation du système `fetchAll` contournant la limite silencieuse des 1000 lignes de Supabase, garantissant un affichage complet du catalogue et du stock.
+- ✅ **Correction Schéma SQL** : Alignement de l'application sur le schéma réel de la base de données (`stock_minimum` au lieu de `seuil_alerte`) réglant les échecs silencieux d'insertion.
 - ✅ **Affichage Date d'Arrivage** : Remplacement de l'affichage de la catégorie par la date d'arrivage (basée sur l'enregistrement) dans la liste des pièces.
 - ✅ **Fiabilité de la Recherche Pièces** : Le champ de recherche est désormais totalement insensible à la casse et gère de façon robuste les correspondances de références et de codes-barres.
 - ✅ **Gestion de Stock Ciblée** : L'édition d'une quantité cible désormais spécifiquement la boutique sélectionnée (sans diviser/écraser le stock des autres).
