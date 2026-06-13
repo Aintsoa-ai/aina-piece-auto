@@ -119,11 +119,12 @@ export const Pieces: React.FC = () => {
     try {
       const result = await Promise.race([queryPromise, timeoutPromise]);
 
-      if (result && !result.isTimeout && result.piecesData && result.piecesData.length > 0) {
+      if (result && !result.isTimeout) {
         const { piecesData, stockData, suppliersData, listBoutiques } = result;
         const parsed: PieceItem[] = [];
 
-        piecesData.forEach((item: any) => {
+        if (piecesData && piecesData.length > 0) {
+          piecesData.forEach((item: any) => {
           const pieceStocks = stockData?.filter((s: any) => s.piece_id === item.id) || [];
           const spPrice = suppliersData?.find((s: any) => s.piece_id === item.id);
           const achatPrice = item.prix_achat || (spPrice ? Number(spPrice.prix_achat) : 0);
@@ -183,21 +184,18 @@ export const Pieces: React.FC = () => {
               });
             });
           }
+          }
         });
+        }
 
         setPieces(parsed);
         
       } else {
         setPieces([]);
-        setBoutiques([{ id: 'b1', name: 'Boutique Centre' }]);
-        setFournisseurs([{ id: 'f1', nom: 'Auto Parts Madagascar' }]);
       }
     } catch (err) {
       console.error('Error loading catalogue pieces, loading spectacular fallbacks:', err);
       setPieces([]);
-      
-      setBoutiques([{ id: 'b1', name: 'Boutique Centre' }]);
-      setFournisseurs([{ id: 'f1', nom: 'Auto Parts Madagascar' }]);
     } finally {
       setLoading(false);
     }
@@ -317,9 +315,12 @@ if (!isModalOpen) {
     setStockMinimum(piece.stock_minimum ? formatNum(piece.stock_minimum) : '');
     setPrixAchat(piece.achat ? formatNum(piece.achat) : '');
     setPrixVente(piece.vente ? formatNum(piece.vente) : '');
-    // Quantité totale = somme de toutes les boutiques. On pré-sélectionne GLOBAL
-    // pour que l'utilisateur voie la quantité totale et puisse la modifier globalement.
-    setSelectedBoutique('GLOBAL');
+    // Si la ligne correspond à une boutique spécifique, on la sélectionne
+    if (piece.boutiquesIds && piece.boutiquesIds.length === 1) {
+      setSelectedBoutique(piece.boutiquesIds[0]);
+    } else {
+      setSelectedBoutique('GLOBAL');
+    }
     setSelectedFournisseur(fournisseurs[0]?.id || '');
     setDescription(piece.description || '');
     setErrorMsg(null);
@@ -542,11 +543,16 @@ if (!isModalOpen) {
   };
 
   const filteredPieces = pieces.filter(p => {
-    const matchesSearch = p.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.marque.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.categorie.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.code_barre && p.code_barre.includes(searchQuery));
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) {
+      return filterBoutique === '' || (p.boutiquesIds && p.boutiquesIds.includes(filterBoutique));
+    }
+    const matchesSearch = 
+      (p.reference && p.reference.toLowerCase().includes(q)) ||
+      (p.designation && p.designation.toLowerCase().includes(q)) ||
+      (p.marque && p.marque.toLowerCase().includes(q)) ||
+      (p.categorie && p.categorie.toLowerCase().includes(q)) ||
+      (p.code_barre && p.code_barre.toLowerCase().includes(q));
       
     const matchesBoutique = filterBoutique === '' || (p.boutiquesIds && p.boutiquesIds.includes(filterBoutique));
     
