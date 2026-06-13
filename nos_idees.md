@@ -1,6 +1,24 @@
 # NOS IDÉES — AINA PIÈCE AUTO ERP
 > Fichier de collecte des idées futures et améliorations possibles
-> Dernière mise à jour : **31/05/2026**
+> Dernière mise à jour : **13/06/2026**
+
+---
+
+## 🟢 POINTS FORTS ET FAIBLESSES
+
+### 💪 Points Forts du Système
+1. **PWA & IndexedDB** : Fonctionne hors-ligne avec synchronisation automatique au retour du réseau.
+2. **Scanner Universel** : Adaptabilité (100ms) pour lecteurs QWERTY/AZERTY, tolérance aux erreurs.
+3. **Multi-boutique Sécurisé** : Isolation absolue via RLS Supabase (sécurité invisible en DB).
+4. **Ticket Thermique Dynamique** : Impression automatique `window.print()` adaptable 58/80mm sans popup supplémentaire.
+5. **Fiabilité Catalogue** : Résolution EAN-13 déterministe pour recherche unifiée et impression.
+6. **Exports Multi-supports** : Structure commune (PDF = Word = Excel) avec graphiques SVG, KPI et tableaux sans perte d'info.
+
+### ⚠️ Points Faibles / Failles (À surveiller)
+1. **Performance Dashboard** : Actuellement sans limite temporelle (lit toutes les données depuis le début), ce qui ralentit avec un fort volume.
+2. **Absence d'unicité `code_barre`** : Deux pièces peuvent encore théoriquement partager un code-barres.
+3. **Stock Négatif Hors-Ligne** : Possible si plusieurs terminaux vendent la même pièce déconnectée en simultané.
+4. **Rechargement pour Options** : Certaines options (ex: Toggle auto-print) demandent d'actualiser la page.
 
 ---
 
@@ -124,3 +142,7 @@ Créer une page de démonstration publique (avec fausses données) + grille tari
 - ✅ Règlements crédit → tableau de vente + code couleur en attente
 - ✅ Calcul dynamique Reste à payer / Reste à rendre dans modal Encaisser
 - ✅ **Impression thermique automatique** (localStorage toggle + fallback PDF)
+- ✅ **Affichage Date d'Arrivage** à la place de Catégorie (13/06/2026)
+- ✅ **Filtre de recherche insensible à la casse** sur tout le catalogue (13/06/2026)
+- ✅ **Correction Stock ciblé** sur la modification des pièces (13/06/2026)
+- ✅ **Correction Base vierge** : plus de lieu vide ou quantité 0 lors de l'initialisation (13/06/2026)

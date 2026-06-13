@@ -3,15 +3,15 @@
 
 ---
 
-## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.6 — 03/06/2026 16:05
+## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.7 — 13/06/2026 14:30
 
-**Hash Git actuel :** `2c480fc` (Stable)  
+**Hash Git actuel :** `HEAD` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app  
 **Repository :** https://github.com/Aintsoa-ai/aina-piece-auto
 
 ---
 
-## 🟢 FONCTIONNALITÉS VALIDÉES ET OPÉRATIONNELLES (03/06/2026)
+## 🟢 FONCTIONNALITÉS VALIDÉES ET OPÉRATIONNELLES (13/06/2026)
 
 ### Module Pièces & Impression Codes-barres (Pieces.tsx)
 | Fonctionnalité | Statut | Note |
@@ -42,8 +42,11 @@
 ### Module Pièces (Pieces.tsx)
 | Fonctionnalité | Statut | Note |
 |---|---|---|
-| Colonne Lieu (Boutique) | ✅ OK | **AJOUTÉ 01/06** — Affiche les boutiques pour chaque pièce |
-| Filtre Professionnel | ✅ OK | **AJOUTÉ 01/06** — Dropdown pour filtrer les pièces par boutique |
+| Colonne Lieu (Boutique) | ✅ OK | Affiche les boutiques pour chaque pièce |
+| Filtre Professionnel | ✅ OK | Dropdown pour filtrer les pièces par boutique |
+| Affichage Date d'Arrivage | ✅ OK | **NOUVEAU 13/06** — Remplace l'affichage de la catégorie |
+| Modification de Quantité Ciblée | ✅ OK | **CORRIGÉ 13/06** — La modification s'applique sur la boutique sélectionnée sans écraser les autres |
+| Filtre de recherche Robuste | ✅ OK | **CORRIGÉ 13/06** — Insensible à la casse, tolérance aux valeurs nulles |
 
 ### Module Clients & Crédits (Clients.tsx)
 | Fonctionnalité | Statut | Note |
@@ -119,6 +122,9 @@
 
 | Date | Bug | Fix |
 |---|---|---|
+| 13/06/2026 | Recherche de pièces vide ("Aucune pièce trouvée") | Correction de la casse (`toLowerCase()`) sur les recherches (référence, code_barre) |
+| 13/06/2026 | Quantité qui ne change pas (ou mal) | Désactivation du forçage 'GLOBAL', sélection automatique de la bonne boutique lors de l'édition |
+| 13/06/2026 | Lieu "—" et quantité à 0 sur nouvelle pièce | Suppression du faux lieu par défaut `b1` empêchant l'insertion SQL dans la table stock |
 | 31/05/2026 | Export Excel incomplet (pas de KPIs) | Feuille "Analyse Globale" uniformisée |
 | 31/05/2026 | Crédits filtrés hors tableau ventes | Suppression du filtre `.or()`, ajout code couleur |
 | 31/05/2026 | Modal Encaisser sans calcul live | Indicateurs Reste à payer/rendre en temps réel |
@@ -167,6 +173,7 @@
 
 | Date | Hash | Statut |
 |---|---|---|
+| 13/06/2026 14:30 | `HEAD` | ✅ **STABLE** — Remplacement Categorie par Date d'Arrivage, corrections édition stock et recherche pièces |
 | 03/06/2026 16:05 | `2c480fc` | ✅ **STABLE** — Standardisation EAN-13 déterministe (5cmx3cm) et scanner multimodule (Ventes, Achats, Stock, Pièces) |
 | 01/06/2026 16:35 | `9819ec3` | ✅ **STABLE** — Séparation visuelle des stocks par boutique (1 ligne/boutique), réparation colonne Actions (overflow/CSS) |
 | 01/06/2026 13:30 | `d29458c` | ✅ **STABLE** — Colonne Lieu, Filtre Boutique, Prix Panier éditable (UI/UX Amélioré) |

@@ -21,7 +21,13 @@ Voir les commits Git et `auDit.md` pour le détail complet des phases 1 à 13.
 - [x] **Masquage du prix** sur les étiquettes de pièces.
 - [x] **Chiffres EAN-13 de garde** parfaitement centrés et lisibles.
 
-## Phase 16 : Améliorations Futures (À Planifier)
+## Phase 16 : Fiabilisation Catalogue et Interface (13/06/2026) ✅
+- [x] **Date d'Arrivage** : Remplacement de l'affichage de la catégorie par la date d'arrivage dans la table Pièces.
+- [x] **Recherche Pièces** : Résolution du filtrage insensible à la casse et de la compatibilité avec codes-barres.
+- [x] **Mise à Jour Quantité** : Cible automatique de la boutique sélectionnée (correction de l'écrasement global).
+- [x] **Résolution Base Vierge** : Correction du problème "lieu vide" (b1) et "quantité à 0" à l'ajout initial.
+
+## Phase 17 : Améliorations Futures (À Planifier)
 - [ ] Toggle impression auto réactif sans rechargement page Ventes (useEffect storage listener).
 - [ ] Contrainte UNIQUE sur `code_barre` en base de données.
 - [ ] Limite temporelle Dashboard (30 derniers jours par défaut).

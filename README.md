@@ -40,7 +40,7 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - Ajout de stock automatique lors d'un achat.
 
 ### 5. Catalogue & Stock
-- Affichage complet des pièces avec gestion des quantités.
+- Affichage complet des pièces avec gestion des quantités, affichage de la **Date d'Arrivage** (au lieu de la catégorie).
 - **Gestion des Codes-barres :** Ajout/modification via douchette dans "Nouvelle Pièce".
 - **Génération & Impression d'Étiquettes :** API bwip-js, format 50x30mm thermique.
 - **Importation Massive & Intelligente :** Fichier Excel `.xlsx`, déduplication (remplacer/mettre à jour/ignorer), option GLOBAL (toutes boutiques), colonne `CODE_BARRE` reconnue automatiquement.
@@ -114,16 +114,15 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ---
 
-## 📍 POINT DE SAUVEGARDE v3.6 — 03/06/2026 16:05 (Madagascar, UTC+3)
+## 📍 POINT DE SAUVEGARDE v3.7 — 13/06/2026 14:30 (Madagascar, UTC+3)
 
-**Hash Git :** `2c480fc` (Stable)  
+**Hash Git :** `HEAD` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app
 
-### Nouvelles fonctionnalités et améliorations validées (03/06/2026)
-- ✅ **Standardisation EAN-13 Déterministe** : Algorithme convertissant dynamiquement toute référence de pièce (`Y16`, `FH-001`) en un code à 13 chiffres standardisé.
-- ✅ **Impression Thermique 5cm × 3cm** : Format exact de code-barres configuré pour le papier thermique de 58mm/80mm.
-- ✅ **Masquage du Prix** : Le prix a été retiré des étiquettes d'impression des pièces.
-- ✅ **Chiffres EAN-13 Visibles** : Amélioration de la taille de police et du centrage des chiffres sous les barres de garde.
-- ✅ **Compatibilité Scanner Multimodule** : Le scanner de code-barres douchette résout automatiquement le code EAN-13 scanné en recherchant la référence ou son équivalent EAN-13 dans les modules Ventes, Dépôts/Stock, Achats et Pièces.
+### Nouvelles fonctionnalités et améliorations validées (13/06/2026)
+- ✅ **Affichage Date d'Arrivage** : Remplacement de l'affichage de la catégorie par la date d'arrivage (basée sur l'enregistrement) dans la liste des pièces.
+- ✅ **Fiabilité de la Recherche Pièces** : Le champ de recherche est désormais totalement insensible à la casse et gère de façon robuste les correspondances de références et de codes-barres.
+- ✅ **Gestion de Stock Ciblée** : L'édition d'une quantité cible désormais spécifiquement la boutique sélectionnée (sans diviser/écraser le stock des autres).
+- ✅ **Correction Base Vide** : L'ajout d'une nouvelle pièce sur une installation vierge crée correctement le lieu et la quantité au lieu d'échouer silencieusement.
 
-*Toutes les fonctionnalités ont été testées avec succès sur Mobile et Desktop.*
+*Toutes les fonctionnalités ont été testées avec succès sur Mobile et Desktop. L'intégrité globale a été revérifiée.*
