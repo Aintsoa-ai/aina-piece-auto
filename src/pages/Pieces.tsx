@@ -416,13 +416,14 @@ if (!isModalOpen) {
               .maybeSingle();
 
             if (existStock) {
-              await supabase.from('stock').update({
+              const { error: stockErr } = await supabase.from('stock').update({
                 quantity_disponible: qtyForThisBoutique,
                 stock_minimum: parseNum(stockMinimum) || 5,
                 emplacement: emplacement.trim() || null
               }).eq('id', existStock.id);
+              if (stockErr) throw stockErr;
             } else {
-              await supabase.from('stock').insert({
+              const { error: stockErr } = await supabase.from('stock').insert({
                 piece_id: editId,
                 boutique_id: b.id,
                 quantity_disponible: qtyForThisBoutique,
@@ -430,6 +431,7 @@ if (!isModalOpen) {
                 stock_minimum: parseNum(stockMinimum) || 5,
                 emplacement: emplacement.trim() || null
               });
+              if (stockErr) throw stockErr;
             }
           }
         } else if (selectedBoutique && selectedBoutique !== 'GLOBAL') {
@@ -441,13 +443,14 @@ if (!isModalOpen) {
             .maybeSingle();
 
           if (existStock) {
-            await supabase.from('stock').update({
+            const { error: stockErr } = await supabase.from('stock').update({
               quantity_disponible: parseNum(quantite),
               stock_minimum: parseNum(stockMinimum) || 5,
               emplacement: emplacement.trim() || null
             }).eq('id', existStock.id);
+            if (stockErr) throw stockErr;
           } else {
-            await supabase.from('stock').insert({
+            const { error: stockErr } = await supabase.from('stock').insert({
               piece_id: editId,
               boutique_id: selectedBoutique,
               quantity_disponible: parseNum(quantite),
@@ -455,6 +458,7 @@ if (!isModalOpen) {
               stock_minimum: parseNum(stockMinimum) || 5,
               emplacement: emplacement.trim() || null
             });
+            if (stockErr) throw stockErr;
           }
         }
         
@@ -490,9 +494,11 @@ if (!isModalOpen) {
             stock_minimum: parseNum(stockMinimum) || 5,
             emplacement: emplacement.trim() || null
           }));
-          await supabase.from('stock').insert(stockInserts);
+          }));
+          const { error: stockErr } = await supabase.from('stock').insert(stockInserts);
+          if (stockErr) throw stockErr;
         } else if (selectedBoutique) {
-          await supabase.from('stock').insert({
+          const { error: stockErr } = await supabase.from('stock').insert({
             piece_id: newPiece.id,
             boutique_id: selectedBoutique,
             quantity_disponible: parseNum(quantite),
@@ -500,6 +506,7 @@ if (!isModalOpen) {
             stock_minimum: parseNum(stockMinimum) || 5,
             emplacement: emplacement.trim() || null
           });
+          if (stockErr) throw stockErr;
         }
 
         // Insert piece supplier price
