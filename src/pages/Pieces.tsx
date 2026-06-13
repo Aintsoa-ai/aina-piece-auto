@@ -101,10 +101,25 @@ export const Pieces: React.FC = () => {
       setTimeout(() => resolve({ isTimeout: true }), 15000)
     );
 
+    const fetchAll = async (query: any) => {
+      let allData: any[] = [];
+      let from = 0;
+      const step = 1000;
+      while (true) {
+        const { data, error } = await query.range(from, from + step - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        allData = allData.concat(data);
+        if (data.length < step) break;
+        from += step;
+      }
+      return allData;
+    };
+
     const queryPromise = (async () => {
-      const { data: piecesData, error: piecesErr } = await supabase.from('pieces').select('*');
-      const { data: stockData } = await supabase.from('stock').select('*');
-      const { data: suppliersData } = await supabase.from('piece_fournisseurs').select('*');
+      const piecesData = await fetchAll(supabase.from('pieces').select('*').order('created_at', { ascending: false }));
+      const stockData = await fetchAll(supabase.from('stock').select('*'));
+      const suppliersData = await fetchAll(supabase.from('piece_fournisseurs').select('*'));
       
       const { data: listBoutiques } = await supabase.from('boutiques').select('id, name');
       const { data: listFournisseurs } = await supabase.from('fournisseurs').select('id, nom');
@@ -112,7 +127,6 @@ export const Pieces: React.FC = () => {
       if (listBoutiques) setBoutiques(listBoutiques);
       if (listFournisseurs) setFournisseurs(listFournisseurs);
 
-      if (piecesErr) throw piecesErr;
       return { piecesData, stockData, suppliersData, listBoutiques };
     })();
 
