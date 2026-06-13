@@ -202,6 +202,13 @@ export const Pieces: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    // Chargement indépendant des boutiques et fournisseurs (sans dépendre du race de fetchData)
+    (async () => {
+      const { data: lb } = await supabase.from('boutiques').select('id, name');
+      if (lb && lb.length > 0) setBoutiques(lb);
+      const { data: lf } = await supabase.from('fournisseurs').select('id, nom');
+      if (lf && lf.length > 0) setFournisseurs(lf);
+    })();
   }, []);
 
   // Barcode Scanner Listener pour la recherche rapide dans le catalogue
@@ -337,6 +344,11 @@ if (!isModalOpen) {
     setIsSubmitting(true);
     setErrorMsg(null);
 
+    // Toujours récupérer les boutiques en temps réel pour éviter les états périmés (race condition)
+    const { data: currentBoutiques } = await supabase.from('boutiques').select('id, name');
+    const activeBoutiques = (currentBoutiques && currentBoutiques.length > 0) ? currentBoutiques : boutiques;
+    if (activeBoutiques.length > 0) setBoutiques(activeBoutiques); // sync le state aussi
+
     const payloadPiece = {
       reference: reference.toUpperCase().trim(),
       code_barre: codeBarre.trim() || null,
@@ -400,13 +412,13 @@ if (!isModalOpen) {
         // ✅ GLOBAL SPLIT : la quantité totale est divisée équitablement entre les boutiques.
         // Exemple : 40 unités avec 2 boutiques = 20 + 20 (total affiché = 40).
         // Les prix (achat/vente) restent identiques pour toutes les boutiques.
-        if (selectedBoutique === 'GLOBAL' && boutiques.length > 0) {
+        if (selectedBoutique === 'GLOBAL' && activeBoutiques.length > 0) {
           const totalQty = parseNum(quantite);
-          const qtyPerBoutique = Math.floor(totalQty / boutiques.length);
-          const remainder = totalQty % boutiques.length; // le reste va à la 1ère boutique
+          const qtyPerBoutique = Math.floor(totalQty / activeBoutiques.length);
+          const remainder = totalQty % activeBoutiques.length; // le reste va à la 1ère boutique
 
-          for (let i = 0; i < boutiques.length; i++) {
-            const b = boutiques[i];
+          for (let i = 0; i < activeBoutiques.length; i++) {
+            const b = activeBoutiques[i];
             const qtyForThisBoutique = qtyPerBoutique + (i === 0 ? remainder : 0);
             const { data: existStock } = await supabase
               .from('stock')
@@ -484,9 +496,9 @@ if (!isModalOpen) {
         // Exemple : 40 avec 2 boutiques = 20 pour chaque. Total affiché = 40.
         if (selectedBoutique === 'GLOBAL') {
           const totalQty = parseNum(quantite);
-          const qtyPerBoutique = Math.floor(totalQty / boutiques.length);
-          const remainder = totalQty % boutiques.length;
-          const stockInserts = boutiques.map((b, i) => ({
+          const qtyPerBoutique = Math.floor(totalQty / activeBoutiques.length);
+          const remainder = totalQty % activeBoutiques.length;
+          const stockInserts = activeBoutiques.map((b, i) => ({
             piece_id: newPiece.id,
             boutique_id: b.id,
             quantity_disponible: qtyPerBoutique + (i === 0 ? remainder : 0),
