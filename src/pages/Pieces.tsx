@@ -34,6 +34,7 @@ export interface PieceItem {
   description?: string;
   lieu?: string;
   boutiquesIds?: string[];
+  date_arrivage?: string;
 }
 const formatNum = (val: string | number | undefined | null) => {
   if (val === null || val === undefined || val === '') return '';
@@ -147,7 +148,8 @@ export const Pieces: React.FC = () => {
               stock_minimum: 5,
               description: item.description || '',
               lieu: '—',
-              boutiquesIds: []
+              boutiquesIds: [],
+              date_arrivage: item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR') : '—'
             });
           } else {
             pieceStocks.forEach((s: any) => {
@@ -176,7 +178,8 @@ export const Pieces: React.FC = () => {
                 stock_minimum: minStock,
                 description: item.description || '',
                 lieu: b ? b.name : '—',
-                boutiquesIds: [s.boutique_id]
+                boutiquesIds: [s.boutique_id],
+                date_arrivage: item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR') : '—'
               });
             });
           }
@@ -610,7 +613,7 @@ if (!isModalOpen) {
                 <th style={s.th}>RÉFÉRENCE</th>
                 <th style={s.th}>PIÈCE</th>
                 <th style={s.th}>MARQUE</th>
-                <th style={s.th}>CATÉGORIE</th>
+                <th style={s.th}>DATE D'ARRIVAGE</th>
                 <th style={s.th}>LIEU</th>
                 <th style={s.th}>QTÉ</th>
                 <th style={s.th}>ACHAT</th>
@@ -625,7 +628,7 @@ if (!isModalOpen) {
                   <td style={{ ...s.td, fontWeight: '700', color: 'rgba(255, 255, 255, 0.45)' }}>{piece.reference}</td>
                   <td style={{ ...s.td, fontWeight: '700', color: '#0066fe' }}>{piece.designation}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{piece.marque}</td>
-                  <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{piece.categorie}</td>
+                  <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{piece.date_arrivage}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.8)', fontSize: '12px', textTransform: 'uppercase' }}>{piece.lieu || '—'}</td>
                   <td style={{ ...s.td, fontWeight: '700' }}>{piece.qte}</td>
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{formatAr(piece.achat)}</td>
