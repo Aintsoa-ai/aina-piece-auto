@@ -32,6 +32,7 @@ export interface PieceItem {
   emplacement?: string;
   stock_minimum?: number;
   description?: string;
+  lieu?: string;
   boutiquesIds?: string[];
   date_arrivage?: string;
   raw_created_at?: string;
