@@ -324,6 +324,9 @@ if (!isModalOpen) {
     // Si la ligne correspond à une boutique spécifique, on la sélectionne
     if (piece.boutiquesIds && piece.boutiquesIds.length === 1) {
       setSelectedBoutique(piece.boutiquesIds[0]);
+    } else if (boutiques.length > 0) {
+      // Pour une pièce sans stock : sélectionner la 1ère boutique par défaut (plus sûr que GLOBAL)
+      setSelectedBoutique(boutiques[0].id);
     } else {
       setSelectedBoutique('GLOBAL');
     }
@@ -348,6 +351,13 @@ if (!isModalOpen) {
     const { data: currentBoutiques } = await supabase.from('boutiques').select('id, name');
     const activeBoutiques = (currentBoutiques && currentBoutiques.length > 0) ? currentBoutiques : boutiques;
     if (activeBoutiques.length > 0) setBoutiques(activeBoutiques); // sync le state aussi
+
+    // Sécurité : si GLOBAL est sélectionné mais aucune boutique n'est chargée, bloquer l'enregistrement
+    if (selectedBoutique === 'GLOBAL' && activeBoutiques.length === 0) {
+      setErrorMsg("Impossible de déterminer les boutiques. Veuillez réessayer.");
+      setIsSubmitting(false);
+      return;
+    }
 
     const payloadPiece = {
       reference: reference.toUpperCase().trim(),
@@ -420,6 +430,7 @@ if (!isModalOpen) {
           for (let i = 0; i < activeBoutiques.length; i++) {
             const b = activeBoutiques[i];
             const qtyForThisBoutique = qtyPerBoutique + (i === 0 ? remainder : 0);
+            console.log('[Stock GLOBAL update] boutique:', b.name, 'qty:', qtyForThisBoutique);
             const { data: existStock } = await supabase
               .from('stock')
               .select('id')
@@ -447,6 +458,7 @@ if (!isModalOpen) {
             }
           }
         } else if (selectedBoutique && selectedBoutique !== 'GLOBAL') {
+          console.log('[Stock specific] boutique_id:', selectedBoutique, 'qty:', parseNum(quantite));
           const { data: existStock } = await supabase
             .from('stock')
             .select('id')
@@ -455,6 +467,7 @@ if (!isModalOpen) {
             .maybeSingle();
 
           if (existStock) {
+            console.log('[Stock] Mise à jour stock existant id:', existStock.id);
             const { error: stockErr } = await supabase.from('stock').update({
               quantity_disponible: parseNum(quantite),
               stock_minimum: parseNum(stockMinimum) || 5,
@@ -462,6 +475,7 @@ if (!isModalOpen) {
             }).eq('id', existStock.id);
             if (stockErr) throw stockErr;
           } else {
+            console.log('[Stock] Insertion nouveau stock pour pièce:', editId, 'boutique:', selectedBoutique);
             const { error: stockErr } = await supabase.from('stock').insert({
               piece_id: editId,
               boutique_id: selectedBoutique,
@@ -531,8 +545,8 @@ if (!isModalOpen) {
       }
 
       setSuccessMsg("Pièce enregistrée avec succès.");
-      fetchData();
-      setTimeout(() => setIsModalOpen(false), 800);
+      await fetchData(); // attend le rechargement complet avant de fermer le modal
+      setIsModalOpen(false);
     } catch (err: any) {
       console.error("DB save error:", err);
       showAlert(`Erreur d'enregistrement : ${err.message || 'Erreur inconnue'}`, 'error');
