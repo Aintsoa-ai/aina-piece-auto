@@ -12,7 +12,8 @@ import {
   Trash2,
   AlertCircle,
   CheckCircle2,
-  Printer
+  Printer,
+  Calculator
 } from 'lucide-react';
 
 export interface PieceItem {
@@ -56,6 +57,7 @@ export const Pieces: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterBoutique, setFilterBoutique] = useState('');
+  const [showTotals, setShowTotals] = useState(false);
   const isDemoData = false;
 
   // Form / Modal States
@@ -658,6 +660,28 @@ if (!isModalOpen) {
             <option key={b.id} value={b.id}>{b.name}</option>
           ))}
         </select>
+        <button
+          onClick={() => setShowTotals(!showTotals)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            backgroundColor: showTotals ? 'rgba(0, 102, 254, 0.15)' : 'transparent',
+            border: `1px solid ${showTotals ? '#0066fe' : 'rgba(255, 255, 255, 0.12)'}`,
+            color: showTotals ? '#0066fe' : '#ffffff',
+            padding: '9px 16px',
+            borderRadius: '6px',
+            fontWeight: '600',
+            fontSize: '13px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            whiteSpace: 'nowrap'
+          }}
+          title="Afficher/Masquer les valeurs totales (Qté × Prix)"
+        >
+          <Calculator size={16} />
+          {showTotals ? 'Masquer totaux' : 'Valeurs totales'}
+        </button>
       </div>
 
       {/* TABLE WRAPPER CONTAINER */}
@@ -677,8 +701,14 @@ if (!isModalOpen) {
                 <th style={s.th}>DATE D'ARRIVAGE</th>
                 <th style={s.th}>LIEU</th>
                 <th style={s.th}>QTÉ</th>
-                <th style={s.th}>ACHAT</th>
-                <th style={s.th}>VENTE</th>
+                <th style={s.th}>ACHAT (U)</th>
+                <th style={s.th}>VENTE (U)</th>
+                {showTotals && (
+                  <>
+                    <th style={s.th}>TOTAL ACHAT</th>
+                    <th style={s.th}>TOTAL VENTE</th>
+                  </>
+                )}
                 <th style={s.th}>STOCK</th>
                 <th style={{ ...s.th, textAlign: 'right' }}>ACTIONS</th>
               </tr>
@@ -695,6 +725,13 @@ if (!isModalOpen) {
                   <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{formatAr(piece.achat)}</td>
                   <td style={{ ...s.td, fontWeight: '700' }}>{formatAr(piece.vente)}</td>
                   
+                  {showTotals && (
+                    <>
+                      <td style={{ ...s.td, color: 'rgba(255,255,255,0.45)' }}>{formatAr(piece.achat * piece.qte)}</td>
+                      <td style={{ ...s.td, fontWeight: '700', color: '#10b981' }}>{formatAr(piece.vente * piece.qte)}</td>
+                    </>
+                  )}
+
                   {/* Status badges matching reference screenshot 1 */}
                   <td style={s.td}>
                     {piece.stockStatus === 'OK' && (
@@ -728,7 +765,7 @@ if (!isModalOpen) {
               ))}
               {filteredPieces.length === 0 && (
                 <tr>
-                  <td colSpan={9} style={s.emptyCell}>Aucune pièce trouvée</td>
+                  <td colSpan={showTotals ? 11 : 9} style={s.emptyCell}>Aucune pièce trouvée</td>
                 </tr>
               )}
             </tbody>
