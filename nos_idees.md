@@ -1,6 +1,6 @@
-# NOS IDÉES — AINA PIÈCE AUTO ERP
+# NOS IDÉES — AINA PIÈCE AUTO ERP & AGENDA INTELLIGENT
 > Fichier de collecte des idées futures et améliorations possibles
-> Dernière mise à jour : **13/06/2026**
+> Dernière mise à jour : **14/06/2026**
 
 ---
 
@@ -14,11 +14,23 @@
 5. **Fiabilité Catalogue** : Résolution EAN-13 déterministe pour recherche unifiée et impression.
 6. **Exports Multi-supports** : Structure commune (PDF = Word = Excel) avec graphiques SVG, KPI et tableaux sans perte d'info.
 
-### ⚠️ Points Faibles / Failles (À surveiller)
-1. **Performance Dashboard** : Actuellement sans limite temporelle (lit toutes les données depuis le début), ce qui ralentit avec un fort volume.
+### ⚠️ Points Faibles / Failles (ERP Web)
+1. **Performance Dashboard** : Actuellement sans limite temporelle.
 2. **Absence d'unicité `code_barre`** : Deux pièces peuvent encore théoriquement partager un code-barres.
-3. **Stock Négatif Hors-Ligne** : Possible si plusieurs terminaux vendent la même pièce déconnectée en simultané.
-4. **Rechargement pour Options** : Certaines options (ex: Toggle auto-print) demandent d'actualiser la page.
+3. **Stock Négatif Hors-Ligne** : Possible si plusieurs terminaux vendent la même pièce déconnectée.
+4. **Rechargement pour Options** : Certaines options demandent d'actualiser la page.
+
+### 💪 Points Forts (Agenda Intelligent Mobile)
+1. **Intelligence Linguistique Hybride :** Moteur phonétique (Français + Malgache) avec prosodie naturelle, et détection fine des voix Premium.
+2. **Auto-Adaptation Temporelle :** Interface qui change d'elle-même (Jour/Nuit) selon l'heure, et salutations dynamiques (Bonjour/Bonsoir).
+3. **Souveraineté des Données :** 100% Hors-Ligne, aucune dépendance cloud.
+4. **Calcul Astronomique :** Jours fériés calculés sans API.
+5. **Accessibilité & UX "Magique" :** Sous-titres dynamiques synchronisés avec la voix, lecture automatique au toucher, et modification des tâches sans suppression.
+
+### ⚠️ Points Faibles (Agenda Intelligent Mobile)
+1. **Limitation d'Ouverture Auto :** OS Mobile interdit d'ouvrir l'app sans l'action utilisateur (Nécessite Full-Screen Intents).
+2. **Dépendance Moteur Vocal OS :** La qualité de la voix dépend de Google TTS / Apple Siri.
+3. **Scalabilité AsyncStorage :** Après des années, SQLite sera préférable.
 
 ---
 
@@ -122,7 +134,30 @@ Créer une page de démonstration publique (avec fausses données) + grille tari
 
 ---
 
-## ✅ IDÉES DÉJÀ IMPLÉMENTÉES (Archivées)
+## 🚀 CE QUI RESTE À ACCOMPLIR (TO DO)
+
+### A. Concernant l'ERP Web
+1. Contrainte UNIQUE sur `code_barre` dans Supabase.
+2. Limiter le Dashboard à 30/60 jours pour les performances.
+3. Notification Push Ventes en Temps Réel.
+4. Toggle Impression Thermique Auto Réactif (Écouter `storage`).
+5. Graphique Ventes 7 Jours — Données Réelles.
+6. Export PDF Ticket par Email / WhatsApp.
+7. Alerte Stock Bas par Notification Push.
+8. Module Devis / Facture Pro.
+9. Code-barres sur Mobile (Caméra).
+10. Détection Automatique Modèle Imprimante.
+
+### B. Concernant l'Agenda Intelligent Mobile
+1. **Migration SQLite** : Remplacer AsyncStorage par `expo-sqlite` pour la pérennité.
+2. **Full-Screen Alarm Intents** : Utiliser `Notifee` pour réveiller le téléphone à l'heure du réveil au lieu des notifications simples.
+3. **Sécurité Biométrique** : Ajouter l'empreinte digitale pour sécuriser les finances de l'agenda.
+4. **Export de sauvegarde locale** : Créer un JSON crypté téléchargeable.
+5. **Mode "Ne pas déranger" global** : Couper les alarmes pendant la plage horaire de "sommeil".
+
+---
+
+## ✅ IDÉES DÉJÀ FAITES (DONE)
 
 - ✅ Mode hors-ligne PWA + IndexedDB
 - ✅ Scanner douchette universel AZERTY/QWERTY (100ms)
@@ -147,3 +182,12 @@ Créer une page de démonstration publique (avec fausses données) + grille tari
 - ✅ **Correction Stock ciblé** sur la modification des pièces (13/06/2026)
 - ✅ **Correction Base vierge** : plus de lieu vide ou quantité 0 lors de l'initialisation (13/06/2026)
 - ✅ **Pagination Supabase (fetchAll)** : contournement de la limite des 1000 lignes pour charger la totalité du stock (13/06/2026)
+- ✅ **Agenda Intelligent (Nouveau Projet)** : Création complète de l'application React Native 100% hors-ligne.
+- ✅ **Moteur Phonétique Humanisé** : La voix parle le malgache et le français avec fluidité sans le défaut des terminaisons en "-ment".
+- ✅ **Thème Auto-Adaptatif** : Jour/Nuit dynamique basé sur l'horloge système.
+- ✅ **Personnalisation de l'IA (Bi-genrée)** : Noms séparés pour la femme et l'homme. Ciblage natif des identifiants Google TTS (fr-fr-x-frd) pour garantir une vraie voix masculine.
+- ✅ **Lecture Vocale Intuitive** : L'IA lit automatiquement le résumé lorsqu'on touche une date.
+- ✅ **Gestion du Silence** : Bouton Mute intelligent (icône Haut-Parleur vert/rouge).
+- ✅ **Sous-Titres (Closed Captioning)** : Bulle de dialogue affichant ce que l'IA prononce en temps réel.
+- ✅ **Salutation Contextuelle** : Bonjour ou Bonsoir dynamiquement calculé selon l'heure (seuil 18h).
+- ✅ **Édition des Tâches** : Modification des tâches et reprogrammation des alarmes à la volée.

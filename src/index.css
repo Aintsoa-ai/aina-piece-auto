@@ -65,6 +65,31 @@
   background: var(--primary);
 }
 
+/* Scrollbar at the top hack for specific tables */
+.scroll-top {
+  overflow-x: auto;
+  transform: rotateX(180deg);
+}
+.scroll-top > * {
+  transform: rotateX(180deg);
+}
+
+/* Scroll discret sur la div elle-même */
+.scroll-top::-webkit-scrollbar {
+  height: 4px; /* Très discret */
+}
+.scroll-top::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.scroll-top::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.scroll-top::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
 body {
   background-color: var(--bg-main);
   color: var(--text-main);

@@ -667,7 +667,7 @@ if (!isModalOpen) {
           <p style={{ marginTop: '12px', color: 'rgba(255,255,255,0.45)', fontSize: '13.5px' }}>Chargement du catalogue...</p>
         </div>
       ) : (
-        <div style={s.tableWrapper}>
+        <div style={s.tableWrapper} className="scroll-top">
           <table style={s.table}>
             <thead>
               <tr>

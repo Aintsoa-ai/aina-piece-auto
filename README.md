@@ -6,6 +6,11 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 **URL Production :** https://aina-piece-auto.vercel.app  
 **Repository :** https://github.com/Aintsoa-ai/aina-piece-auto
 
+## L'Écosystème Aina Pièce Auto :
+Le système se divise désormais en deux piliers :
+1. **L'ERP Web (Cloud & PWA)** : Pour la gestion multi-boutique, les stocks, et les caisses.
+2. **L'Agenda Intelligent (Mobile APK)** : Une application React Native 100% hors-ligne pour la gestion personnelle du gérant avec un assistant vocal intelligent bilingue (Français/Malgache).
+
 ---
 
 ## Fonctionnalités Actuelles (Validées et Opérationnelles)
@@ -104,6 +109,14 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 - Purge sélective : Transactions, Catalogue, Fournisseurs, Utilisateurs, Boutiques, Clients/Crédits, Caisse.
 - Admin "blindé" en dur — impossible d'effacer le compte admin.
 
+### 14. L'Agenda Intelligent (Application Mobile Compagnon)
+- **100% Hors-Ligne** : Construit avec React Native et AsyncStorage, aucune donnée ne quitte le téléphone.
+- **Moteur Vocal Hybride Humanisé** : Lit couramment le français et phonétise le malgache avec la vraie intonation locale. Recherche automatique des voix masculines/féminines premium de Google TTS.
+- **Thème Auto-Adaptatif (Time-Aware)** : Le design bascule de clair à sombre automatiquement en fonction du cycle solaire (06h00/18h00), avec salutations dynamiques.
+- **Assistant Personnalisable** : Paramétrage du nom pour chaque genre (ex: Aina pour Femme, Rado pour Homme), du genre et du rythme de la voix.
+- **Calendrier & Algorithme Astronomique** : Suivi des caisses quotidiennes et calcul interne autonome des fêtes mobiles malgaches (Pâques, Pentecôte, Ascension).
+- **UX "Magique"** : Lecture vocale au clic sur une date, sous-titres dynamiques synchronisés avec la voix (Closed Captioning), bouton Mute (silence) vert/rouge, et modification des tâches avec reprogrammation d'alarmes en temps réel.
+
 ---
 
 ## Compatibilité Matérielle
@@ -114,12 +127,14 @@ Application web (ERP) sur-mesure pour la gestion complète des boutiques Aina Pi
 
 ---
 
-## 📍 POINT DE SAUVEGARDE v3.8 — 13/06/2026 16:30 (Madagascar, UTC+3)
+## 📍 POINT DE SAUVEGARDE v4.1 — 14/06/2026 00:15 (Madagascar, UTC+3)
 
 **Hash Git :** `HEAD` (Stable)  
 **URL Production :** https://aina-piece-auto.vercel.app
 
-### Nouvelles fonctionnalités et améliorations validées (13/06/2026)
+### Nouvelles fonctionnalités et améliorations validées (13/06/2026 - 14/06/2026)
+- ✅ **Agenda Intelligent - UX Avancée** : Ajout des sous-titres vocaux, de la lecture sur clic de date, du mute dynamique, et de l'édition des tâches sans avoir à les supprimer.
+- ✅ **Agenda Intelligent - Humanisation** : Séparation des prénoms masculin/féminin de l'IA, ciblage des voix Google TTS premium masculines (`frd`), salutations contextuelles et suppression des défauts phonétiques (ex: les mots en -ment).
 - ✅ **Pagination Automatique Supabase** : Implémentation du système `fetchAll` contournant la limite silencieuse des 1000 lignes de Supabase, garantissant un affichage complet du catalogue et du stock.
 - ✅ **Correction Schéma SQL** : Alignement de l'application sur le schéma réel de la base de données (`stock_minimum` au lieu de `seuil_alerte`) réglant les échecs silencieux d'insertion.
 - ✅ **Affichage Date d'Arrivage** : Remplacement de l'affichage de la catégorie par la date d'arrivage (basée sur l'enregistrement) dans la liste des pièces.

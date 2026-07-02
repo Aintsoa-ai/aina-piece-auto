@@ -29,7 +29,17 @@ Voir les commits Git et `auDit.md` pour le détail complet des phases 1 à 13.
 - [x] **Pagination Supabase (fetchAll)** : Contournement de la limite par défaut de 1000 lignes pour garantir un catalogue et un stock complets.
 - [x] **Alignement Schéma de Base** : Retour à `stock_minimum` au lieu de `seuil_alerte` pour éviter les blocages silencieux.
 
-## Phase 17 : Améliorations Futures (À Planifier)
+## Phase 17 : Application Mobile "Agenda Intelligent" (13/06/2026 - 14/06/2026) ✅
+- [x] Création d'une application React Native (APK) totalement hors-ligne.
+- [x] Moteur vocal bilingue Français/Malgache avec prononciation humanisée et ciblage natif des voix premium.
+- [x] Système de Thème Auto-Adaptatif "Jour/Nuit" basé sur l'heure locale et salutations contextuelles.
+- [x] Base de données locale (AsyncStorage) pour les finances et l'agenda.
+- [x] Calcul astronomique embarqué pour les jours fériés malgaches mobiles.
+- [x] Personnalisation de l'IA (Bi-genrée, Noms indépendants) et paramètres de routines.
+- [x] UX Magique : Sous-titres dynamiques, lecture sur clic date, et bouton Mute intelligent.
+- [x] Modification des tâches à la volée sans suppression et reprogrammation des alarmes en temps réel.
+
+## Phase 18 : Améliorations Futures (À Planifier)
 - [ ] Toggle impression auto réactif sans rechargement page Ventes (useEffect storage listener).
 - [ ] Contrainte UNIQUE sur `code_barre` en base de données.
 - [ ] Limite temporelle Dashboard (30 derniers jours par défaut).

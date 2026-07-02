@@ -1,17 +1,28 @@
 # AUDIT TECHNIQUE — AINA PIÈCE AUTO ERP
-> Dernière mise à jour : **03/06/2026 — 16:05 (Madagascar, UTC+3)**
+> Dernière mise à jour : **14/06/2026 — 00:15 (Madagascar, UTC+3)**
 
 ---
 
-## ✅ POINT DE SAUVEGARDE CERTIFIÉ v3.7 — 13/06/2026 14:30
+## ✅ POINT DE SAUVEGARDE CERTIFIÉ v4.1 — 14/06/2026 00:15
 
 **Hash Git actuel :** `HEAD` (Stable)  
-**URL Production :** https://aina-piece-auto.vercel.app  
+**URL Production (ERP) :** https://aina-piece-auto.vercel.app  
 **Repository :** https://github.com/Aintsoa-ai/aina-piece-auto
 
 ---
 
 ## 🟢 FONCTIONNALITÉS VALIDÉES ET OPÉRATIONNELLES (13/06/2026)
+
+### Application Mobile "Agenda Intelligent" (React Native APK)
+| Fonctionnalité | Statut | Note |
+|---|---|---|
+| Moteur Phonétique | ✅ OK | **AMÉLIORÉ 14/06** — Lit parfaitement Français/Malgache (retrait du fix '-ment' problématique) |
+| Thème Auto-Adaptatif | ✅ OK | **NOUVEAU** — Changement UI dynamique selon l'horloge (Jour/Nuit) |
+| Mode Hors-Ligne Total | ✅ OK | **NOUVEAU** — AsyncStorage (0 dépendance Cloud) |
+| Configuration Assistante (Bi-genrée) | ✅ OK | **NOUVEAU 14/06** — Noms séparés (ex: Aina / Rado), ciblage natif des voix premium (fr-fr-x-frd) |
+| Algorithme Astronomique | ✅ OK | **NOUVEAU** — Calcul interne des fêtes de Pâques/Pentecôte/Ascension |
+| Lecture Intuitive & Sous-titres | ✅ OK | **NOUVEAU 14/06** — L'IA lit sur clic-date et affiche une bulle de sous-titres en temps réel |
+| Mute Dynamique & Édition de tâches | ✅ OK | **NOUVEAU 14/06** — Bouton Mute vert/rouge, et modification des tâches sans perte |
 
 ### Module Pièces & Impression Codes-barres (Pieces.tsx)
 | Fonctionnalité | Statut | Note |
@@ -122,6 +133,11 @@
 
 | Date | Bug | Fix |
 |---|---|---|
+| 14/06/2026 | Voix masculine ressemblant à une femme (Agenda) | Ciblage spécifique des identifiants Google TTS natifs (`fr-fr-x-frd`, `frb`, `fre`) pour garantir la virilité |
+| 14/06/2026 | Rendu des mots en "ment" (avancemon) | Suppression du remplacement phonétique `man` car les TTS natifs français lisent très bien le `ment` |
+| 14/06/2026 | Crash "Rendered more hooks" (Agenda) | Déplacement de la condition de chargement après la déclaration du Hook `useEffect` |
+| 13/06/2026 | Pièce enregistrée mais quantité/lieu invisibles | Contournement limite Supabase (1000 rows) via pagination (`fetchAll`) sur `stock` et `pieces` |
+| 13/06/2026 | Blocage silencieux (erreur `seuil_alerte`) | Alignement DB: Restauration `stock_minimum` et `emplacement` vs `seuil_alerte` |
 | 13/06/2026 | Recherche de pièces vide ("Aucune pièce trouvée") | Correction de la casse (`toLowerCase()`) sur les recherches (référence, code_barre) |
 | 13/06/2026 | Quantité qui ne change pas (ou mal) | Désactivation du forçage 'GLOBAL', sélection automatique de la bonne boutique lors de l'édition |
 | 13/06/2026 | Lieu "—" et quantité à 0 sur nouvelle pièce | Suppression du faux lieu par défaut `b1` empêchant l'insertion SQL dans la table stock |
@@ -173,7 +189,10 @@
 
 | Date | Hash | Statut |
 |---|---|---|
-| 13/06/2026 14:30 | `HEAD` | ✅ **STABLE** — Remplacement Categorie par Date d'Arrivage, corrections édition stock et recherche pièces |
+| 14/06/2026 00:15 | `HEAD` | ✅ **STABLE** — Finalisation Agenda (UX Magique, Sous-titres, Voix masculine native, Édition tâches) |
+| 13/06/2026 23:25 | `v4.0` | ✅ **STABLE** — Création de l'Agenda Intelligent (APK), Moteur vocal Bilingue Humanisé, Thème Dynamique Jour/Nuit |
+| 13/06/2026 16:30 | `v3.8` | ✅ **STABLE** — Correction limite Supabase 1000 lignes (`fetchAll`), retour au schéma `stock_minimum`, fiabilisation affichage quantité/lieu |
+| 13/06/2026 14:30 | `4081ac6` | ✅ **STABLE** — Remplacement Categorie par Date d'Arrivage, corrections édition stock et recherche pièces |
 | 03/06/2026 16:05 | `2c480fc` | ✅ **STABLE** — Standardisation EAN-13 déterministe (5cmx3cm) et scanner multimodule (Ventes, Achats, Stock, Pièces) |
 | 01/06/2026 16:35 | `9819ec3` | ✅ **STABLE** — Séparation visuelle des stocks par boutique (1 ligne/boutique), réparation colonne Actions (overflow/CSS) |
 | 01/06/2026 13:30 | `d29458c` | ✅ **STABLE** — Colonne Lieu, Filtre Boutique, Prix Panier éditable (UI/UX Amélioré) |
